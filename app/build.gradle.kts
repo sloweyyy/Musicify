@@ -40,8 +40,22 @@ dependencies {
     testImplementation(libs.junit)
     androidTestImplementation(libs.ext.junit)
     androidTestImplementation(libs.espresso.core)
-    val room_version = "2.5.0"
+    val room_version = "2.6.1"
+    //room & RxJava
     implementation("androidx.room:room-runtime:$room_version")
     annotationProcessor("androidx.room:room-compiler:$room_version")
-    implementation("androidx.recyclerview:recyclerview:1.2.1")
+    implementation("androidx.room:room-rxjava2:$room_version")
+    //recycle
+    implementation("androidx.recyclerview:recyclerview:1.3.2")
+    //retrofit
+    implementation ("com.squareup.retrofit2:retrofit:2.9.0")
+    implementation("com.squareup.retrofit2:converter-gson")
+    //RxJava
+    implementation ("io.reactivex.rxjava3:rxjava:3.1.8")
+    //LifeCycle & ViewModel & Model & Live Data
+    val lifecycle_version = "2.7.0"
+    // ViewModel
+    implementation("androidx.lifecycle:lifecycle-viewmodel:$lifecycle_version")
+    // LiveData
+    implementation("androidx.lifecycle:lifecycle-livedata:$lifecycle_version")
 }
