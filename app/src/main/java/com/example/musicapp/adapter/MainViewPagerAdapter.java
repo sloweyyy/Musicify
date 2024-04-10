@@ -4,7 +4,7 @@ import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentManager;
 import androidx.annotation.NonNull;
 import androidx.viewpager.widget.PagerAdapter;
-
+import androidx.fragment.*;
 import java.util.ArrayList;
 
 
