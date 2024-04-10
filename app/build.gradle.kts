@@ -51,8 +51,8 @@ dependencies {
     //recycle
     implementation("androidx.recyclerview:recyclerview:1.3.2")
     //retrofit
-    implementation ("com.squareup.retrofit2:retrofit:2.9.0")
-    //implementation("com.squareup.retrofit2:converter-gson")
+    implementation ("com.squareup.retrofit2:retrofit:2.11.0")
+    implementation ("com.squareup.retrofit2:converter-gson:2.10.0")
     //RxJava
     implementation ("io.reactivex.rxjava3:rxjava:3.1.8")
     //LifeCycle & ViewModel & Model & Live Data
