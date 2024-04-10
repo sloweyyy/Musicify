@@ -40,6 +40,9 @@ dependencies {
     testImplementation(libs.junit)
     androidTestImplementation(libs.ext.junit)
     androidTestImplementation(libs.espresso.core)
+    //gson
+    implementation ("com.google.code.gson:gson:2.10.1")
+    //
     val room_version = "2.6.1"
     //room & RxJava
     implementation("androidx.room:room-runtime:$room_version")
@@ -49,7 +52,7 @@ dependencies {
     implementation("androidx.recyclerview:recyclerview:1.3.2")
     //retrofit
     implementation ("com.squareup.retrofit2:retrofit:2.9.0")
-    implementation("com.squareup.retrofit2:converter-gson")
+    //implementation("com.squareup.retrofit2:converter-gson")
     //RxJava
     implementation ("io.reactivex.rxjava3:rxjava:3.1.8")
     //LifeCycle & ViewModel & Model & Live Data
