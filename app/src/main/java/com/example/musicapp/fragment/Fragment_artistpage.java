@@ -8,12 +8,12 @@ import android.support.v4.app.*;
 
 import com.example.musicapp.R;
 
-public class Fragment_Home extends Fragment {
+public class Fragment_artistpage extends Fragment{
     View view;
     @Nullable
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
-        view = inflater.inflate(R.layout.layout_home, container,false);
+        view = inflater.inflate(R.layout.layout_artistpage, container,false);
         return view;
     }
 }
