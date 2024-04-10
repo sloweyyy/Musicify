@@ -7,9 +7,17 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.graphics.Insets;
 import androidx.core.view.ViewCompat;
 import androidx.core.view.WindowInsetsCompat;
+import androidx.viewpager.widget.ViewPager;
+
+import com.example.musicapp.adapter.MainViewPagerAdapter;
+import com.example.musicapp.fragment.Fragment_Home;
+import com.example.musicapp.fragment.Fragment_artistpage;
+import com.google.android.material.tabs.TabLayout;
 
 public class MainActivity extends AppCompatActivity {
 
+    TabLayout tabLayout;
+    ViewPager viewPager;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -20,5 +28,22 @@ public class MainActivity extends AppCompatActivity {
             v.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom);
             return insets;
         });
+        anhxa();
+        init();
+    }
+    private void anhxa()
+    {
+        tabLayout = findViewById(R.id.myTabLayout);
+        viewPager = findViewById(R.id.myViewPaper);
+    }
+    private void init()
+    {
+        MainViewPagerAdapter mVPA = new MainViewPagerAdapter(getSupportFragmentManager());
+        mVPA.addFragment(new Fragment_Home());
+        mVPA.addFragment(new Fragment_artistpage());
+        viewPager.setAdapter(mVPA);
+        tabLayout.setupWithViewPager(viewPager);
+        tabLayout.getTabAt(0).setIcon(R.drawable.home2);
+        tabLayout.getTabAt(1).setIcon(R.drawable.heart1);
     }
 }
