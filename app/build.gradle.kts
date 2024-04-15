@@ -1,3 +1,5 @@
+import org.apache.tools.ant.util.JavaEnvUtils.VERSION_1_8
+
 plugins {
     alias(libs.plugins.androidApplication)
 }
@@ -8,7 +10,7 @@ android {
 
     defaultConfig {
         applicationId = "com.example.musicapp"
-        minSdk = 24
+        minSdk = 34
         targetSdk = 34
         versionCode = 1
         versionName = "1.0"
@@ -27,7 +29,6 @@ android {
         sourceCompatibility = JavaVersion.VERSION_1_8
         targetCompatibility = JavaVersion.VERSION_1_8
     }
-
 
 }
 
@@ -52,13 +53,13 @@ dependencies {
     implementation("androidx.recyclerview:recyclerview:1.3.2")
     //retrofit
     implementation ("com.squareup.retrofit2:retrofit:2.11.0")
-    implementation ("com.squareup.retrofit2:converter-gson:2.10.0")
+    implementation ("com.squareup.retrofit2:converter-gson:2.11.0")
     //RxJava
     implementation ("io.reactivex.rxjava3:rxjava:3.1.8")
     //LifeCycle & ViewModel & Model & Live Data
     val lifecycle_version = "2.7.0"
     // ViewModel
-    implementation("androidx.lifecycle:lifecycle-viewmodel:$lifecycle_version")
+    implementation("androidx.lifecycle:lifecycle-viewmodel:lifecycle_version")
     // LiveData
-    implementation("androidx.lifecycle:lifecycle-livedata:$lifecycle_version")
+    implementation("androidx.lifecycle:lifecycle-livedata:2.7.0")
 }
