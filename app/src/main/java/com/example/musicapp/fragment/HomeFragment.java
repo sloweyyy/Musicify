@@ -11,12 +11,11 @@ import androidx.fragment.app.Fragment;
 
 import com.example.musicapp.R;
 
-public class accountFragment extends Fragment {
-    View view;
+public class HomeFragment extends Fragment {
+
     @Nullable
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
-        view = inflater.inflate(R.layout.layout_account, container,false);
-        return view;
+        return inflater.inflate(R.layout.layout_home, container, false);
     }
 }
