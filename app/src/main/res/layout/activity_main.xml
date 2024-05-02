@@ -1,29 +1,38 @@
-
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
-    android:id="@+id/main"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical"
     tools:context=".MainActivity">
-    <androidx.viewpager.widget.ViewPager
-        android:id="@+id/myViewPaper"
+
+    <FrameLayout
+        android:id="@+id/frame_layout"
         android:layout_width="match_parent"
         android:layout_height="0dp"
-        android:layout_weight="1"
-        >
-    </androidx.viewpager.widget.ViewPager>
-    <com.google.android.material.tabs.TabLayout
-        android:id="@+id/myTabLayout"
+        android:layout_weight="1">
+
+    </FrameLayout>
+
+    <com.google.android.material.bottomappbar.BottomAppBar
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        app:tabIndicatorColor="#42C83C"
-        app:tabMode="fixed"
-        app:tabIndicatorHeight="4dp"
-        android:background="#737373"
-        >
-    </com.google.android.material.tabs.TabLayout>
-
-
+        android:layout_height="72dp"
+        android:layout_gravity="bottom"
+        android:id="@+id/bottomAppBar"
+        app:fabCradleMargin="10dp"
+        app:fabCradleRoundedCornerRadius="10dp"
+        app:fabCradleVerticalOffset="10dp"
+        tools:ignore="BottomAppBar">
+        <com.google.android.material.bottomnavigation.BottomNavigationView
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:id="@+id/bottomNavigationView"
+            android:layout_marginEnd="16dp"
+            app:menu="@menu/bottom_nav"
+            android:background="@drawable/transparent_background"
+            app:itemIconTint="@color/caribbean_current"
+            app:itemTextColor="@color/caribbean_current"
+            app:itemIconSize="32dp"
+            />
+    </com.google.android.material.bottomappbar.BottomAppBar>
 </LinearLayout>
