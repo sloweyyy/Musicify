@@ -1,4 +1,4 @@
 package com.example.musicapp.model;
 
-public class Album {
+public class Playlist {
 }
