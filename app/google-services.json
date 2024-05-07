@@ -1,0 +1,30 @@
+{
+  "project_info": {
+    "project_number": "356303471546",
+    "firebase_url": "https://musicappreal-default-rtdb.asia-southeast1.firebasedatabase.app",
+    "project_id": "musicappreal",
+    "storage_bucket": "musicappreal.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:356303471546:android:74a0ae6d672e1125a49383",
+        "android_client_info": {
+          "package_name": "com.example.musicapp"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCoNGRxx7pYX9hSaDBmYGlOuxrKp64fRck"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

@@ -6,4 +6,6 @@
     <color name="gray">#737373</color>
     <color name="dark_gray">#343434</color>
     <color name="caribbean_current">#216869</color>
+    <color name="btnColor">#30AF75</color>
+    <color name="linkTextColor">#288CE9</color>
 </resources>
