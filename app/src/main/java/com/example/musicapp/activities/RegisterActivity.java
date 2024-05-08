@@ -4,6 +4,7 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.text.method.PasswordTransformationMethod;
 import android.util.Log;
+import android.util.Patterns;
 import android.view.MotionEvent;
 import android.view.View;
 import android.widget.Button;
@@ -27,7 +28,9 @@ import com.google.firebase.auth.AuthResult;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.firestore.DocumentReference;
+import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
+import com.google.firebase.firestore.Transaction;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -38,6 +41,7 @@ public class RegisterActivity extends AppCompatActivity {
     TextView textSignInNow;
     boolean passwordVisible;
     EditText inputName,inputEmail,inputPassword;
+    TextView msgError;
     //private DocumentReference mFirestore = FirebaseFirestore.getInstance().document("user/user1");
 
     @Override
@@ -56,6 +60,7 @@ public class RegisterActivity extends AppCompatActivity {
         inputName = findViewById(R.id.inputName);
         inputPassword = findViewById(R.id.inputPassword);
         inputEmail = findViewById(R.id.inputEmail);
+        msgError = findViewById(R.id.msgError);
 
         inputPassword.setOnTouchListener(new View.OnTouchListener() {
             @Override
@@ -66,15 +71,11 @@ public class RegisterActivity extends AppCompatActivity {
                         int selection = inputPassword.getSelectionEnd();
 
                         if (passwordVisible) {
-                            // set drawable image here
                             inputPassword.setCompoundDrawablesRelativeWithIntrinsicBounds(0, 0, R.drawable.visibility_off_24dp,0);
-                            // For hide password
                             inputPassword.setTransformationMethod(PasswordTransformationMethod.getInstance());
                             passwordVisible = false;
                         } else {
-                            // set drawable image here
                             inputPassword.setCompoundDrawablesRelativeWithIntrinsicBounds(0,0, R.drawable.visibility_24dp, 0);
-                            // For show password
                             inputPassword.setTransformationMethod(null);
                             passwordVisible = true;
                         }
@@ -111,8 +112,19 @@ public class RegisterActivity extends AppCompatActivity {
                     return;
                 }
                 if(password.isEmpty()){
-                    inputPassword.setError("Password is required");
+                    msgError.setText("Password is required");
+                    msgError.setVisibility(View.VISIBLE);
                     inputPassword.requestFocus();
+                    return;
+                }
+                if(email.isEmpty() || !Patterns.EMAIL_ADDRESS.matcher(email).matches()){
+                    inputEmail.setError("Valid email is required");
+                    inputEmail.requestFocus();
+                    return;
+                }
+                if(password.length() < 6 ){
+                    msgError.setText("Password must be at least 6 characters");
+                    msgError.setVisibility(View.VISIBLE);
                     return;
                 }
                 mAuth.createUserWithEmailAndPassword(email, password)
@@ -125,26 +137,54 @@ public class RegisterActivity extends AppCompatActivity {
                                     FirebaseUser currentUser = mAuth.getCurrentUser();
                                     if(currentUser != null)
                                     {
-                                        DocumentReference mFirestore = FirebaseFirestore.getInstance()
-                                                .document("user/" + currentUser.getUid());
-                                        Map<String, Object> user = new HashMap<>();
-                                        user.put("Name", name);
-                                        mFirestore.set(user).addOnSuccessListener(new OnSuccessListener<Void>() {
-                                            @Override
-                                            public void onSuccess(Void unused) {
-                                                Log.d("TAG","User has been saved to database");
-                                            }
-                                        }).addOnFailureListener(new OnFailureListener() {
-                                            @Override
-                                            public void onFailure(@NonNull Exception e) {
-                                                Log.d("TAG","Error saving user to database");
-                                            }
-                                        });
-                                    }
+                                        FirebaseFirestore db = FirebaseFirestore.getInstance();
+                                        DocumentReference counterRef = db.collection("counters").document("userCounter");
+                                    counterRef.get().addOnSuccessListener(new OnSuccessListener<DocumentSnapshot>() {
+                                        @Override
+                                        public void onSuccess(DocumentSnapshot documentSnapshot) {
+                                            double newCounter = documentSnapshot.getDouble("counter") + 1;
+                                            counterRef.update("counter", newCounter).addOnSuccessListener(new OnSuccessListener<Void>() {
+                                                @Override
+                                                public void onSuccess(Void unused) {
+                                                    Log.d("TAG", "Counter Updated!");
+                                                    DocumentReference mFirestore = db.document("users/user" + newCounter);
 
-                                    Intent intent = new Intent(getApplicationContext(), LoginActivity.class);
-                                    startActivity(intent);
-                                    finish();
+                                                    Map<String, Object> user = new HashMap<>();
+                                                    user.put("Name", name);
+                                                    user.put("id", currentUser.getUid());
+                                                    user.put("password",password);
+                                                    user.put("email", email);
+                                                    mFirestore.set(user).addOnSuccessListener(new OnSuccessListener<Void>() {
+                                                        @Override
+                                                        public void onSuccess(Void unused) {
+                                                            Log.d("TAG", "User Data Saved Successfully!");
+
+                                                            Intent intent = new Intent(getApplicationContext(), LoginActivity.class);
+                                                            startActivity(intent);
+                                                            finish();
+                                                        }
+                                                    }).addOnFailureListener(new OnFailureListener() {
+                                                        @Override
+                                                        public void onFailure(@NonNull Exception e) {
+                                                            Log.w("TAG", "Failed to save user data.", e);
+                                                        }
+                                                    });
+
+                                                }
+                                            }).addOnFailureListener(new OnFailureListener() {
+                                                @Override
+                                                public void onFailure(@NonNull Exception e) {
+                                                    Log.w("TAG", "Failed to update counter.", e);
+                                                }
+                                            }).addOnFailureListener(new OnFailureListener() {
+                                                @Override
+                                                public void onFailure(@NonNull Exception e) {
+                                                    Log.w("TAG", "Failed to get counter.", e);
+                                                }
+                                            });
+                                        }
+                                    });
+                                    }
                                 } else {
                                     Toast.makeText(RegisterActivity.this, "Authentication failed.",
                                             Toast.LENGTH_SHORT).show();

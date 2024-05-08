@@ -2,6 +2,7 @@ package com.example.musicapp.activities;
 
 import android.content.Intent;
 import android.os.Bundle;
+import android.os.Handler;
 import android.text.method.PasswordTransformationMethod;
 import android.view.MotionEvent;
 import android.view.View;
@@ -26,6 +27,8 @@ import com.google.android.gms.tasks.Task;
 import com.google.firebase.Firebase;
 import com.google.firebase.auth.AuthResult;
 import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseAuthInvalidCredentialsException;
+import com.google.firebase.auth.FirebaseAuthInvalidUserException;
 import com.google.firebase.auth.FirebaseUser;
 
 public class LoginActivity extends AppCompatActivity {
@@ -34,6 +37,7 @@ public class LoginActivity extends AppCompatActivity {
     Button btnSignIn;
     TextView btnRegisterNow;
     EditText editEmail,editPassword;
+    TextView msgError;
     TextView textForgetPassword;
     boolean passwordVisible;
 //    @Override
@@ -67,6 +71,17 @@ public class LoginActivity extends AppCompatActivity {
         btnRegisterNow = findViewById(R.id.registerPath);
         btnSignIn= findViewById(R.id.btnSignIn);
         textForgetPassword = findViewById(R.id.forgetPassword);
+        msgError = findViewById(R.id.msgError);
+
+        //logic
+        textForgetPassword.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent intent = new Intent(getApplicationContext(),ForgetPasswordActivity.class);
+                startActivity(intent);
+                finish();
+            }
+        });
         editPassword.setOnTouchListener(new View.OnTouchListener() {
             @Override
             public boolean onTouch(View v, MotionEvent event) {
@@ -129,10 +144,31 @@ public class LoginActivity extends AppCompatActivity {
                                     Intent intent = new Intent(getApplicationContext(), MainActivity.class);
                                     startActivity(intent);
                                     finish();
+                                    msgError.setVisibility(View.GONE);
 
                                 } else {
-                                    Toast.makeText(LoginActivity.this, "Authentication failed.",
-                                            Toast.LENGTH_SHORT).show();
+                                    try {
+                                        throw task.getException();
+                                    }
+                                    // If sign-in fails, display a message to the user.
+                                    catch(FirebaseAuthInvalidUserException e) {
+                                        msgError.setText("Account doesn't exist");
+                                        msgError.setVisibility(View.VISIBLE);
+                                    }
+                                    catch(FirebaseAuthInvalidCredentialsException e) {
+                                        msgError.setText("Invalid email or password");
+                                        msgError.setVisibility(View.VISIBLE);
+                                    }
+                                    catch(Exception e) {
+                                        msgError.setText("Authentication failed");
+                                        msgError.setVisibility(View.VISIBLE);
+                                    }
+                                    new Handler().postDelayed(new Runnable() {
+                                        @Override
+                                        public void run() {
+                                            msgError.setVisibility(View.GONE);
+                                        }
+                                    }, 4000);
                                 }
                             }
                         });
