@@ -8,4 +8,5 @@
     <color name="caribbean_current">#216869</color>
     <color name="btnColor">#30AF75</color>
     <color name="linkTextColor">#288CE9</color>
+    <color name="errorColor">#F32323</color>
 </resources>
