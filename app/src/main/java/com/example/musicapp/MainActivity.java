@@ -23,6 +23,8 @@ public class MainActivity extends AppCompatActivity {
         binding = ActivityMainBinding.inflate(getLayoutInflater());
         setContentView(binding.getRoot());
 
+        // test bottom sheet
+
         replaceFragment(new HomeFragment());
         binding.bottomNavigationView.setBackground(null);
 
