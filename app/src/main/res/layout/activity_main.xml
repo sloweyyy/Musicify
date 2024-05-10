@@ -22,7 +22,8 @@
         app:fabCradleMargin="10dp"
         app:fabCradleRoundedCornerRadius="10dp"
         app:fabCradleVerticalOffset="10dp"
-        tools:ignore="BottomAppBar">
+        tools:ignore="BottomAppBar"
+        android:backgroundTint="@color/dark_gray">
         <com.google.android.material.bottomnavigation.BottomNavigationView
             android:layout_width="match_parent"
             android:layout_height="match_parent"
