@@ -1,6 +1,8 @@
 package com.example.musicapp.activities;
 
+import android.content.Intent;
 import android.os.Bundle;
+import android.widget.Button;
 
 import androidx.activity.EdgeToEdge;
 import androidx.appcompat.app.AppCompatActivity;
@@ -11,7 +13,7 @@ import androidx.core.view.WindowInsetsCompat;
 import com.example.musicapp.R;
 
 public class ThemeActivity extends AppCompatActivity {
-
+    Button btnContinue;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -21,6 +23,12 @@ public class ThemeActivity extends AppCompatActivity {
             Insets systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars());
             v.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom);
             return insets;
+        });
+        btnContinue = findViewById(R.id.btnContinue);
+        btnContinue.setOnClickListener(v -> {
+            Intent intent = new Intent(getApplicationContext(), RegisterOrSignUp.class);
+            startActivity(intent);
+            finish();
         });
     }
 }

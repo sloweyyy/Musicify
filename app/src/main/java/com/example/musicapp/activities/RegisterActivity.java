@@ -37,7 +37,7 @@ import java.util.Map;
 
 public class RegisterActivity extends AppCompatActivity {
     FirebaseAuth mAuth;
-    Button  btnRegister;
+    Button  btnRegister,iconBack;
     TextView textSignInNow;
     boolean passwordVisible;
     EditText inputName,inputEmail,inputPassword;
@@ -61,7 +61,16 @@ public class RegisterActivity extends AppCompatActivity {
         inputPassword = findViewById(R.id.inputPassword);
         inputEmail = findViewById(R.id.inputEmail);
         msgError = findViewById(R.id.msgError);
+        iconBack= findViewById(R.id.iconBack);
 
+        iconBack.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent intent = new Intent(getApplicationContext(), RegisterOrSignUp.class);
+                startActivity(intent);
+                finish();
+            }
+        });
         inputPassword.setOnTouchListener(new View.OnTouchListener() {
             @Override
             public boolean onTouch(View v, MotionEvent event) {
