@@ -83,14 +83,14 @@
 
                     <ImageView
                         android:id="@+id/iconLikedSongs"
-                        android:layout_width="30dp"
-                        android:layout_height="30dp"
-                        android:layout_gravity="center"
-                        android:clickable="true"
-                        android:focusable="true"
-                        android:paddingLeft="8dp"
-                        android:src="@drawable/heart_svgrepo_com"
-                        android:tint="@color/caribbean_current" />
+                    android:layout_width="30dp"
+                    android:layout_height="30dp"
+                    android:layout_gravity="center"
+                    android:clickable="true"
+                    android:focusable="true"
+                    android:paddingLeft="8dp"
+                    android:src="@drawable/heart_svgrepo_com"
+                    android:tint="@color/caribbean_current" />
 
                     <!-- Text for liked songs -->
                     <TextView

@@ -1,40 +1,19 @@
 package com.example.musicapp.fragment;
 
-import android.app.AppComponentFactory;
 import android.os.Bundle;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.Button;
-import android.widget.EditText;
-import android.widget.ImageView;
-import android.widget.Switch;
-import android.widget.Toast;
+import android.widget.TextView;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
-import androidx.appcompat.app.AppCompatActivity;
 import androidx.fragment.app.Fragment;
-import androidx.recyclerview.widget.LinearLayoutManager;
-import androidx.recyclerview.widget.RecyclerView;
-import androidx.viewpager.widget.ViewPager;
 import androidx.viewpager2.widget.ViewPager2;
 
 import com.example.musicapp.R;
-import com.example.musicapp.adapter.PlaylistAdapter;
 import com.example.musicapp.adapter.TabFavoriteAdapter;
-import com.example.musicapp.model.Playlist;
-import com.google.android.gms.tasks.OnFailureListener;
-import com.google.android.gms.tasks.OnSuccessListener;
-import com.google.android.material.bottomsheet.BottomSheetDialog;
 import com.google.android.material.tabs.TabLayout;
-import com.google.firebase.auth.FirebaseAuth;
-import com.google.firebase.firestore.DocumentReference;
-import com.google.firebase.firestore.FirebaseFirestore;
-
-import java.util.ArrayList;
-import java.util.List;
 
 public class FavouriteFragment extends Fragment {
 
@@ -51,13 +30,26 @@ public class FavouriteFragment extends Fragment {
 
         tabLayout = view.findViewById(R.id.tablayout);
         viewPager2 = view.findViewById(R.id.viewpager);
-//        tabFavoriteAdapter = new TabFavoriteAdapter(this);
         tabFavoriteAdapter = new TabFavoriteAdapter(getActivity());
         viewPager2.setAdapter(tabFavoriteAdapter);
+
+        // Đặt nội dung cho tab đầu tiên ngay từ ban đầu
+        TabLayout.Tab firstTab = tabLayout.getTabAt(0);
+        if (firstTab != null) {
+            String firstTabText = firstTab.getText().toString();
+            TextView textView = view.findViewById(R.id.textView);
+            textView.setText(firstTabText);
+        }
         tabLayout.addOnTabSelectedListener(new TabLayout.OnTabSelectedListener() {
             @Override
             public void onTabSelected(TabLayout.Tab tab) {
                 viewPager2.setCurrentItem(tab.getPosition());
+                // Lấy nội dung của TabItem được chọn
+                String selectedTabText = tab.getText().toString();
+
+                // Cập nhật nội dung của TextView
+                TextView textView = view.findViewById(R.id.textView);
+                textView.setText(selectedTabText);
             }
 
             @Override
