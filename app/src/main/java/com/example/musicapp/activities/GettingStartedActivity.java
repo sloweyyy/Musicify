@@ -42,6 +42,7 @@ public class GettingStartedActivity extends AppCompatActivity {
         typingt = findViewById(R.id.typingt);
         btnStart = findViewById(R.id.btnStart);
         Glide.with(this).load(R.drawable.gif_background).into(gif);
+        handler = new Handler(Looper.getMainLooper());
         typingTextEffect();
         btnStart.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -54,7 +55,7 @@ public class GettingStartedActivity extends AppCompatActivity {
 
     }
     private void typingTextEffect() {
-        handler = new Handler(Looper.getMainLooper());
+
         handler.postDelayed(new Runnable() {
             @Override
             public void run() {
