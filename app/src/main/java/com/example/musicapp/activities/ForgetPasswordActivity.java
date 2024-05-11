@@ -45,6 +45,15 @@ public class ForgetPasswordActivity extends AppCompatActivity {
         inputResetEmail = findViewById(R.id.inputResetEmail);
         mAuth= FirebaseAuth.getInstance();
 
+        iconBack.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent intent = new Intent(getApplicationContext(), LoginActivity.class);
+                startActivity(intent);
+                finish();
+            }
+        });
+
         //btnReset
         btnResetPassword.setOnClickListener(v -> {
             String email = inputResetEmail.getText().toString().trim();
@@ -71,14 +80,7 @@ public class ForgetPasswordActivity extends AppCompatActivity {
                             }
                         });
             }
-            iconBack.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View v) {
-                    Intent intent = new Intent(getApplicationContext(), LoginActivity.class);
-                    startActivity(intent);
-                    finish();
-                }
-            });
+
         });
     }
 }
