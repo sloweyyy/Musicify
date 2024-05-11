@@ -111,6 +111,7 @@ public class FavouriteFragment extends Fragment {
 
         recyclerView.setLayoutManager(new LinearLayoutManager(getActivity()));
 
+
         return view;
     }
 }
