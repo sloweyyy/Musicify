@@ -9,4 +9,7 @@
     <color name="btnColor">#30AF75</color>
     <color name="linkTextColor">#288CE9</color>
     <color name="errorColor">#F32323</color>
+    <color name="themeBackground">#626855</color>
+    <color name="btnPressed">#2BA16B</color>
+    <color name ="textColor">#ffffff</color>
 </resources>
