@@ -25,7 +25,8 @@ public class GettingStartedActivity extends AppCompatActivity {
     private String fullText = "Your ultimate music experience";
     private int index = 0;
     Button btnStart;
-    private Handler handler = new Handler();
+    Handler handler;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -53,6 +54,7 @@ public class GettingStartedActivity extends AppCompatActivity {
 
     }
     private void typingTextEffect() {
+        handler = new Handler(Looper.getMainLooper());
         handler.postDelayed(new Runnable() {
             @Override
             public void run() {
