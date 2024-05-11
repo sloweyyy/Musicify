@@ -3,40 +3,35 @@ package com.example.musicapp.adapter;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
+import androidx.fragment.app.FragmentActivity;
 import androidx.fragment.app.FragmentManager;
-import androidx.fragment.app.FragmentPagerAdapter;
-import androidx.fragment.app.FragmentStatePagerAdapter;
+import androidx.viewpager2.adapter.FragmentStateAdapter;
+
+import com.example.musicapp.fragment.AlbumsFragment;
+import com.example.musicapp.fragment.ArtistsFragment;
+import com.example.musicapp.fragment.PlaylistsFragment;
 
 import java.util.ArrayList;
 
-public class TabFavoriteAdapter extends FragmentPagerAdapter {
-    private final ArrayList<Fragment> fragmentArrayList = new ArrayList<>();
-    private ArrayList<String> fragmentTitle = new ArrayList<>();
+public class TabFavoriteAdapter extends FragmentStateAdapter {
 
-    public TabFavoriteAdapter(@NonNull FragmentManager fm, int behavior) {
-        super(fm, behavior);
-
+    public TabFavoriteAdapter(@NonNull FragmentActivity fragmentActivity) {
+        super(fragmentActivity);
     }
 
     @NonNull
     @Override
-    public Fragment getItem(int position) {
-        return fragmentArrayList.get(position);
+    public Fragment createFragment(int position) {
+        switch (position) {
+            case 0: return new PlaylistsFragment();
+            case 1: return new ArtistsFragment();
+            case 2: return new AlbumsFragment();
+            default: return new PlaylistsFragment();
+        }
     }
 
     @Override
-    public int getCount() {
-        return fragmentArrayList.size();
-    }
-
-    @Nullable
-    @Override
-    public CharSequence getPageTitle(int position) {
-        return fragmentTitle.get(position);
-    }
-
-    public void addFragment(Fragment fragment, String title) {
-        fragmentArrayList.add(fragment);
-        fragmentTitle.add(title);
+    public int getItemCount() {
+        return 3;
     }
 }
