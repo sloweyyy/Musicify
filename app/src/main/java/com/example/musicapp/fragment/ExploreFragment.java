@@ -15,29 +15,37 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.musicapp.R;
 import com.example.musicapp.adapter.exploreAdapter;
-import com.example.musicapp.model.Category;
-import com.example.musicapp.model.TokenResponse;
-import com.example.musicapp.service.SpotifyAuthService;
-import com.google.gson.Gson;
 
-import java.io.IOException;
-import java.util.Base64;
-import java.util.List;
+
+import com.example.musicapp.adapter.FetchAccessToken;
 
 import retrofit2.Call;
 import retrofit2.Callback;
-import retrofit2.Response;
 import retrofit2.Retrofit;
 import retrofit2.converter.gson.GsonConverterFactory;
+import java.io.IOException;
+
+import java.util.List;
+
+import com.example.musicapp.model.Category;
+import com.google.gson.Gson;
+
+import retrofit2.Response;
 import retrofit2.http.GET;
 import retrofit2.http.Header;
 import retrofit2.http.Path;
+import org.json.*;
 
-public class ExploreFragment extends Fragment {
+
+public class ExploreFragment extends Fragment implements FetchAccessToken.AccessTokenCallback {
     View view;
-
     RecyclerView recyclerView;
-
+    private FetchAccessToken fetchAccessToken;
+    @Override
+    public void onTokenReceived(String accessToken)
+    {
+        fetchCategories(accessToken);
+    }
     @Nullable
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
@@ -46,71 +54,9 @@ public class ExploreFragment extends Fragment {
         int spanCount = 2;
         GridLayoutManager layoutManager = new GridLayoutManager(getActivity(), spanCount);
         recyclerView.setLayoutManager(layoutManager);
-
-        getTokenFromSpotify(new AccessTokenCallback() {
-            @Override
-            public void onTokenReceived(String accessToken) {
-                fetchCategories(accessToken);
-            }
-        });
+        fetchAccessToken = new FetchAccessToken();
+        fetchAccessToken.getTokenFromSpotify(this);
         return view;
-    }
-
-    public String getTokenFromSpotify(final AccessTokenCallback callback) {
-        Retrofit retrofit = new Retrofit.Builder().baseUrl("https://accounts.spotify.com/api/").addConverterFactory(GsonConverterFactory.create()).build();
-
-        SpotifyAuthService authService = retrofit.create(SpotifyAuthService.class);
-        final AccessTokenWrapper accessTokenWrapper = new AccessTokenWrapper();
-        String credentials = "19380ddfc0344af29cb61de3c6655fda:1b0bf947882f4b89a1705cc65443ae9c";
-        String authoToken = Base64.getEncoder().encodeToString(credentials.getBytes());
-        String authorization = "Basic " + authoToken;
-        String grantType = "client_credentials";
-        String contentType = "application/x-www-form-urlencoded";
-
-        Call<TokenResponse> call = authService.getToken(authorization, contentType, grantType);
-        call.enqueue(new Callback<TokenResponse>() {
-            @Override
-            public void onResponse(Call<TokenResponse> call, Response<TokenResponse> response) {
-                if (response.isSuccessful()) {
-                    TokenResponse tokenResponse = response.body();
-                    if (tokenResponse != null) {
-                        String accessToken = tokenResponse.accessToken;
-                        Toast.makeText(getActivity(), "Access Token: " + accessToken, Toast.LENGTH_SHORT).show();
-                        accessTokenWrapper.setAccessToken(accessToken);
-                        callback.onTokenReceived(accessToken);
-                    }
-
-                } else {
-                    try {
-                        String errorBody = response.errorBody().string(); // Lấy thông tin lỗi từ phản hồi
-                        Toast.makeText(getActivity(), "API Call failed: " + errorBody, Toast.LENGTH_SHORT).show();
-                    } catch (IOException e) {
-                        e.printStackTrace();
-                    }
-                }
-
-            }
-
-            @Override
-            public void onFailure(Call<TokenResponse> call, Throwable t) {
-                String errorMessage = t.getMessage(); // Lấy thông báo lỗi
-                Toast.makeText(getActivity(), "API Call failed: " + errorMessage, Toast.LENGTH_SHORT).show();
-            }
-        });
-
-        return accessTokenWrapper.getAccessToken();
-    }
-
-    public static class AccessTokenWrapper {
-        private String accessToken;
-
-        public void setAccessToken(String accessToken) {
-            this.accessToken = accessToken;
-        }
-
-        public String getAccessToken() {
-            return accessToken;
-        }
     }
 
     public interface SpotifyApiService {
@@ -175,8 +121,8 @@ public class ExploreFragment extends Fragment {
             @Override
             public void onResponse(Call<CategoryResponse> call, Response<CategoryResponse> response) {
 
-                if (response.isSuccessful()) {
-
+                if (response.isSuccessful())
+                {
 
                     Gson gson = new Gson();
                     String jsonResponse = gson.toJson(response.body());
@@ -217,4 +163,6 @@ public class ExploreFragment extends Fragment {
     public interface AccessTokenCallback {
         void onTokenReceived(String accessToken);
     }
+
+
 }
