@@ -1,5 +1,5 @@
 [versions]
-agp = "8.3.2"
+agp = "8.4.0"
 junit = "4.13.2"
 junitVersion = "1.1.5"
 espressoCore = "3.5.1"
@@ -10,7 +10,6 @@ constraintlayout = "2.1.4"
 googleServices = "4.4.1"
 firebaseAuth = "23.0.0"
 glide = "5.0.0-rc01"
-
 
 [libraries]
 junit = { group = "junit", name = "junit", version.ref = "junit" }
