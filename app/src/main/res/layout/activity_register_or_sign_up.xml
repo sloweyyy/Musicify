@@ -1,0 +1,89 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/main"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context=".activities.RegisterOrSignUp">
+    <LinearLayout
+        android:layout_width="35dp"
+        android:layout_height="35dp"
+        android:layout_marginTop="20dp"
+        android:orientation="horizontal"
+        android:gravity="center"
+        android:layout_marginLeft="15dp"
+        android:background="@drawable/back_btn_custom">
+
+        <Button
+            android:id="@+id/iconBack"
+            android:layout_width="25dp"
+            android:layout_height="25dp"
+            android:paddingLeft="28dp"
+            android:layout_marginLeft="10dp"
+            android:background="@drawable/arrow_back"
+            app:backgroundTint="@android:color/white"
+            />
+
+    </LinearLayout>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:orientation="vertical"
+        android:gravity="center"
+        android:layout_marginBottom="160dp"
+        android:layout_height="match_parent">
+    <ImageView
+        android:layout_width="160dp"
+        android:layout_height="150dp"
+        android:src="@drawable/logo"
+        />
+        <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="17dp"
+        android:text="Musicify"
+        android:textSize="30dp"
+        android:textAlignment="center"
+        />
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginLeft="15dp"
+            android:layout_marginRight="15dp"
+            android:layout_marginBottom="20dp"
+            android:text="Musicify is the go-to Vietnamese music app, offering a wide range of tracks, personalized playlists."
+            android:textSize="14dp"
+            android:textAlignment="center"
+            />
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:orientation="horizontal"
+            android:gravity="center"
+            android:layout_height="wrap_content">
+            <Button
+                android:id="@+id/btnRegister"
+                android:layout_width="160dp"
+                android:layout_marginLeft="24dp"
+                android:layout_marginRight="24dp"
+                android:text="Register"
+                app:backgroundTint="@color/btnColor"
+                android:layout_height="70dp"
+                android:textColor="@color/textColor"
+                android:background="@drawable/button_custom_selector"
+                />
+            <Button
+                android:id="@+id/btnSignIn"
+                android:layout_width="160dp"
+                android:layout_marginLeft="24dp"
+                android:layout_marginRight="24dp"
+                android:text="Sign in"
+                android:textColor="@color/textColor"
+                app:backgroundTint="@color/btnColor"
+                android:layout_height="70dp"
+                android:background="@drawable/button_custom_selector"
+                />
+        </LinearLayout>
+    </LinearLayout>
+
+</RelativeLayout>

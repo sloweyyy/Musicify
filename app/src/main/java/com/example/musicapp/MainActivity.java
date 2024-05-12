@@ -1,54 +1,47 @@
 package com.example.musicapp;
 
-import static com.example.musicapp.R.id.*;
-
-import android.os.Binder;
 import android.os.Bundle;
-import android.renderscript.ScriptGroup;
-import android.view.MenuItem;
 
-import androidx.activity.EdgeToEdge;
 import androidx.appcompat.app.AppCompatActivity;
-import androidx.core.graphics.Insets;
-import androidx.core.view.ViewCompat;
-import androidx.core.view.WindowInsetsCompat;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentManager;
 import androidx.fragment.app.FragmentTransaction;
-import androidx.room.RoomSQLiteQuery;
-import androidx.viewpager.widget.ViewPager;
 
-import com.example.musicapp.fragment.Fragment_Home;
-import com.example.musicapp.fragment.Fragment_artistpage;
-import com.example.musicapp.fragment.accountFragment;
-import com.example.musicapp.fragment.exploreFragmant;
+import com.example.musicapp.fragment.FavouriteFragment;
+import com.example.musicapp.fragment.HomeFragment;
+import com.example.musicapp.fragment.ProfileFragment;
+import com.example.musicapp.fragment.ExploreFragment;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
-import com.google.android.material.tabs.TabLayout;
 
-import java.util.Objects;
+import com.example.musicapp.databinding.ActivityMainBinding;
 
 public class MainActivity extends AppCompatActivity {
-
+    ActivityMainBinding binding;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_main);
-        BottomNavigationView bottomBar = findViewById(R.id.bottomBar);
+        binding = ActivityMainBinding.inflate(getLayoutInflater());
+        setContentView(binding.getRoot());
 
-       bottomBar.setOnItemSelectedListener(item ->
-                {
-                    int itemId = item.getItemId();
-                    if (itemId == R.id.homeTab) {
-                        replaceFragment(new Fragment_Home());
-                    } else if (itemId == R.id.exploreTab) {
-                        replaceFragment(new exploreFragmant());
-                    } else if (itemId == R.id.accountTab) {
-                        replaceFragment(new accountFragment());
-                    }
-                    return true;
-                }
-                );
-        replaceFragment(new Fragment_Home());
+        // test bottom sheet
+
+        replaceFragment(new HomeFragment());
+        binding.bottomNavigationView.setBackground(null);
+
+        binding.bottomNavigationView.setOnItemSelectedListener(item -> {
+
+            if (item.getItemId() == R.id.home) {
+                replaceFragment(new HomeFragment());
+            } else if (item.getItemId() == R.id.search) {
+                replaceFragment(new ExploreFragment());
+            } else if (item.getItemId() == R.id.favourite) {
+                replaceFragment(new FavouriteFragment());
+            } else if (item.getItemId() == R.id.profile) {
+                replaceFragment(new ProfileFragment());
+            }
+
+            return true;
+        });
     }
     private void replaceFragment(Fragment fragment)
     {

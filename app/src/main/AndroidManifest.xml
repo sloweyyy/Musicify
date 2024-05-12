@@ -2,6 +2,8 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools">
 
+    <uses-permission android:name="android.permission.INTERNET" />
+
     <application
         android:allowBackup="true"
         android:dataExtractionRules="@xml/data_extraction_rules"
@@ -10,20 +12,29 @@
         android:label="@string/app_name"
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
-        android:theme="@style/Theme.MusicApp"
-        tools:targetApi="31">
+        android:theme="@style/Theme.Material3.Dark.NoActionBar">
+        <activity
+            android:name=".activities.RegisterOrSignUp"
+            android:exported="false" />
+        <activity
+            android:name=".activities.RegisterActivity"
+            android:exported="false" />
+        <activity
+            android:name=".activities.ThemeActivity"
+            android:exported="false" />
+        <activity
+            android:name=".activities.ForgetPasswordActivity"
+            android:exported="false" />
         <activity
             android:name=".MainActivity"
-<<<<<<< Updated upstream
-=======
-            android:exported="true" >
+            android:exported="false">
+
         </activity>
         <activity
             android:name=".activities.LoginActivity"
             android:exported="false" />
         <activity
-            android:name=".activities.RegisterActivity"
->>>>>>> Stashed changes
+            android:name=".activities.GettingStartedActivity"
             android:exported="true">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
@@ -31,6 +42,7 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
+
     </application>
 
 </manifest>
