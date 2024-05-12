@@ -1,10 +1,7 @@
 package com.example.musicapp.fragment;
-import androidx.fragment.app.Fragment;
 
-import android.app.AppComponentFactory;
 import android.os.Bundle;
 import android.util.Log;
-
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -12,15 +9,16 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.Switch;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
+import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.musicapp.R;
 import com.example.musicapp.adapter.PlaylistAdapter;
-import com.example.musicapp.adapter.TabFavoriteAdapter;
 import com.example.musicapp.model.Playlist;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
@@ -39,9 +37,11 @@ public class PlaylistsFragment extends Fragment {
     private RecyclerView recyclerView;
     private PlaylistAdapter adapter;
 
+
+
+
     @Override
-    public View onCreateView(LayoutInflater inflater, ViewGroup container,
-                             Bundle savedInstanceState) {
+    public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         // Inflate the layout for this fragment
         view = inflater.inflate(R.layout.fragment_playlists, container, false);
         recyclerView = view.findViewById(R.id.recyclerView);
@@ -54,8 +54,10 @@ public class PlaylistsFragment extends Fragment {
         adapter.fetchPlaylists();
 
 
-        ImageView addPlaylist = view.findViewById(R.id.iconAddPlaylist);
-        addPlaylist.setOnClickListener(new View.OnClickListener() {
+        ImageView addPlaylistIcon = view.findViewById(R.id.iconAddPlaylist);
+        TextView addPlaylistText = view.findViewById(R.id.textAddPlaylist);
+
+        View.OnClickListener addPlaylistClickListener = new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 BottomSheetDialog bottomSheetDialog = new BottomSheetDialog(getActivity());
@@ -107,11 +109,40 @@ public class PlaylistsFragment extends Fragment {
 
 
             }
-        });
+        };
+
+        addPlaylistIcon.setOnClickListener(addPlaylistClickListener);
+        addPlaylistText.setOnClickListener(addPlaylistClickListener);
+
+
+        ImageView recentlyPlayedIcon = view.findViewById(R.id.iconRecentlyPlayed);
+        TextView recentlyPlayedText = view.findViewById(R.id.textRecentlyPlayed);
+        final boolean[] isRecentlyPlayed = {false};
+
+        View.OnClickListener recentlyPlayedClickListener = new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                isRecentlyPlayed[0] = !isRecentlyPlayed[0];
+                if (isRecentlyPlayed[0]) {
+                    recentlyPlayedIcon.setImageResource(R.drawable.down_arrow);
+                    recentlyPlayedText.setText("Hide Recently Played");
+                    adapter.sortPlaylistByName();
+                } else {
+                    recentlyPlayedIcon.setImageResource(R.drawable.up_arrow);
+                    recentlyPlayedText.setText("Recently Played");
+                    adapter.sortPlaylistByPrivacy();
+                }
+            }
+        };
+
+        recentlyPlayedIcon.setOnClickListener(recentlyPlayedClickListener);
+        recentlyPlayedText.setOnClickListener(recentlyPlayedClickListener);
 
         recyclerView.setLayoutManager(new LinearLayoutManager(getActivity()));
 
 
         return view;
     }
+
+
 }
