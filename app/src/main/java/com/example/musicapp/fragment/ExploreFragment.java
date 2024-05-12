@@ -1,37 +1,29 @@
 package com.example.musicapp.fragment;
+
 import android.app.AlertDialog;
-import android.content.Context;
 import android.os.Bundle;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Toast;
+
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.GridLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
-import com.example.musicapp.fragment.CenterSpaceItemDecoration;
+
 import com.example.musicapp.R;
 import com.example.musicapp.adapter.exploreAdapter;
+import com.example.musicapp.model.Category;
 import com.example.musicapp.model.TokenResponse;
 import com.example.musicapp.service.SpotifyAuthService;
+import com.google.gson.Gson;
 
-<<<<<<< Updated upstream:app/src/main/java/com/example/musicapp/fragment/exploreFragmant.java
-public class exploreFragmant extends Fragment {
-=======
 import java.io.IOException;
-import java.util.ArrayList;
 import java.util.Base64;
 import java.util.List;
 
-import com.example.musicapp.model.Category;
-import com.google.gson.Gson;
-import com.google.gson.annotations.SerializedName;
-
-import okhttp3.MediaType;
-import okhttp3.RequestBody;
 import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
@@ -40,9 +32,8 @@ import retrofit2.converter.gson.GsonConverterFactory;
 import retrofit2.http.GET;
 import retrofit2.http.Header;
 import retrofit2.http.Path;
-import org.json.*;
+
 public class ExploreFragment extends Fragment {
->>>>>>> Stashed changes:app/src/main/java/com/example/musicapp/fragment/ExploreFragment.java
     View view;
 
     RecyclerView recyclerView;
@@ -65,12 +56,8 @@ public class ExploreFragment extends Fragment {
         return view;
     }
 
-    public String getTokenFromSpotify(final AccessTokenCallback callback)
-    {
-        Retrofit retrofit = new Retrofit.Builder()
-                .baseUrl("https://accounts.spotify.com/api/")
-                .addConverterFactory(GsonConverterFactory.create())
-                .build();
+    public String getTokenFromSpotify(final AccessTokenCallback callback) {
+        Retrofit retrofit = new Retrofit.Builder().baseUrl("https://accounts.spotify.com/api/").addConverterFactory(GsonConverterFactory.create()).build();
 
         SpotifyAuthService authService = retrofit.create(SpotifyAuthService.class);
         final AccessTokenWrapper accessTokenWrapper = new AccessTokenWrapper();
@@ -113,6 +100,7 @@ public class ExploreFragment extends Fragment {
 
         return accessTokenWrapper.getAccessToken();
     }
+
     public static class AccessTokenWrapper {
         private String accessToken;
 
@@ -127,36 +115,29 @@ public class ExploreFragment extends Fragment {
 
     public interface SpotifyApiService {
         @GET("v1/categories/{categoryId}")
-        Call<CategoryResponse> getCategory(
-                @Header("Authorization") String authorization,
-                @Path("categoryId") String categoryId
-        );
+        Call<CategoryResponse> getCategory(@Header("Authorization") String authorization, @Path("categoryId") String categoryId);
 
         @GET("v1/browse/categories")
-        Call<CategoryResponse> getCategories(
-                @Header("Authorization") String authorization
-        );
+        Call<CategoryResponse> getCategories(@Header("Authorization") String authorization);
 
     }
 
-        public class CategoryResponse {
-            private Categories categories;
+    public class CategoryResponse {
+        private Categories categories;
 
-            public Categories getCategories() {
-                return categories;
-            }
-
-            public void setCategories(Categories categories) {
-                this.categories = categories;
-            }
-
-            @Override
-            public String toString() {
-                return "CategoryResponse{" +
-                        "categories=" + categories +
-                        '}';
-            }
+        public Categories getCategories() {
+            return categories;
         }
+
+        public void setCategories(Categories categories) {
+            this.categories = categories;
+        }
+
+        @Override
+        public String toString() {
+            return "CategoryResponse{" + "categories=" + categories + '}';
+        }
+    }
 
     public class Categories {
         private String href;
@@ -180,18 +161,13 @@ public class ExploreFragment extends Fragment {
 
         @Override
         public String toString() {
-            return "Categories{" +
-                    "href='" + href + '\'' +
-                    ", items=" + items +
-                    '}';
+            return "Categories{" + "href='" + href + '\'' + ", items=" + items + '}';
         }
     }
+
     public void fetchCategories(String accessToken) {
 
-        Retrofit retrofit = new Retrofit.Builder()
-                .baseUrl("https://api.spotify.com/")
-                .addConverterFactory(GsonConverterFactory.create())
-                .build();
+        Retrofit retrofit = new Retrofit.Builder().baseUrl("https://api.spotify.com/").addConverterFactory(GsonConverterFactory.create()).build();
 
         SpotifyApiService apiService = retrofit.create(SpotifyApiService.class);
         Call<CategoryResponse> call = apiService.getCategories("Bearer " + accessToken);
@@ -199,8 +175,7 @@ public class ExploreFragment extends Fragment {
             @Override
             public void onResponse(Call<CategoryResponse> call, Response<CategoryResponse> response) {
 
-                if (response.isSuccessful())
-                {
+                if (response.isSuccessful()) {
 
 
                     Gson gson = new Gson();
@@ -213,10 +188,7 @@ public class ExploreFragment extends Fragment {
                     try {
                         String errorBody = response.errorBody().string(); // Lấy thông tin lỗi từ phản hồi
                         AlertDialog.Builder builder = new AlertDialog.Builder(getContext());
-                        builder.setTitle("API call fail")
-                                .setMessage(errorBody)
-                                .setPositiveButton("OK", null)
-                                .show();
+                        builder.setTitle("API call fail").setMessage(errorBody).setPositiveButton("OK", null).show();
                     } catch (IOException e) {
                         e.printStackTrace();
                     }
@@ -227,10 +199,7 @@ public class ExploreFragment extends Fragment {
             public void onFailure(Call<CategoryResponse> call, Throwable t) {
                 String errorMessage = t.getMessage();
                 AlertDialog.Builder builder = new AlertDialog.Builder(getContext());
-                builder.setTitle("API call faile")
-                        .setMessage(errorMessage)
-                        .setPositiveButton("OK", null)
-                        .show();
+                builder.setTitle("API call faile").setMessage(errorMessage).setPositiveButton("OK", null).show();
             }
         });
     }
