@@ -38,6 +38,11 @@ dependencies {
     implementation(libs.material)
     implementation(libs.activity)
     implementation(libs.constraintlayout)
+<<<<<<< Updated upstream
+=======
+    implementation(libs.firebase.auth)
+    implementation(libs.glide)
+>>>>>>> Stashed changes
     testImplementation(libs.junit)
     androidTestImplementation(libs.ext.junit)
     androidTestImplementation(libs.espresso.core)
