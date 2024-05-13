@@ -56,14 +56,14 @@
                 android:clickable="true"
                 android:focusable="true"
                 android:padding="5dp"
-                android:src="@drawable/sort_vert"
-                android:tint="@color/btnColor" />
+                android:src="@drawable/down_up_arrow"
+                android:tint="@color/white" />
             <TextView
                 android:id="@+id/textRecentlyAdded"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="Recently added"
-                android:textColor="@color/white"
+                android:textColor="@color/btnColor"
                 android:textSize="16sp"
                 android:layout_gravity="center_vertical"
                 android:layout_marginStart="5dp"/>
