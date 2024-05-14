@@ -1,0 +1,250 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/play_song"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:background="@color/black">
+
+    <LinearLayout
+        android:id="@+id/headerPlaying"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:layout_weight="1"
+        android:layout_marginLeft="30dp"
+        android:layout_marginRight="30dp"
+        android:layout_marginTop="20dp"
+        >
+    <LinearLayout
+        android:id="@+id/backButtonLayout"
+        android:layout_width="35dp"
+        android:layout_height="35dp"
+        android:layout_weight="0"
+        android:background="@drawable/back_btn_custom"
+        android:gravity="center"
+        android:orientation="horizontal">
+
+        <Button
+            android:id="@+id/iconBackPlaying"
+            android:layout_width="24dp"
+            android:layout_height="24dp"
+            android:layout_marginLeft="10dp"
+            android:background="@drawable/arrow_back"
+            android:paddingLeft="28dp"
+            app:backgroundTint="@android:color/white"
+            android:contentDescription="Go back"/>
+    </LinearLayout>
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:gravity="center"
+            android:text="Now Playing"
+            android:textSize="24sp"
+            android:layout_weight="1">
+
+        </TextView>
+
+        <ImageView
+            android:id="@+id/threeDots"
+            android:layout_width="25dp"
+            android:layout_height="30dp"
+            android:layout_marginStart="8dp"
+            android:src="@drawable/three_dots"
+            app:tint="@color/white" />
+    </LinearLayout>
+
+    <androidx.cardview.widget.CardView
+        app:cardCornerRadius="20dp"
+        android:id="@+id/imageAvaRe"
+        android:layout_width="match_parent"
+        android:layout_height="350dp"
+        android:layout_marginBottom="20dp"
+        android:layout_marginLeft="30dp"
+        android:layout_marginTop="20dp"
+        android:layout_marginRight="30dp"
+        android:layout_below="@+id/headerPlaying"
+        >
+        <ImageView
+            android:id="@+id/imageCon"
+            android:scaleType="centerCrop"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:src="@drawable/favourite_outline"
+            />
+    </androidx.cardview.widget.CardView>
+
+
+    <LinearLayout
+        android:id="@+id/labelandheart"
+        android:layout_marginHorizontal="30dp"
+        android:layout_width="match_parent"
+        android:layout_gravity="center_vertical"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/imageAvaRe"
+        android:orientation="horizontal"
+        >
+    <LinearLayout
+        android:layout_weight="1"
+
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:orientation="vertical">
+        <TextView
+            android:id="@+id/songNamePlay"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:text="Bad Guy"
+            android:textSize="24sp"
+            android:textStyle="bold"
+            />
+        <TextView
+            android:id="@+id/artistNamePlay"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:textSize="20sp"
+            android:text="Billie English"/>
+
+    </LinearLayout>
+        <ImageView
+            android:layout_width="24dp"
+            android:layout_height="24dp"
+            android:src="@drawable/heart_green_ouline"
+
+            android:layout_gravity="center_vertical"
+            />
+    </LinearLayout>
+
+    <RelativeLayout
+        android:layout_marginVertical="20dp"
+        android:layout_below="@+id/labelandheart"
+        android:id="@+id/seekbarCon"
+        android:layout_width="match_parent"
+        android:layout_height="60dp"
+        android:layout_marginLeft="30dp"
+        android:layout_marginRight="30dp">
+
+        <SeekBar
+            android:maxHeight="10dp"
+            android:progressTint="#49A078"
+            android:thumbTint="#49A078"
+            android:id="@+id/seekbar"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_alignParentTop="true"
+            />
+        <TextView
+            android:id="@+id/played"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="1:28"
+            android:textSize="15sp"
+            android:layout_marginStart="10dp"
+            android:layout_alignParentBottom="true"/>
+        <TextView
+            android:id="@+id/total"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="1:28"
+            android:textSize="15sp"
+            android:layout_marginEnd="10dp"
+            android:layout_alignParentBottom="true"
+            android:layout_alignParentEnd="true"/>
+    </RelativeLayout>
+    <LinearLayout
+        android:layout_weight="4"
+        android:id="@+id/bottomHeader"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:layout_below="@+id/seekbarCon"
+        android:layout_marginLeft="30dp"
+        android:layout_marginRight="30dp"
+        android:gravity="center_horizontal|center_vertical"
+        
+        >
+
+        <ImageButton
+            android:id="@+id/repeateBtn"
+            android:contentDescription="Repeate"
+            android:layout_width="30dp"
+            android:layout_height="30dp"
+            android:background="@drawable/repeate"
+            />
+        <Space
+            android:layout_width="wrap_content"
+            android:layout_height="match_parent"
+            android:layout_weight="1"/>
+        <ImageButton
+            android:id="@+id/previousBtn"
+            android:contentDescription="previous"
+            android:layout_width="30dp"
+            android:layout_height="30dp"
+            android:background="@drawable/previous"
+            />
+        <Space
+            android:layout_width="wrap_content"
+            android:layout_height="match_parent"
+            android:layout_weight="1"/>
+        <RelativeLayout
+            android:layout_width="60dp"
+            android:layout_height="60dp"
+            android:gravity="center"
+            android:background="@drawable/ellipse_play">
+            <ImageButton
+                android:id="@+id/pauseBtn"
+                android:contentDescription="pause"
+                android:layout_width="30dp"
+                android:layout_height="30dp"
+                android:background="@drawable/pause"/>
+        </RelativeLayout>
+        <Space
+            android:layout_width="wrap_content"
+            android:layout_height="match_parent"
+            android:layout_weight="1"/>
+
+        <ImageButton
+            android:id="@+id/nextBtn"
+            android:contentDescription="Next"
+            android:layout_width="30dp"
+            android:layout_height="30dp"
+            android:background="@drawable/next"
+            />
+        <Space
+            android:layout_width="wrap_content"
+            android:layout_height="match_parent"
+            android:layout_weight="1"/>
+        <ImageButton
+            android:id="@+id/shuffleBtn"
+            android:contentDescription="Shuffe"
+            android:layout_width="30dp"
+            android:layout_height="30dp"
+            android:background="@drawable/shuffle"
+            />
+    </LinearLayout>
+    <LinearLayout
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:gravity="center_horizontal"
+        android:layout_alignParentBottom="true"
+        android:layout_marginBottom="10dp"
+        android:layout_centerHorizontal="true">
+        <ImageButton
+            android:id="@+id/show_lyricBtn"
+            android:contentDescription="lyric show"
+            android:layout_width="30dp"
+            android:layout_height="30dp"
+            android:background="@drawable/drop_up"/>
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Lyrics"
+            android:textSize="20sp"/>
+
+    </LinearLayout>
+</RelativeLayout>
