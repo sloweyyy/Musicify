@@ -14,6 +14,10 @@
         android:supportsRtl="true"
         android:theme="@style/Theme.Material3.Dark.NoActionBar">
         <activity
+            android:name=".activities.SongListActivity"
+            android:exported="false"
+            android:theme="@style/Theme.Material3.Dark.NoActionBar" />
+        <activity
             android:name=".activities.RegisterOrSignUp"
             android:exported="false" />
         <activity
@@ -27,9 +31,7 @@
             android:exported="false" />
         <activity
             android:name=".MainActivity"
-            android:exported="false">
-
-        </activity>
+            android:exported="false"></activity>
         <activity
             android:name=".activities.LoginActivity"
             android:exported="false" />
@@ -42,7 +44,6 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-
     </application>
 
 </manifest>
