@@ -3,27 +3,25 @@ package com.example.musicapp.adapter;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.ImageView;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
 import androidx.cardview.widget.CardView;
 import androidx.recyclerview.widget.RecyclerView;
 
-import com.bumptech.glide.Glide;
 import com.example.musicapp.R;
 import com.example.musicapp.model.Category;
-
 
 import java.util.List;
 
 public class exploreAdapter extends RecyclerView.Adapter<exploreAdapter.myViewHolder> {
     private List<Category> categories;
+
     public exploreAdapter(List<Category> categories) {
         this.categories = categories;
     }
-    class myViewHolder extends RecyclerView.ViewHolder
-    {
+
+    class myViewHolder extends RecyclerView.ViewHolder {
         CardView cardView;
         TextView textView;
 

@@ -115,7 +115,7 @@ public class PlaylistsFragment extends Fragment {
         addPlaylistText.setOnClickListener(addPlaylistClickListener);
 
 
-        ImageView recentlyPlayedIcon = view.findViewById(R.id.iconRecentlyAdded);
+        ImageView recentlyPlayedIcon = view.findViewById(R.id.iconRecentlyPlayed);
         TextView recentlyPlayedText = view.findViewById(R.id.textRecentlyPlayed);
         final boolean[] isRecentlyPlayed = {false};
 
