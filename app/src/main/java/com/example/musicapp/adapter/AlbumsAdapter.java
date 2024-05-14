@@ -17,7 +17,6 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.musicapp.R;
 import com.example.musicapp.fragment.AlbumDetailFragment;
-import com.example.musicapp.fragment.PlaylistDetailFragment;
 import com.example.musicapp.model.Album;
 import com.example.musicapp.model.Playlist;
 import com.google.firebase.firestore.FirebaseFirestore;
@@ -39,7 +38,7 @@ public class AlbumsAdapter extends RecyclerView.Adapter<AlbumsAdapter.ViewHolder
     @NonNull
     @Override
     public ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
-        View view = LayoutInflater.from(context).inflate(R.layout.item_playlist, parent, false);
+        View view = LayoutInflater.from(context).inflate(R.layout.item_album, parent, false);
         return new ViewHolder(view);
     }
 
@@ -50,7 +49,7 @@ public class AlbumsAdapter extends RecyclerView.Adapter<AlbumsAdapter.ViewHolder
         holder.itemView.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Fragment albumDetailFragment = AlbumDetailFragment.newInstance(album.getName(), album.getImageResource(), album.getDescription());
+                Fragment albumDetailFragment = AlbumDetailFragment.newInstance(album.getName(), album.getImageResource(), album.getArtistName());
                 FragmentManager fragmentManager = ((AppCompatActivity) context).getSupportFragmentManager();
                 FragmentTransaction transaction = fragmentManager.beginTransaction();
                 transaction.replace(R.id.frame_layout, albumDetailFragment);
@@ -64,6 +63,80 @@ public class AlbumsAdapter extends RecyclerView.Adapter<AlbumsAdapter.ViewHolder
     public int getItemCount() {
         return albumsList.size();
     }
-    public class ViewHolder extends RecyclerView.ViewHolder {}
+    public class ViewHolder extends RecyclerView.ViewHolder {
+        private ImageView albumImage;
+        private TextView albumName;
+        private TextView albumArtist;
+        private ImageView privacyIcon;
+
+        public ViewHolder(@NonNull View itemView) {
+            super(itemView);
+            albumImage = itemView.findViewById(R.id.albumImage);
+            albumName = itemView.findViewById(R.id.albumName);
+            albumArtist = itemView.findViewById(R.id.albumArtist);
+            privacyIcon = itemView.findViewById(R.id.privacyIcon);
+
+        }
+
+        public void bind(Album album) {
+            albumImage.setImageResource(album.getImageResource());
+            albumName.setText(album.getName());
+            albumArtist.setText(album.getArtistName());
+        }
+    }
+
+    // Method to update the playlist list
+    public void updateAlbumList(List<Album> albums) {
+        albumsList.clear();
+        albumsList.addAll(albums);
+        notifyDataSetChanged();
+    }
+
+    // Method to fetch liked albums from Firestore based on the user's ID
+    public void fetchAlbums() {
+        FirebaseFirestore db = FirebaseFirestore.getInstance();
+        db.collection("albums").whereEqualTo("userId", userId).get().addOnSuccessListener(queryDocumentSnapshots -> {
+            List<Album> albums = new ArrayList<>();
+            for (QueryDocumentSnapshot document : queryDocumentSnapshots) {
+                Album album = document.toObject(Album.class);
+                albums.add(album);
+            }
+            updateAlbumList(albums);
+        }).addOnFailureListener(e -> {
+            // Handle error
+        });
+    }
+
+    // sort the playlist list by name
+    public void sortAlbumByName() {
+        albumsList.sort((album1, album2) -> {
+            String name1 = album1.getName();
+            String name2 = album2.getName();
+
+            // Kiểm tra null trước khi so sánh
+            if (name1 == null && name2 == null) {
+                return 0; // Cả hai đều là null, không có sự khác biệt
+            } else if (name1 == null) {
+                return -1; // playlist1 null, sắp xếp trước playlist2
+            } else if (name2 == null) {
+                return 1; // playlist2 null, sắp xếp trước playlist1
+            } else {
+                // Cả hai không phải là null, sắp xếp bình thường
+                return name1.compareTo(name2);
+            }
+        });
+        notifyDataSetChanged();
+    }
+
+
+    // Method to delete a liked album from Firestore
+    public void unlikeAlbum(Album album) {
+        FirebaseFirestore db = FirebaseFirestore.getInstance();
+        db.collection("albums").document(album.getId()).delete().addOnSuccessListener(aVoid -> {
+            fetchAlbums();
+        }).addOnFailureListener(e -> {
+            // Handle error
+        });
+    }
 
 }
