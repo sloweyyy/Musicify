@@ -5,13 +5,49 @@
     android:layout_height="match_parent"
     tools:context=".fragment.ArtistsFragment">
 
-    <!-- TODO: Update blank fragment layout -->
-    <TextView
+    <LinearLayout
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:text="tab2"
-        android:gravity="center"
-        android:textColor="@color/white"
-        android:textSize="40dp"/>
+        android:layout_height="wrap_content"
+        android:layout_marginHorizontal="36sp">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginVertical="30sp">
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Sort by"
+                android:textSize="16sp"
+                android:textColor="@color/white"
+                android:layout_gravity="center_vertical"
+                android:layout_weight="1"/>
+            <ImageView
+                android:id="@+id/iconSortArtist"
+                android:layout_width="30dp"
+                android:layout_height="30dp"
+                android:layout_gravity="center"
+                android:clickable="true"
+                android:focusable="true"
+                android:padding="5dp"
+                android:src="@drawable/sort_vert"
+                android:tint="@color/btnColor" />
+            <TextView
+                android:id="@+id/textRecentlyPlayed"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Recently played"
+                android:textColor="@color/white"
+                android:textSize="16sp"
+                android:layout_gravity="center_vertical"
+                android:layout_marginStart="5dp"/>
+        </LinearLayout>
+        <androidx.recyclerview.widget.RecyclerView
+            android:id="@+id/recyclerView"
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:layout_weight="1" />
+    </LinearLayout>
+    <!-- RecyclerView for playlist items -->
 
 </FrameLayout>
