@@ -1,5 +1,6 @@
 package com.example.musicapp.model;
 
+
 public class User {
     private String Name;
     private String Email;
@@ -8,6 +9,6 @@ public class User {
     private String Image;
     private String Bio;
     private String Following;
-
+    private String[] likedAlbums;
 
 }

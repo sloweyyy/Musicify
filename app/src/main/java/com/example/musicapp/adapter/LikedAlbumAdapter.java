@@ -1,7 +1,6 @@
 package com.example.musicapp.adapter;
 
 import android.content.Context;
-import android.provider.MediaStore;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -16,22 +15,22 @@ import androidx.fragment.app.FragmentTransaction;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.musicapp.R;
-import com.example.musicapp.fragment.AlbumDetailFragment;
+import com.example.musicapp.fragment.LikedAlbumDetailFragment;
 import com.example.musicapp.model.Album;
-import com.example.musicapp.model.Playlist;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.QueryDocumentSnapshot;
 
 import java.util.ArrayList;
 import java.util.List;
 
-public class AlbumsAdapter extends RecyclerView.Adapter<AlbumsAdapter.ViewHolder> {
+public class LikedAlbumAdapter extends RecyclerView.Adapter<LikedAlbumAdapter.ViewHolder> {
     private Context context;
-    private List<Album> albumsList;
+    private List<Album> likedAlbumsList;
     private String userId;
-    public AlbumsAdapter(Context context, List<Album> albumsList, String userId) {
+
+    public LikedAlbumAdapter(Context context, List<Album> likedAlbumsList, String userId) {
         this.context = context;
-        this.albumsList = albumsList;
+        this.likedAlbumsList = likedAlbumsList;
         this.userId = userId;
     }
 
@@ -44,15 +43,15 @@ public class AlbumsAdapter extends RecyclerView.Adapter<AlbumsAdapter.ViewHolder
 
     @Override
     public void onBindViewHolder(@NonNull ViewHolder holder, int position) {
-        Album album = albumsList.get(position);
+        Album album = likedAlbumsList.get(position);
         holder.bind(album);
         holder.itemView.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Fragment albumDetailFragment = AlbumDetailFragment.newInstance(album.getName(), album.getImageResource(), album.getArtistName());
+                Fragment likedAlbumDetailFragment = LikedAlbumDetailFragment.newInstance(album.getName(), album.getImageResource(), album.getArtistName());
                 FragmentManager fragmentManager = ((AppCompatActivity) context).getSupportFragmentManager();
                 FragmentTransaction transaction = fragmentManager.beginTransaction();
-                transaction.replace(R.id.frame_layout, albumDetailFragment);
+                transaction.replace(R.id.frame_layout, likedAlbumDetailFragment);
                 transaction.addToBackStack(null);
                 transaction.commit();
             }
@@ -61,8 +60,9 @@ public class AlbumsAdapter extends RecyclerView.Adapter<AlbumsAdapter.ViewHolder
 
     @Override
     public int getItemCount() {
-        return albumsList.size();
+        return likedAlbumsList.size();
     }
+
     public class ViewHolder extends RecyclerView.ViewHolder {
         private ImageView albumImage;
         private TextView albumName;
@@ -75,7 +75,6 @@ public class AlbumsAdapter extends RecyclerView.Adapter<AlbumsAdapter.ViewHolder
             albumName = itemView.findViewById(R.id.albumName);
             albumArtist = itemView.findViewById(R.id.albumArtist);
             privacyIcon = itemView.findViewById(R.id.privacyIcon);
-
         }
 
         public void bind(Album album) {
@@ -85,58 +84,56 @@ public class AlbumsAdapter extends RecyclerView.Adapter<AlbumsAdapter.ViewHolder
         }
     }
 
-    // Method to update the playlist list
-    public void updateAlbumList(List<Album> albums) {
-        albumsList.clear();
-        albumsList.addAll(albums);
+    // Method to update the likedAlbum list
+    public void updateLikedAlbumList(List<Album> albums) {
+        likedAlbumsList.clear();
+        likedAlbumsList.addAll(albums);
         notifyDataSetChanged();
     }
 
     // Method to fetch liked albums from Firestore based on the user's ID
-    public void fetchAlbums() {
+    public void fetchLikedAlbums() {
         FirebaseFirestore db = FirebaseFirestore.getInstance();
-        db.collection("albums").whereEqualTo("userId", userId).get().addOnSuccessListener(queryDocumentSnapshots -> {
+        db.collection("users").whereEqualTo("userId", userId).get().addOnSuccessListener(queryDocumentSnapshots -> {
             List<Album> albums = new ArrayList<>();
             for (QueryDocumentSnapshot document : queryDocumentSnapshots) {
                 Album album = document.toObject(Album.class);
                 albums.add(album);
             }
-            updateAlbumList(albums);
+            updateLikedAlbumList(albums);
         }).addOnFailureListener(e -> {
             // Handle error
         });
     }
 
-    // sort the playlist list by name
+    // Method to sort the album list by name
     public void sortAlbumByName() {
-        albumsList.sort((album1, album2) -> {
+        likedAlbumsList.sort((album1, album2) -> {
             String name1 = album1.getName();
             String name2 = album2.getName();
 
-            // Kiểm tra null trước khi so sánh
+            // Check for null before comparing
             if (name1 == null && name2 == null) {
-                return 0; // Cả hai đều là null, không có sự khác biệt
+                return 0; // Both are null, no difference
             } else if (name1 == null) {
-                return -1; // playlist1 null, sắp xếp trước playlist2
+                return -1; // album1 is null, sort it before album2
             } else if (name2 == null) {
-                return 1; // playlist2 null, sắp xếp trước playlist1
+                return 1; // album2 is null, sort it before album1
             } else {
-                // Cả hai không phải là null, sắp xếp bình thường
+                // Both are not null, sort normally
                 return name1.compareTo(name2);
             }
         });
         notifyDataSetChanged();
     }
 
-
     // Method to delete a liked album from Firestore
     public void unlikeAlbum(Album album) {
         FirebaseFirestore db = FirebaseFirestore.getInstance();
-        db.collection("albums").document(album.getId()).delete().addOnSuccessListener(aVoid -> {
-            fetchAlbums();
+        db.collection("users").document(album.getId()).delete().addOnSuccessListener(aVoid -> {
+            fetchLikedAlbums();
         }).addOnFailureListener(e -> {
             // Handle error
         });
     }
-
 }
