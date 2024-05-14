@@ -2,7 +2,7 @@
 <androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
-    android:layout_height="350dp">
+    android:layout_height="450dp">
 
     <LinearLayout
         android:layout_width="match_parent"
@@ -19,12 +19,21 @@
             app:layout_constraintTop_toTopOf="parent" />
 
         <TextView
+            android:id="@+id/createPlaylistTitle"
             android:layout_width="wrap_content"
             android:layout_height="40dp"
             android:layout_marginBottom="10dp"
             android:text="Create new playlist"
             android:textAlignment="center"
             android:textSize="30dp" />
+
+        <ImageView
+            android:id="@+id/playlistImage"
+            android:layout_width="100dp"
+            android:layout_height="100dp"
+            android:layout_marginBottom="10dp"
+            android:src="@drawable/image_up"
+            />
 
         <androidx.cardview.widget.CardView
             android:layout_width="match_parent"
@@ -52,7 +61,6 @@
                     android:inputType="text"
                     android:textAlignment="center"
                     android:textSize="18dp" />
-
             </LinearLayout>
         </androidx.cardview.widget.CardView>
 
@@ -83,12 +91,12 @@
                 android:textAlignment="center"
                 android:textSize="18dp" />
 
-
             <Switch
                 android:id="@+id/privacySwitch"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_marginRight="10dp" />
+                android:layout_marginRight="10dp"
+                />
 
             <TextView
                 android:id="@+id/publicPrivacy"
@@ -127,9 +135,6 @@
                 android:text="Create"
                 android:textSize="18dp"
                 app:backgroundTint="@color/btnColor" />
-
         </LinearLayout>
-
-
     </LinearLayout>
 </androidx.constraintlayout.widget.ConstraintLayout>
