@@ -172,12 +172,6 @@ public class PlaySongFragment extends Fragment implements FetchAccessToken.Acces
                         songname.setText(songName);
                         artistname.setText(artistName);
                         Glide.with(getActivity()).load(imageUrl).into(cover_art);
-                        AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
-                        builder.setTitle("Error");
-                        builder.setMessage(play_url);
-                        builder.setPositiveButton("OK", null);
-                        AlertDialog alertDialog = builder.create();
-                        alertDialog.show();
                         try {
                             mediaPlayer = new MediaPlayer();
                             mediaPlayer.setAudioAttributes(new AudioAttributes.Builder()
