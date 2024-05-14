@@ -15,7 +15,8 @@
         android:layout_marginTop="20dp"
         android:background="@drawable/back_btn_custom"
         android:gravity="center"
-        android:orientation="horizontal">
+        android:orientation="horizontal"
+        android:layout_alignParentStart="true">
 
         <Button
             android:id="@+id/iconBack"
@@ -26,6 +27,28 @@
             android:paddingLeft="28dp"
             app:backgroundTint="@android:color/white" />
     </LinearLayout>
+
+    <!-- Nút ba dấu chấm -->
+    <LinearLayout
+        android:id="@+id/iconThreeDots"
+        android:layout_width="35dp"
+        android:layout_height="35dp"
+        android:layout_marginRight="15dp"
+        android:layout_marginTop="20dp"
+        android:background="@drawable/back_btn_custom"
+        android:gravity="center"
+        android:orientation="horizontal"
+        android:layout_alignParentEnd="true">
+
+        <Button
+            android:id="@+id/threeDots"
+            android:layout_width="25dp"
+            android:layout_height="25dp"
+            android:background="@drawable/three_dots"
+            android:paddingLeft="28dp"
+            app:backgroundTint="@android:color/white" />
+    </LinearLayout>
+
 
     <!-- Phần còn lại của layout -->
     <ImageView
