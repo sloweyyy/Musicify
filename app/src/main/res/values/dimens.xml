@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <dimen name="sdp_60">12%</dimen>
+    <dimen name="sdp_30">7.5%</dimen>
+    <dimen name="sdp_25">6.25%</dimen>
+    <dimen name="sdp_24">6.2%</dimen>
+    <dimen name="sdp_20">5.5%</dimen>
+    <dimen name="sdp_10">2.25%</dimen>
+    <dimen name="sdp_35">9%</dimen>
+</resources>

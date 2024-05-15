@@ -12,14 +12,14 @@
         android:layout_height="wrap_content"
         android:orientation="horizontal"
         android:layout_weight="1"
-        android:layout_marginLeft="30dp"
-        android:layout_marginRight="30dp"
-        android:layout_marginTop="20dp"
+        android:layout_marginLeft="@dimen/_30sdp"
+        android:layout_marginRight="@dimen/_30sdp"
+        android:layout_marginTop="@dimen/_20sdp"
         >
     <LinearLayout
         android:id="@+id/backButtonLayout"
-        android:layout_width="35dp"
-        android:layout_height="35dp"
+        android:layout_width="@dimen/_30sdp"
+        android:layout_height="@dimen/_30sdp"
         android:layout_weight="0"
         android:background="@drawable/back_btn_custom"
         android:gravity="center"
@@ -27,9 +27,9 @@
 
         <Button
             android:id="@+id/iconBackPlaying"
-            android:layout_width="24dp"
-            android:layout_height="24dp"
-            android:layout_marginLeft="10dp"
+            android:layout_width="@dimen/_20sdp"
+            android:layout_height="@dimen/_20sdp"
+            android:layout_marginLeft="@dimen/_10sdp"
             android:background="@drawable/arrow_back"
             android:paddingLeft="28dp"
             app:backgroundTint="@android:color/white"
@@ -48,22 +48,22 @@
 
         <ImageView
             android:id="@+id/threeDots"
-            android:layout_width="25dp"
-            android:layout_height="30dp"
-            android:layout_marginStart="8dp"
+            android:layout_width="@dimen/_25sdp"
+            android:layout_height="@dimen/_25sdp"
+            android:layout_marginStart="@dimen/_10sdp"
             android:src="@drawable/three_dots"
             app:tint="@color/white" />
     </LinearLayout>
 
     <androidx.cardview.widget.CardView
-        app:cardCornerRadius="20dp"
+        app:cardCornerRadius="@dimen/_20sdp"
         android:id="@+id/imageAvaRe"
         android:layout_width="match_parent"
         android:layout_height="350dp"
-        android:layout_marginBottom="20dp"
-        android:layout_marginLeft="30dp"
-        android:layout_marginTop="20dp"
-        android:layout_marginRight="30dp"
+        android:layout_marginBottom="@dimen/_10sdp"
+        android:layout_marginLeft="@dimen/_30sdp"
+        android:layout_marginTop="@dimen/_10sdp"
+        android:layout_marginRight="@dimen/_30sdp"
         android:layout_below="@+id/headerPlaying"
         >
         <ImageView
@@ -78,7 +78,7 @@
 
     <LinearLayout
         android:id="@+id/labelandheart"
-        android:layout_marginHorizontal="30dp"
+        android:layout_marginHorizontal="@dimen/_30sdp"
         android:layout_width="match_parent"
         android:layout_gravity="center_vertical"
         android:layout_height="wrap_content"
@@ -110,8 +110,8 @@
 
     </LinearLayout>
         <ImageView
-            android:layout_width="24dp"
-            android:layout_height="24dp"
+            android:layout_width="@dimen/_24sdp"
+            android:layout_height="@dimen/_24sdp"
             android:src="@drawable/heart_green_ouline"
 
             android:layout_gravity="center_vertical"
@@ -119,16 +119,15 @@
     </LinearLayout>
 
     <RelativeLayout
-        android:layout_marginVertical="20dp"
         android:layout_below="@+id/labelandheart"
         android:id="@+id/seekbarCon"
         android:layout_width="match_parent"
-        android:layout_height="60dp"
-        android:layout_marginLeft="30dp"
-        android:layout_marginRight="30dp">
+        android:layout_height="@dimen/_60sdp"
+        android:layout_marginLeft="@dimen/_30sdp"
+        android:layout_marginRight="@dimen/_30sdp">
 
         <SeekBar
-            android:maxHeight="10dp"
+            android:maxHeight="@dimen/_10sdp"
             android:progressTint="#49A078"
             android:thumbTint="#49A078"
             android:id="@+id/seekbar"
@@ -140,17 +139,17 @@
             android:id="@+id/played"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="1:28"
+            android:text="0:00"
             android:textSize="15sp"
-            android:layout_marginStart="10dp"
+            android:layout_marginStart="@dimen/_10sdp"
             android:layout_alignParentBottom="true"/>
         <TextView
             android:id="@+id/total"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="1:28"
+            android:text="0:00"
             android:textSize="15sp"
-            android:layout_marginEnd="10dp"
+            android:layout_marginEnd="@dimen/_10sdp"
             android:layout_alignParentBottom="true"
             android:layout_alignParentEnd="true"/>
     </RelativeLayout>
@@ -161,8 +160,8 @@
         android:layout_height="wrap_content"
         android:orientation="horizontal"
         android:layout_below="@+id/seekbarCon"
-        android:layout_marginLeft="30dp"
-        android:layout_marginRight="30dp"
+        android:layout_marginLeft="@dimen/_30sdp"
+        android:layout_marginRight="@dimen/_30sdp"
         android:gravity="center_horizontal|center_vertical"
         
         >
@@ -170,8 +169,8 @@
         <ImageButton
             android:id="@+id/repeateBtn"
             android:contentDescription="Repeate"
-            android:layout_width="30dp"
-            android:layout_height="30dp"
+            android:layout_width="@dimen/_24sdp"
+            android:layout_height="@dimen/_24sdp"
             android:background="@drawable/repeate"
             />
         <Space
@@ -181,8 +180,8 @@
         <ImageButton
             android:id="@+id/previousBtn"
             android:contentDescription="previous"
-            android:layout_width="30dp"
-            android:layout_height="30dp"
+            android:layout_width="@dimen/_24sdp"
+            android:layout_height="@dimen/_24sdp"
             android:background="@drawable/previous"
             />
         <Space
@@ -190,15 +189,15 @@
             android:layout_height="match_parent"
             android:layout_weight="1"/>
         <RelativeLayout
-            android:layout_width="60dp"
-            android:layout_height="60dp"
+            android:layout_width="@dimen/_60sdp"
+            android:layout_height="@dimen/_60sdp"
             android:gravity="center"
             android:background="@drawable/ellipse_play">
             <ImageButton
                 android:id="@+id/pauseBtn"
                 android:contentDescription="pause"
-                android:layout_width="30dp"
-                android:layout_height="30dp"
+                android:layout_width="@dimen/_24sdp"
+                android:layout_height="@dimen/_24sdp"
                 android:background="@drawable/pause"/>
         </RelativeLayout>
         <Space
@@ -209,8 +208,8 @@
         <ImageButton
             android:id="@+id/nextBtn"
             android:contentDescription="Next"
-            android:layout_width="30dp"
-            android:layout_height="30dp"
+            android:layout_width="@dimen/_24sdp"
+            android:layout_height="@dimen/_24sdp"
             android:background="@drawable/next"
             />
         <Space
@@ -220,8 +219,8 @@
         <ImageButton
             android:id="@+id/shuffleBtn"
             android:contentDescription="Shuffe"
-            android:layout_width="30dp"
-            android:layout_height="30dp"
+            android:layout_width="@dimen/_24sdp"
+            android:layout_height="@dimen/_24sdp"
             android:background="@drawable/shuffle"
             />
     </LinearLayout>
@@ -231,13 +230,13 @@
         android:orientation="vertical"
         android:gravity="center_horizontal"
         android:layout_alignParentBottom="true"
-        android:layout_marginBottom="10dp"
+        android:layout_marginBottom="@dimen/_10sdp"
         android:layout_centerHorizontal="true">
         <ImageButton
             android:id="@+id/show_lyricBtn"
             android:contentDescription="lyric show"
-            android:layout_width="30dp"
-            android:layout_height="30dp"
+            android:layout_width="@dimen/_24sdp"
+            android:layout_height="@dimen/_24sdp"
             android:background="@drawable/drop_up"/>
 
         <TextView

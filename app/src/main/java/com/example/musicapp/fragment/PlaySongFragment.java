@@ -1,12 +1,13 @@
 package com.example.musicapp.fragment;
-
 import android.annotation.SuppressLint;
 import android.app.AlertDialog;
+import android.content.Context;
 import android.media.AudioAttributes;
 import android.media.MediaPlayer;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Looper;
+import android.provider.MediaStore;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -15,9 +16,13 @@ import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.SeekBar;
 import android.widget.TextView;
-
+import com.spotify.android.appremote.api.*;
+import com.spotify.android.appremote.api.Connector;
+import com.spotify.android.appremote.api.PlayerApi.*;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.appcompat.app.AppCompatActivity;
+import androidx.core.app.NotificationCompat;
 import androidx.fragment.app.Fragment;
 
 import com.bumptech.glide.Glide;
@@ -37,11 +42,19 @@ import retrofit2.http.GET;
 import retrofit2.http.Header;
 import retrofit2.http.Path;
 
+import com.spotify.android.appremote.*;
+import com.spotify.android.appremote.api.Connector;
+import com.spotify.android.appremote.api.SpotifyAppRemote;
+import com.spotify.protocol.client.CallResult;
+import com.spotify.protocol.types.Empty;
+import com.spotify.protocol.types.Track;
+
 public class PlaySongFragment extends Fragment implements FetchAccessToken.AccessTokenCallback {
 
     private View view;
     private Handler handler = new Handler(Looper.getMainLooper());
     private Runnable updateSeekBarRunnable;
+    private SpotifyAppRemote spotifyAppRemote;
     private TextView songname, artistname, duration_played, duration_total;
     private ImageView cover_art;
     private ImageButton repeateBtn, previousBtn, pauseBtn, nextBtn, shuffleBtn;
@@ -50,6 +63,10 @@ public class PlaySongFragment extends Fragment implements FetchAccessToken.Acces
     private boolean isPlaying = false;
     private int position = -1;
     private FetchAccessToken fetchAccessToken;
+    ConnectionParams connectionParams = new ConnectionParams.Builder("19380ddfc0344af29cb61de3c6655fda")
+            .setRedirectUri("https://com.spotify.android.spotifysdkkotlindemo/callback")
+            .showAuthView(true)
+            .build();
 
     @Override
     public void onTokenReceived(String accessToken) {
@@ -107,7 +124,9 @@ public class PlaySongFragment extends Fragment implements FetchAccessToken.Acces
         });
     }
 
-    private void setupTrack(TrackModel track) {
+
+
+    public void setupTrack(TrackModel track) {
         String songName = track.getName();
         String artistName = track.artists.get(0).getName();
         String imageUrl = track.album.images.get(0).getUrl();
@@ -117,12 +136,44 @@ public class PlaySongFragment extends Fragment implements FetchAccessToken.Acces
         artistname.setText(artistName);
         Glide.with(getActivity()).load(imageUrl).into(cover_art);
 
-        setupMediaPlayer(playUrl);
+//        setupMediaPlayer(playUrl);
+        if (spotifyAppRemote != null) {
+            spotifyAppRemote.getPlayerApi().play("spotify:track:7ouMYWpwJ422jRcDASZB7P");
+        }
         setupSeekBar();
         setupPauseButton();
     }
 
-    private void setupMediaPlayer(String playUrl) {
+    public void setUpSpotifyRemote(){
+        ConnectionParams connectionParams = new ConnectionParams.Builder("19380ddfc0344af29cb61de3c6655fda")
+                .setRedirectUri("https://com.spotify.android.spotifysdkkotlindemo/callback")
+                .showAuthView(true)
+                .build();
+        spotifyAppRemote.connect(requireContext(), connectionParams, new Connector.ConnectionListener() {
+            @Override
+            public void onConnected(SpotifyAppRemote appRemote) {
+                spotifyAppRemote = appRemote;
+                Log.d("MainActivity", "Connected! Yay!");
+                // Now you can start interacting with App Remote
+                if (spotifyAppRemote != null) {
+                    // Play a playlist
+                    String playlistURI = "spotify:track:7ouMYWpwJ422jRcDASZB7P";
+                    spotifyAppRemote.getPlayerApi().play(playlistURI);
+                    // Subscribe to PlayerState
+                    spotifyAppRemote.getPlayerApi().subscribeToPlayerState().setEventCallback(playerState -> {
+                        Track track = playerState.track;
+                    });
+                }
+            }
+
+            @Override
+            public void onFailure(Throwable throwable) {
+                Log.e("MainActivity", throwable.getMessage(), throwable);
+                // Something went wrong when attempting to connect! Handle errors here
+            }
+        });
+    }
+    public void setupMediaPlayer(String playUrl) {
         try {
             mediaPlayer = new MediaPlayer();
             mediaPlayer.setAudioAttributes(new AudioAttributes.Builder().setContentType(AudioAttributes.CONTENT_TYPE_MUSIC).setUsage(AudioAttributes.USAGE_MEDIA).build());
@@ -140,7 +191,7 @@ public class PlaySongFragment extends Fragment implements FetchAccessToken.Acces
         }
     }
 
-    private void setupSeekBar() {
+    public void setupSeekBar() {
         seekBar.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
             @Override
             public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
@@ -170,7 +221,7 @@ public class PlaySongFragment extends Fragment implements FetchAccessToken.Acces
         };
     }
 
-    private void setupPauseButton() {
+    public void setupPauseButton() {
         pauseBtn.setOnClickListener(v -> {
             if (isPlaying) {
                 mediaPlayer.pause();
@@ -184,7 +235,7 @@ public class PlaySongFragment extends Fragment implements FetchAccessToken.Acces
         });
     }
 
-    private void showError(Response<TrackModel> response) {
+    public void showError(Response<TrackModel> response) {
         try {
             assert response.errorBody() != null;
             String errorReason = response.errorBody().string();
