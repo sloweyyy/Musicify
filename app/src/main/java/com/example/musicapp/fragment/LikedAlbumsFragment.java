@@ -30,7 +30,6 @@ import java.util.List;
 
 public class LikedAlbumsFragment extends Fragment {
     private View view;
-
     private RecyclerView recyclerView;
     private LikedAlbumAdapter adapter;
 

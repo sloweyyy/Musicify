@@ -1,6 +1,8 @@
 package com.example.musicapp.model;
 
 
+import java.util.ArrayList;
+
 public class User {
     private String Name;
     private String Email;
@@ -9,6 +11,6 @@ public class User {
     private String Image;
     private String Bio;
     private String Following;
-    private String[] likedAlbums;
+    private ArrayList likedAlbums;
 
 }
