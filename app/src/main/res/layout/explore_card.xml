@@ -3,6 +3,10 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:id="@+id/cardExplore"
     android:layout_width="150dp"
+
+    android:layout_gravity="center_horizontal"
+    android:backgroundTint="#49A078"
+
     android:layout_height="80dp"
     android:layout_gravity="center"
     android:layout_marginBottom="20dp"
