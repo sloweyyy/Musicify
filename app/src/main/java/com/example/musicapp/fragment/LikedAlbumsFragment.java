@@ -48,7 +48,7 @@ public class LikedAlbumsFragment extends Fragment  {
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
-        view = inflater.inflate(R.layout.fragment_albums, container, false);
+        view = inflater.inflate(R.layout.fragment_liked_albums, container, false);
         recyclerView = view.findViewById(R.id.recyclerView);
         List<Album> albumList = new ArrayList<>();
         String userId = FirebaseAuth.getInstance().getCurrentUser().getUid();
