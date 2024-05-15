@@ -14,6 +14,7 @@ import androidx.fragment.app.FragmentManager;
 import androidx.fragment.app.FragmentTransaction;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.bumptech.glide.Glide;
 import com.example.musicapp.R;
 import com.example.musicapp.fragment.PlaylistDetailFragment;
 import com.example.musicapp.model.Playlist;
@@ -49,7 +50,8 @@ public class PlaylistAdapter extends RecyclerView.Adapter<PlaylistAdapter.ViewHo
         holder.itemView.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Fragment playlistDetailFragment = PlaylistDetailFragment.newInstance(playlist.getName(), playlist.getImageResource(), playlist.getDescription());
+                Fragment playlistDetailFragment = PlaylistDetailFragment.newInstance(playlist.getName(), playlist.getImageURL(), playlist.getDescription(), playlist.getId() // Pass playlist ID here
+                );
                 FragmentManager fragmentManager = ((AppCompatActivity) context).getSupportFragmentManager();
                 FragmentTransaction transaction = fragmentManager.beginTransaction();
                 transaction.replace(R.id.frame_layout, playlistDetailFragment);
@@ -81,7 +83,8 @@ public class PlaylistAdapter extends RecyclerView.Adapter<PlaylistAdapter.ViewHo
         }
 
         public void bind(Playlist playlist) {
-            playlistImage.setImageResource(playlist.getImageResource());
+            Glide.with(context).load(playlist.getImageURL()).placeholder(R.drawable.image_up).error(R.drawable.image_up).into(playlistImage);
+
             playlistName.setText(playlist.getName());
             playlistCount.setText(playlist.getSongCount() + " songs");
             privacyIcon.setImageResource(playlist.getPrivacyIcon());
@@ -96,20 +99,24 @@ public class PlaylistAdapter extends RecyclerView.Adapter<PlaylistAdapter.ViewHo
         notifyDataSetChanged();
     }
 
-    // Method to fetch playlists from Firestore based on the user's ID
     public void fetchPlaylists() {
         FirebaseFirestore db = FirebaseFirestore.getInstance();
         db.collection("playlists").whereEqualTo("userId", userId).get().addOnSuccessListener(queryDocumentSnapshots -> {
             List<Playlist> playlists = new ArrayList<>();
             for (QueryDocumentSnapshot document : queryDocumentSnapshots) {
+                String imageURL = document.getString("imageURL");
                 Playlist playlist = document.toObject(Playlist.class);
+                playlist.setImageURL(imageURL);
+
+                playlist.setId(document.getId());
+
                 playlists.add(playlist);
             }
             updatePlaylistList(playlists);
         }).addOnFailureListener(e -> {
-            // Handle error
         });
     }
+
 
     // sort the playlist list by name
     public void sortPlaylistByName() {
@@ -117,15 +124,14 @@ public class PlaylistAdapter extends RecyclerView.Adapter<PlaylistAdapter.ViewHo
             String name1 = playlist1.getName();
             String name2 = playlist2.getName();
 
-            // Kiểm tra null trước khi so sánh
             if (name1 == null && name2 == null) {
-                return 0; // Cả hai đều là null, không có sự khác biệt
+                return 0;
             } else if (name1 == null) {
-                return -1; // playlist1 null, sắp xếp trước playlist2
+                return -1;
             } else if (name2 == null) {
-                return 1; // playlist2 null, sắp xếp trước playlist1
+                return 1;
             } else {
-                // Cả hai không phải là null, sắp xếp bình thường
+
                 return name1.compareTo(name2);
             }
         });
@@ -136,17 +142,15 @@ public class PlaylistAdapter extends RecyclerView.Adapter<PlaylistAdapter.ViewHo
     // sort the playlist by privacy
     public void sortPlaylistByPrivacy() {
         playlistList.sort((playlist1, playlist2) -> {
-            // Kiểm tra xem cả hai playlist đều không phải là null trước khi so sánh privacy
             if (playlist1 != null && playlist2 != null) {
                 String privacy1 = playlist1.getPrivacy();
                 String privacy2 = playlist2.getPrivacy();
 
-                // Kiểm tra xem privacy1 và privacy2 có phải là null không trước khi so sánh
                 if (privacy1 != null && privacy2 != null) {
-                    return privacy1.compareTo(privacy2); // Trả về kết quả so sánh
+                    return privacy1.compareTo(privacy2);
                 }
             }
-            return 0; // Trả về 0 nếu bất kỳ đối tượng nào là null
+            return 0;
         });
         notifyDataSetChanged();
     }
@@ -158,7 +162,6 @@ public class PlaylistAdapter extends RecyclerView.Adapter<PlaylistAdapter.ViewHo
         db.collection("playlists").document(playlist.getId()).delete().addOnSuccessListener(aVoid -> {
             fetchPlaylists();
         }).addOnFailureListener(e -> {
-            // Handle error
         });
     }
 
@@ -168,7 +171,6 @@ public class PlaylistAdapter extends RecyclerView.Adapter<PlaylistAdapter.ViewHo
         db.collection("playlists").document(playlist.getId()).update("privacy", playlist.getPrivacy()).addOnSuccessListener(aVoid -> {
             fetchPlaylists();
         }).addOnFailureListener(e -> {
-            // Handle error
         });
     }
 

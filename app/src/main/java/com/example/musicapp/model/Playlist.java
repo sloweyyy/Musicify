@@ -8,6 +8,8 @@ public class Playlist {
     private String name;
     private String description;
     private int thumbnail;
+    private String imageURL;
+
 
     private String privacy;
 
@@ -17,18 +19,33 @@ public class Playlist {
 
     }
 
-    public Playlist(String userId, String name, String description, String privacy, int thumbnail) {
+    public Playlist(String id, String userId, String name, String description, String privacy, String imageURL) {
+        this.id = id;
         this.userId = userId;
         this.name = name;
         this.description = description;
         this.privacy = privacy;
-        this.thumbnail = thumbnail;
-        if (privacy.equals("Private")) {
+        this.imageURL = imageURL;
+        if ("Private".equals(privacy)) {
             setPrivacyIcon(R.drawable.ic_private);
         } else {
             setPrivacyIcon(R.drawable.ic_public);
         }
     }
+
+    public Playlist(String userId, String name, String description, String privacy, String imageURL) {
+        this.userId = userId;
+        this.name = name;
+        this.description = description;
+        this.privacy = privacy;
+        this.imageURL = imageURL;
+        if ("Private".equals(privacy)) {
+            setPrivacyIcon(R.drawable.ic_private);
+        } else {
+            setPrivacyIcon(R.drawable.ic_public);
+        }
+    }
+
 
     public String getName() {
         return name;
@@ -54,12 +71,24 @@ public class Playlist {
         return thumbnail;
     }
 
+    public String getImageURL() {
+        return imageURL;
+    }
+
+    public void setImageURL(String imageURL) {
+        this.imageURL = imageURL;
+    }
+
     public void setPrivacyIcon(int privacyIcon) {
         this.privacyIcon = privacyIcon;
     }
 
     public int getPrivacyIcon() {
-        return privacyIcon;
+        if ("Private".equals(privacy)) {
+            return R.drawable.ic_private;
+        } else {
+            return R.drawable.ic_public;
+        }
     }
 
     public void setUserId(String userId) {

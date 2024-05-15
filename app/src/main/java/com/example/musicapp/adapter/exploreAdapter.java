@@ -24,11 +24,13 @@ public class exploreAdapter extends RecyclerView.Adapter<exploreAdapter.myViewHo
     class myViewHolder extends RecyclerView.ViewHolder {
         CardView cardView;
         TextView textView;
+        ImageView imageView;
 
         public myViewHolder(@NonNull View itemView) {
             super(itemView);
             cardView = itemView.findViewById(R.id.cardExplore);
             textView = itemView.findViewById(R.id.textExplore);
+            imageView = itemView.findViewById(R.id.imageViewExplore); // Add ImageView
         }
     }
 
@@ -43,21 +45,18 @@ public class exploreAdapter extends RecyclerView.Adapter<exploreAdapter.myViewHo
     public void onBindViewHolder(@NonNull myViewHolder holder, int position) {
         Category category = categories.get(position);
         holder.textView.setText(category.getName());
-        int margin = (holder.itemView.getContext().getResources().getDisplayMetrics().widthPixels - 300) / 10;
 
+        // Load image using Glide
+        Glide.with(holder.itemView.getContext())
+                .load(category.getImageUrl())
+                .placeholder(R.drawable.image_up) // Placeholder image
+                .error(R.drawable.image_up) // Error image
+                .into(holder.imageView);
+
+        int margin = (holder.itemView.getContext().getResources().getDisplayMetrics().widthPixels - 300) / 10;
         ViewGroup.MarginLayoutParams layoutParams = (ViewGroup.MarginLayoutParams) holder.cardView.getLayoutParams();
         layoutParams.leftMargin = margin;
-
         holder.cardView.setLayoutParams(layoutParams);
-
-        // Sử dụng Glide hoặc Picasso để tải và hiển thị hình ảnh background
-
-//        Glide.with(holder.itemView.getContext())
-//                .load(category.getBackgroundImageUrl())
-//                .into(imageView);
-
-        // Đặt ImageView làm nền cho CardView
-
     }
 
     @Override

@@ -3,7 +3,7 @@ package com.example.musicapp.model;
 public class Category {
     private String href;
     private String id;
-    private String img;
+    private Icons[] icons;
     private String name;
 
     public String getHref() {
@@ -18,9 +18,6 @@ public class Category {
         return id;
     }
 
-    public String getImg(){
-        return null;
-    }
     public void setId(String id) {
         this.id = id;
     }
@@ -31,5 +28,27 @@ public class Category {
 
     public void setName(String name) {
         this.name = name;
+    }
+
+    public Icons[] getIcons() {
+        return icons;
+    }
+
+    public void setIcons(Icons[] icons) {
+        this.icons = icons;
+    }
+
+    public String getImageUrl() {
+        if (icons != null && icons.length > 0) {
+            return icons[0].url;
+        } else {
+            return null;
+        }
+    }
+
+    public static class Icons{
+        public String url;
+        public int height;
+        public int width;
     }
 }
