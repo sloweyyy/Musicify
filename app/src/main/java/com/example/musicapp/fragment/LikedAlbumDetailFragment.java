@@ -1,5 +1,6 @@
 package com.example.musicapp.fragment;
 
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -15,18 +16,30 @@ import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.bumptech.glide.Glide;
 import com.example.musicapp.R;
+import com.example.musicapp.adapter.FetchAccessToken;
 import com.example.musicapp.adapter.SongAdapter;
 import com.example.musicapp.model.Song;
 
 import java.util.ArrayList;
 import java.util.List;
 
+import retrofit2.Call;
+import retrofit2.Callback;
+import retrofit2.Response;
+import retrofit2.Retrofit;
+import retrofit2.converter.gson.GsonConverterFactory;
+
+import com.example.musicapp.adapter.FetchAccessToken;
+
 public class LikedAlbumDetailFragment extends Fragment {
     private RecyclerView recyclerView;
     private SongAdapter adapter;
     private List<Song> songList;
     private Button backButton;
+    private View view;
+    private FetchAccessToken fetchAccessToken;
 
     public LikedAlbumDetailFragment () {}
 
@@ -51,7 +64,9 @@ public class LikedAlbumDetailFragment extends Fragment {
     @Nullable
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
-        return inflater.inflate(R.layout.fragment_album_detail, container, false);
+        view = inflater.inflate(R.layout.fragment_album_detail, container, false);
+
+        return view;
     }
 
     @Override
@@ -104,6 +119,54 @@ public class LikedAlbumDetailFragment extends Fragment {
         adapter.notifyDataSetChanged();
     }
 
+//    @Override
+//    public void onTokenReceived(String accessToken) {
+//        getAlbum(accessToken);
+//    }
+//
+//    private void getAlbum (String accessToken){
+//        Retrofit retrofit = new Retrofit.Builder().baseUrl("https://api.spotify.com/").addConverterFactory(GsonConverterFactory.create()).build();
+//
+//        PlaySongFragment.SpotifyApi apiService = retrofit.create(PlaySongFragment.SpotifyApi.class);
+//        String authorization = "Bearer " + accessToken;
+//
+//        Call<PlaySongFragment.TrackModel> call = apiService.getTrack(authorization, songId);
+//        call.enqueue(new Callback<PlaySongFragment.TrackModel>() {
+//            @Override
+//            public void onResponse(@NonNull Call<PlaySongFragment.TrackModel> call, @NonNull Response<PlaySongFragment.TrackModel> response) {
+//                if (response.isSuccessful()) {
+//                    PlaySongFragment.TrackModel track = response.body();
+//                    if (track != null) {
+//                        setupTrack(track);
+//                    }
+//                } else {
+//                    showError(response);
+//                }
+//            }
+//
+//            @Override
+//            public void onFailure(Call<PlaySongFragment.TrackModel> call, Throwable throwable) {
+//                Log.e("Error fetching track", throwable.getMessage());
+//            }
+//        });
+//    }
+//    public void setupTrack(PlaySongFragment.TrackModel track) {
+//        String songName = track.getName();
+//        String artistName = track.artists.get(0).getName();
+//        String imageUrl = track.album.images.get(0).getUrl();
+//        String playUrl = track.getPreview_url();
+//
+//        songname.setText(songName);
+//        artistname.setText(artistName);
+//        Glide.with(getActivity()).load(imageUrl).into(cover_art);
+//
+////        setupMediaPlayer(playUrl);
+//        if (spotifyAppRemote != null) {
+//            spotifyAppRemote.getPlayerApi().play("spotify:track:7ouMYWpwJ422jRcDASZB7P");
+//        }
+//        setupSeekBar();
+//        setupPauseButton();
+//    }
 }
 
 
