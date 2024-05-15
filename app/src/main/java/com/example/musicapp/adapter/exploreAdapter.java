@@ -16,23 +16,25 @@ import com.bumptech.glide.Glide;
 import com.example.musicapp.R;
 import com.example.musicapp.model.Category;
 
-
 import java.util.List;
 
 public class exploreAdapter extends RecyclerView.Adapter<exploreAdapter.myViewHolder> {
     private List<Category> categories;
+
     public exploreAdapter(List<Category> categories) {
         this.categories = categories;
     }
-    class myViewHolder extends RecyclerView.ViewHolder
-    {
+
+    class myViewHolder extends RecyclerView.ViewHolder {
         CardView cardView;
         TextView textView;
+        ImageView imageView;
 
         public myViewHolder(@NonNull View itemView) {
             super(itemView);
             cardView = itemView.findViewById(R.id.cardExplore);
             textView = itemView.findViewById(R.id.textExplore);
+            imageView = itemView.findViewById(R.id.imageViewExplore); // Add ImageView
         }
     }
 
@@ -59,7 +61,6 @@ public class exploreAdapter extends RecyclerView.Adapter<exploreAdapter.myViewHo
             layoutParams.setMarginEnd(0); // Set margin end về 0 để căn giữa về bên phải
             holder.cardView.setLayoutParams(layoutParams);
         }
-
 
 
     }
