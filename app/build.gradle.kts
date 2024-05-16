@@ -46,6 +46,7 @@ dependencies {
     implementation(libs.firebase.storage)
     implementation(libs.navigation.fragment)
     implementation(libs.navigation.ui)
+    implementation(libs.androidthings)
 
     testImplementation(libs.junit)
     androidTestImplementation(libs.ext.junit)
@@ -83,5 +84,6 @@ dependencies {
     //gif
     implementation ("com.github.bumptech.glide:glide:4.11.0")
     annotationProcessor ("com.github.bumptech.glide:compiler:4.11.0")
+
 
 }
