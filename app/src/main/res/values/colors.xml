@@ -12,4 +12,7 @@
     <color name="themeBackground">#626855</color>
     <color name="btnPressed">#2BA16B</color>
     <color name ="textColor">#ffffff</color>
+    <color name="backgroundUser">#1C1B1B</color>
+    <color name="textSettingsColor">#A0BEC3</color>
+    <color name="yellow">#F7F700</color>
 </resources>
