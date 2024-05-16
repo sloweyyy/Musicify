@@ -15,6 +15,9 @@ import androidx.recyclerview.widget.RecyclerView;
 import com.bumptech.glide.Glide;
 import com.example.musicapp.R;
 import com.example.musicapp.fragment.List_Playlist;
+
+import com.example.musicapp.fragment.PlaylistDetailAPI;
+
 import com.example.musicapp.model.Category;
 import com.example.musicapp.model.Playlist;
 import com.example.musicapp.model.PlaylistAPI;
@@ -82,6 +85,22 @@ public class PlaylistAdapterAPI extends RecyclerView.Adapter<PlaylistAdapterAPI.
 
         @Override
         public void onClick(View v) {
+            int position = getAbsoluteAdapterPosition();
+            if (position != RecyclerView.NO_POSITION) {
+                PlaylistAPI selected = Playlists.get(position);
+                PlaylistDetailAPI fragment = new PlaylistDetailAPI();
+                fragment.setPlaylistId(selected.getId());
+                Bundle args = new Bundle();
+                args.putString("playlistId", selected.getId());
+                fragment.setArguments(args);
+                // Add the Fragment to the Activity
+                ((AppCompatActivity)v.getContext()).getSupportFragmentManager()
+                        .beginTransaction()
+                        .replace(R.id.frame_layout, fragment)
+                        .addToBackStack(null)
+                        .commit();
+            }
+
         }
 
         public void setOnItemClickListener(PlaylistAdapterAPI.OnItemClickListener listenerInput) {
