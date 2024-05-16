@@ -99,20 +99,15 @@ private ImageView imageView;
                     playlistName.setText(playlist.getName());
                     playlistDescription.setText(playlist.getDescription());
                     Glide.with(requireContext()).load(playlist.images.get(0).getUrl()).into(imageView);
+                    List<Song> songs = new ArrayList<>();
+                   for (ItemModel item : playlist.tracksContainer.tracks) {
+                       SimplifiedTrack track = item.track;
+                       songs.add(Song.fromSimplifiedTrack(track));
+                  }
+                    songAdapter = new SongAdapter(getContext(), songs);
+                    recyclerView.setAdapter(songAdapter);
+                    recyclerView.setVisibility(View.VISIBLE);
 
-                 List<SimplifiedTrack> tracks = playlist.tracksContainer.tracks;
-
-//                    builder.setTitle("Thông báo");
-//                    builder.setMessage(playlist.tracksContainer.total);
-//                    builder.setPositiveButton("OK",null);
-//
-//                    List<Song> songs = new ArrayList<>();
-//                    for (SimplifiedTrack track : tracks) {
-//                        songs.add(Song.fromSimplifiedTrack(track));
-//                    }
-//                    songAdapter = new SongAdapter(getContext(), songs);
-//                    recyclerView.setAdapter(songAdapter);
-//                    recyclerView.setVisibility(View.VISIBLE);
                 } else {
                     builder.setTitle("Cảnh báo");
                     builder.setMessage(response.body().getName());
@@ -134,5 +129,52 @@ private ImageView imageView;
 
     }
 
+    public class PlaylistSimplified {
+        @SerializedName("description")
+        private String description;
+
+        public String getDescription() {
+            return description;
+        }
+
+        @SerializedName("id")
+        private String id;
+
+        public String getId() {
+            return id;
+        }
+
+        @SerializedName("name")
+        private String name;
+
+        public String getName() {
+            return name;
+        }
+
+        @SerializedName("images")
+        public List<imageModel> images;
+
+        public class imageModel{
+            @SerializedName("url")
+            public String url;
+
+            public String getUrl() {
+                return url;
+            }
+        }
+
+        @SerializedName("tracks")
+        public TracksModel tracksContainer;
+
+    }
+
+    public class TracksModel {
+        @SerializedName("items")
+        public List<ItemModel> tracks;
+    }
+    public class ItemModel{
+        @SerializedName("track")
+        public SimplifiedTrack track;
+    }
 
 }

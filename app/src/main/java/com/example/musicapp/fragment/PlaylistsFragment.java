@@ -13,11 +13,13 @@ import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.Switch;
 import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.annotation.Nullable;
+import androidx.appcompat.app.AppCompatActivity;
 import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
@@ -40,6 +42,8 @@ import java.util.UUID;
 public class PlaylistsFragment extends Fragment {
     private View view;
     private TabLayout tabLayout;
+
+
     private RecyclerView recyclerView;
     private PlaylistAdapter adapter;
 
@@ -61,6 +65,7 @@ public class PlaylistsFragment extends Fragment {
         recyclerView = view.findViewById(R.id.recyclerView);
         storage = FirebaseStorage.getInstance();
 
+        LinearLayout liked = view.findViewById(R.id.liked);
 
         List<Playlist> playlistList = new ArrayList<>();
         String userId = null;
@@ -71,7 +76,6 @@ public class PlaylistsFragment extends Fragment {
 
         recyclerView.setAdapter(adapter);
         adapter.fetchPlaylists();
-
 
         ImageView addPlaylistIcon = view.findViewById(R.id.iconAddPlaylist);
         TextView addPlaylistText = view.findViewById(R.id.textAddPlaylist);
@@ -131,8 +135,24 @@ public class PlaylistsFragment extends Fragment {
             }
         };
 
+        View.OnClickListener moveToLikedSong = new View.OnClickListener() {
+
+            @Override
+            public void onClick(View v) {
+                LikedSongFragment fragment = new LikedSongFragment();
+                ((AppCompatActivity)v.getContext()).getSupportFragmentManager()
+                        .beginTransaction()
+                        .replace(R.id.frame_layout, fragment)
+                        .addToBackStack(null)
+                        .commit();
+                Bundle args = new Bundle();
+            }
+        };
+
         addPlaylistIcon.setOnClickListener(addPlaylistClickListener);
         addPlaylistText.setOnClickListener(addPlaylistClickListener);
+
+        liked.setOnClickListener(moveToLikedSong);
 
 
         ImageView recentlyPlayedIcon = view.findViewById(R.id.iconRecentlyPlayed);

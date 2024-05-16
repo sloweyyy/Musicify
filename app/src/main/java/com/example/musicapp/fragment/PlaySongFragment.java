@@ -50,9 +50,11 @@ public class PlaySongFragment extends Fragment implements FetchAccessToken.Acces
     private boolean isPlaying = false;
     private int position = -1;
     private FetchAccessToken fetchAccessToken;
+    private String accessToken;
 
     @Override
     public void onTokenReceived(String accessToken) {
+        this.accessToken = accessToken;
         getTrack(accessToken);
     }
 
