@@ -3,10 +3,13 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:id="@+id/cardExplore"
     android:layout_width="150dp"
+<<<<<<< Updated upstream
 
     android:layout_gravity="center_horizontal"
     android:backgroundTint="#49A078"
 
+=======
+>>>>>>> Stashed changes
     android:layout_height="80dp"
     android:layout_gravity="center"
     android:layout_marginBottom="20dp"
