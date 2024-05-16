@@ -19,8 +19,8 @@ import androidx.recyclerview.widget.RecyclerView;
 import com.bumptech.glide.Glide;
 import com.example.musicapp.R;
 import com.example.musicapp.fragment.LikedAlbumDetailFragment;
-import com.example.musicapp.fragment.PlaySongFragment;
 import com.example.musicapp.model.Album;
+import com.example.musicapp.model.AlbumSimplified;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.QueryDocumentSnapshot;
 
@@ -51,15 +51,18 @@ public class LikedAlbumAdapter extends RecyclerView.Adapter<LikedAlbumAdapter.Vi
         this.context = context;
         this.likedAlbumsList = likedAlbumsList;
         this.userId = userId;
+
+        this.fetchAccessToken = new FetchAccessToken();     //Mới thêm
+        fetchAccessToken.getTokenFromSpotify(this); //Mới thêm
     }
+
 
     @NonNull
     @Override
     public ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
         View view = LayoutInflater.from(context).inflate(R.layout.item_album, parent, false);
-        fetchAccessToken = new FetchAccessToken();
-        fetchAccessToken.getTokenFromSpotify(this);
-
+//        fetchAccessToken = new FetchAccessToken();
+//        fetchAccessToken.getTokenFromSpotify(this);
         return new ViewHolder(view);
     }
 
@@ -97,12 +100,20 @@ public class LikedAlbumAdapter extends RecyclerView.Adapter<LikedAlbumAdapter.Vi
             albumArtist = itemView.findViewById(R.id.albumArtist);
         }
 
-        public void bind(Album album) {
-            albumImage.setImageResource(album.getImageResource());
-            albumName.setText(album.getName());
-            albumArtist.setText(album.getArtistName());
-        }
+//        public void bind(Album album) {
+//            albumImage.setImageResource(album.getImageResource());
+//            albumName.setText(album.getName());
+//            albumArtist.setText(album.getArtistName());
+//        }
+        public void bind(AlbumSimplified album) {
+            String songName = album.getName();
+            String artistName = album.getArtist().get(0).getName();
+            String imageUrl = album.getImages().get(0).getUrl();
 
+            albumName.setText(songName);
+            albumArtist.setText(artistName);
+            Glide.with(context).load(imageUrl).into(albumImage);
+        }
     }
 
     // Method to update the likedAlbum list
@@ -170,12 +181,12 @@ public class LikedAlbumAdapter extends RecyclerView.Adapter<LikedAlbumAdapter.Vi
         String albumId = "4aawyAB9vmqN3uQ7FjRGTy";
         String authorization = "Bearer " + accessToken;
 
-        Call<AlbumModel> call = apiService.getAlbum(authorization, albumId);
-        call.enqueue(new Callback<AlbumModel>() {
+        Call<AlbumSimplified> call = apiService.getAlbum(authorization, albumId);
+        call.enqueue(new Callback<AlbumSimplified>() {
             @Override
-            public void onResponse(@NonNull Call<AlbumModel> call, @NonNull Response<AlbumModel> response) {
+            public void onResponse(@NonNull Call<AlbumSimplified> call, @NonNull Response<AlbumSimplified> response) {
                 if (response.isSuccessful()) {
-                    AlbumModel album = response.body();
+                    AlbumSimplified album = response.body();
                     if (album != null) {
                         setupAlbum(album);
                     }
@@ -185,25 +196,24 @@ public class LikedAlbumAdapter extends RecyclerView.Adapter<LikedAlbumAdapter.Vi
             }
 
             @Override
-            public void onFailure(Call<AlbumModel> call, Throwable throwable) {
+            public void onFailure(Call<AlbumSimplified> call, Throwable throwable) {
                 Log.e("Error fetching track", throwable.getMessage());
             }
         });
     }
-    public void setupAlbum(AlbumModel album) {
+    public void setupAlbum(AlbumSimplified album, TextView albumName, TextView albumArtist, ImageView albumImage) {
         String songName = album.getName();
-        String artistName = album.artists.get(0).getName();
-        String imageUrl = album.images.get(0).getUrl();
+        String artistName = album.getArtist().get(0).getName();
+        String imageUrl = album.getImages().get(0).getUrl();
 
         albumName.setText(songName);
         albumArtist.setText(artistName);
-        Glide.with(getActivity()).load(imageUrl).into(albumImage);
+        Glide.with(context).load(imageUrl).into(albumImage);
     }
-    public void showError(Response<AlbumModel> response) {
+    public void showError(Response<AlbumSimplified> response) {
         try {
-            assert response.errorBody() != null;
             String errorReason = response.errorBody().string();
-            AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
+            AlertDialog.Builder builder = new AlertDialog.Builder(context);
             builder.setTitle("Error");
             builder.setMessage(errorReason);
             builder.setPositiveButton("OK", null);
@@ -215,46 +225,7 @@ public class LikedAlbumAdapter extends RecyclerView.Adapter<LikedAlbumAdapter.Vi
 
     public interface SpotifyApi {
         @GET("v1/albums/{id}")
-        Call<AlbumModel> getAlbum(@Header("Authorization") String authorization, @Path("albumId") String albumId);
+        Call<AlbumSimplified> getAlbum(@Header("Authorization") String authorization, @Path("albumId") String albumId);
     }
-    public static class AlbumModel {
-        @SerializedName("id")
-        private String id;
 
-        @SerializedName("name")
-        private String name;
-
-        @SerializedName("artists")
-        private List<ArtistModel> artists;
-
-        @SerializedName("images")
-        private List<ImageModel> images;
-
-        public String getId() {
-            return id;
-        }
-
-        public String getName() {
-            return name;
-        }
-
-
-        public static class ArtistModel {
-            @SerializedName("name")
-            private String name;
-
-            public String getName() {
-                return name;
-            }
-        }
-
-        public static class ImageModel {
-            @SerializedName("url")
-            private String url;
-
-            public String getUrl() {
-                return url;
-            }
-        }
-    }
 }

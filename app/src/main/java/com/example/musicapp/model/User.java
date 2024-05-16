@@ -12,5 +12,8 @@ public class User {
     private String Bio;
     private String Following;
     private ArrayList likedAlbums;
+    public ArrayList getLikedAlbums() {
+        return likedAlbums;
+    }
 
 }

@@ -19,6 +19,7 @@ import com.bumptech.glide.Glide;
 import com.example.musicapp.R;
 import com.example.musicapp.adapter.LikedAlbumAdapter;
 import com.example.musicapp.model.Album;
+import com.example.musicapp.model.AlbumSimplified;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.material.bottomsheet.BottomSheetDialog;

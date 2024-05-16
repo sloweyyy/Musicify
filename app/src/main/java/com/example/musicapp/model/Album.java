@@ -28,12 +28,9 @@ public class Album {
         return thumbnail;
     }
 
-
-
     public int getImageResource() {
         return thumbnail;
     }
-
 
     public String getId() {
         return id;
@@ -42,7 +39,6 @@ public class Album {
     public void setId(String id) {
         this.id = id;
     }
-
 
     public void setName(String name) {
         this.name = name;
