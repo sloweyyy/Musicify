@@ -9,6 +9,7 @@ import androidx.fragment.app.FragmentTransaction;
 
 import com.example.musicapp.fragment.FavouriteFragment;
 import com.example.musicapp.fragment.HomeFragment;
+import com.example.musicapp.fragment.LikedSongFragment;
 import com.example.musicapp.fragment.ProfileFragment;
 import com.example.musicapp.fragment.ExploreFragment;
 import com.example.musicapp.fragment.PlaySongFragment;
@@ -32,7 +33,7 @@ public class MainActivity extends AppCompatActivity {
         binding.bottomNavigationView.setOnItemSelectedListener(item -> {
 
             if (item.getItemId() == R.id.home) {
-                replaceFragment(new PlaySongFragment());
+                replaceFragment(new HomeFragment());
             } else if (item.getItemId() == R.id.search) {
                 replaceFragment(new ExploreFragment());
             } else if (item.getItemId() == R.id.favourite) {

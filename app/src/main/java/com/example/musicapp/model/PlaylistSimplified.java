@@ -43,9 +43,11 @@ public class PlaylistSimplified {
 
     public static class TracksModel {
         @SerializedName("items")
-        public List<SimplifiedTrack> tracks;
-        @SerializedName("href")
-        public String href;
+        public List<ItemModel> tracks;
 
+        public static class ItemModel{
+            @SerializedName("track")
+            public SimplifiedTrack track;
+        }
     }
 }
