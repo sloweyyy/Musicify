@@ -1,7 +1,214 @@
 <?xml version="1.0" encoding="utf-8"?>
 <androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="#F44336">
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:background="@color/backgroundUser">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:gravity="center"
+        android:id="@+id/linearLayout1"
+        android:orientation="vertical"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toTopOf="parent">
+
+        <ImageView
+            android:id="@+id/backgroundAvatar"
+            android:layout_width="match_parent"
+            android:layout_height="230dp"
+            android:background="@drawable/bg_avatar_corners" />
+
+        <de.hdodenhof.circleimageview.CircleImageView
+            android:id="@+id/avatarImage"
+            android:layout_width="150dp"
+            android:layout_height="150dp"
+            android:layout_marginStart="131dp"
+            android:clickable="true"
+            app:civ_circle_background_color="#FFFFFF"
+            android:layout_marginTop="-70dp"
+            android:layout_marginEnd="130dp"
+            android:src="@drawable/upload_24dp_fill0_wght400_grad0_opsz24"
+            app:civ_border_width="1dp" />
+
+        <LinearLayout
+            android:layout_width="wrap_content"
+            android:orientation="horizontal"
+            android:layout_marginTop="10dp"
+            android:layout_height="wrap_content">
+        <EditText
+            android:id="@+id/Name"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textColor="@color/textColor" />
+            <ImageButton
+                android:id="@+id/modifyName"
+                android:layout_width="wrap_content"
+                android:background="?android:selectableItemBackgroundBorderless"
+                android:src="@drawable/edit_24dp_fill0_wght400_grad0_opsz24"
+                android:layout_height="wrap_content"/>
+        </LinearLayout>
+    </LinearLayout>
+
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:id="@+id/constraintLayout2"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:gravity="center"
+        android:orientation="horizontal"
+        tools:layout_editor_absoluteX="16dp"
+        tools:layout_editor_absoluteY="16dp">
+
+        <ImageButton
+            android:id="@+id/iconBack"
+            android:layout_width="25dp"
+            android:layout_height="25dp"
+            android:layout_marginStart="10dp"
+            android:background="?android:selectableItemBackgroundBorderless"
+            android:contentDescription="back_to_home"
+            android:src="@drawable/arrow_back"
+            android:tint="@color/white"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
+
+        <ImageButton
+            android:id="@+id/notificationIcon"
+            android:layout_width="50dp"
+            android:layout_height="50dp"
+            android:background="?android:selectableItemBackgroundBorderless"
+            android:contentDescription="notify"
+            android:src="@drawable/notifications_24dp_fill0_wght400_grad0_opsz24"
+            android:tint="@color/white"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
+
+<ScrollView
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    app:layout_constraintTop_toBottomOf="@+id/linearLayout1"
+    app:layout_constraintStart_toStartOf="parent"
+    android:fillViewport="true">
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical">
+    <LinearLayout
+        android:id="@+id/linearLayout2"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:gravity="center"
+        android:orientation="vertical">
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_marginLeft="15dp"
+            android:layout_marginBottom="5dp"
+            android:textSize="20dp"
+            android:textColor="@color/textSettingsColor"
+            android:text="Settings"
+            android:layout_height="wrap_content"/>
+        <TextView android:layout_marginLeft="20dp"
+            android:text="Password settings"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="5dp"
+            android:id="@+id/modifyPassword"
+            android:drawablePadding="10dp"
+            android:drawableLeft="@drawable/manage_accounts_24dp_fill0_wght400_grad0_opsz24"
+            android:layout_width="match_parent"
+            android:textColor="@color/textColor"/>
+        <TextView android:layout_marginLeft="20dp"
+            android:text="Show notifications"
+            android:layout_height="wrap_content"
+            android:drawablePadding="10dp"
+            android:layout_marginTop="5dp"
+            android:id="@+id/notification"
+            android:drawableLeft="@drawable/notifications_24dp_fill0_wght400_grad0_opsz24"
+            android:layout_width="match_parent"
+            android:textColor="@color/textColor"/>
+        <TextView android:layout_marginLeft="20dp"
+            android:text="Music Quality"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="5dp"
+            android:drawablePadding="10dp"
+            android:drawableLeft="@drawable/manage_accounts_24dp_fill0_wght400_grad0_opsz24"
+            android:layout_width="match_parent"
+            android:textColor="@color/textColor"/>
+
+
+
+    </LinearLayout>
+    <LinearLayout
+        android:layout_marginTop="15dp"
+        android:id="@+id/linearLayout3"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        app:layout_constraintTop_toBottomOf="@+id/linearLayout2"
+        app:layout_constraintStart_toStartOf="parent"
+        android:gravity="center"
+        android:orientation="vertical">
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_marginLeft="15dp"
+            android:layout_marginBottom="5dp"
+            android:textSize="20dp"
+            android:textColor="@color/textSettingsColor"
+            android:text="Options"
+            android:layout_height="wrap_content"/>
+        <TextView android:layout_marginLeft="20dp"
+            android:text="Check for updates"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="5dp"
+            android:drawablePadding="10dp"
+            android:drawableLeft="@drawable/update_24dp_fill0_wght400_grad0_opsz24"
+            android:layout_width="match_parent"
+            android:textColor="@color/textColor"/>
+        <TextView android:layout_marginLeft="20dp"
+            android:text="Give feedbacks and report errors"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="5dp"
+            android:drawablePadding="10dp"
+            android:drawableLeft="@drawable/flag_24dp_fill0_wght400_grad0_opsz24"
+            android:layout_width="match_parent"
+            android:textColor="@color/textColor"/>
+        <TextView android:layout_marginLeft="20dp"
+            android:text="Terms and conditions"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="5dp"
+            android:drawablePadding="10dp"
+            android:id="@+id/termsAndConditions"
+            android:drawableLeft="@drawable/description_24dp_fill0_wght400_grad0_opsz24"
+            android:layout_width="match_parent"
+            android:textColor="@color/textColor"/>
+        <TextView android:layout_marginLeft="20dp"
+            android:text="Privacy policy"
+            android:layout_height="wrap_content"
+            android:drawablePadding="10dp"
+            android:layout_marginTop="5dp"
+            android:id="@+id/privacyPolicy"
+            android:drawableLeft="@drawable/admin_panel_settings_24dp_fill0_wght400_grad0_opsz24"
+            android:layout_width="match_parent"
+            android:textColor="@color/textColor"/>
+
+        <Button
+            android:id="@+id/btnLogout"
+            android:layout_width="230dp"
+            android:layout_marginLeft="24dp"
+            android:layout_marginRight="24dp"
+            android:layout_marginTop="15dp"
+            android:text="Log out"
+            app:backgroundTint="@color/btnColor"
+            android:layout_height="40dp"
+            android:textColor="@color/textColor"
+            android:background="@drawable/button_custom_selector"
+            />
+
+    </LinearLayout>
+    </LinearLayout>
+</ScrollView>
 
 </androidx.constraintlayout.widget.ConstraintLayout>

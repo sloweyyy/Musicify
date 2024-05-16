@@ -1,0 +1,58 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:orientation="horizontal"
+    android:gravity="center"
+    android:layout_height="155dp">
+    <ImageButton
+        android:id="@+id/playButton"
+        android:layout_width="64dp"
+        android:layout_marginLeft="19dp"
+        android:layout_marginTop="19dp"
+        android:layout_height="64dp"
+        android:background="@drawable/image_button_round_bg"
+        android:src="@drawable/play_arrow_24dp_fill0_wght400_grad0_opsz24"
+     />
+<LinearLayout
+    android:layout_width="wrap_content"
+    android:layout_marginLeft="20dp"
+    android:orientation="vertical"
+    android:gravity="center"
+    android:layout_height="match_parent">
+    <TextView
+        android:id="@+id/playlistName"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Bad Guy"
+        android:textSize="30dp"
+        android:textStyle="bold" />
+
+    <TextView
+        android:id="@+id/artistName"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Billie Eilish"
+        android:textSize="16dp"  />
+
+</LinearLayout>
+    <LinearLayout
+        android:gravity="center"
+        android:orientation="horizontal"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
+<TextView
+    android:layout_width="wrap_content"
+    android:id="@+id/duration"
+    android:textSize="20dp"
+    android:text="5:33"
+    android:layout_height="wrap_content"/>
+        <ImageButton
+            android:layout_width="wrap_content"
+            android:id="@+id/likedButton"
+            android:background="@drawable/play_arrow_24dp_fill0_wght400_grad0_opsz24"
+            android:layout_marginLeft="10dp"
+            android:text="5:33"
+            android:layout_height="wrap_content"/>
+    </LinearLayout>
+
+</LinearLayout>
