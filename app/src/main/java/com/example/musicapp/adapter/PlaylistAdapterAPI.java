@@ -15,7 +15,9 @@ import androidx.recyclerview.widget.RecyclerView;
 import com.bumptech.glide.Glide;
 import com.example.musicapp.R;
 import com.example.musicapp.fragment.List_Playlist;
+
 import com.example.musicapp.fragment.PlaylistDetailAPI;
+
 import com.example.musicapp.model.Category;
 import com.example.musicapp.model.Playlist;
 import com.example.musicapp.model.PlaylistAPI;
@@ -98,6 +100,7 @@ public class PlaylistAdapterAPI extends RecyclerView.Adapter<PlaylistAdapterAPI.
                         .addToBackStack(null)
                         .commit();
             }
+
         }
 
         public void setOnItemClickListener(PlaylistAdapterAPI.OnItemClickListener listenerInput) {

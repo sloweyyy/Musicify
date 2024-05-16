@@ -12,6 +12,7 @@ public class SimplifiedTrack {
     private List<Artist> artists;
     @SerializedName("album")
     private AlbumSimplified album;
+
     public String getName() {
         return name;
     }

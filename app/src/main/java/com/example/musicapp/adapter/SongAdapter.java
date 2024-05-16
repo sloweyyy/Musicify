@@ -10,7 +10,9 @@ import android.widget.TextView;
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.bumptech.glide.Glide;
 import com.example.musicapp.R;
+import com.example.musicapp.model.SimplifiedTrack;
 import com.example.musicapp.model.Song;
 
 import java.util.List;
@@ -37,7 +39,13 @@ public class SongAdapter extends RecyclerView.Adapter<SongAdapter.ViewHolder> {
         Song song = songList.get(position);
         holder.songTitle.setText(song.getTitle());
         holder.artistName.setText(song.getArtist());
-        // Load thumbnail here if available
+
+        // Load image using Glide
+        Glide.with(context)
+                .load(song.getImageUrl()) // Get image URL from the Song object
+                .placeholder(R.drawable.playlist_image)
+                .error(R.drawable.playlist_image)
+                .into(holder.songThumbnail);
     }
 
     @Override
@@ -50,13 +58,16 @@ public class SongAdapter extends RecyclerView.Adapter<SongAdapter.ViewHolder> {
         TextView songTitle;
         TextView artistName;
         ImageView threeDots;
+        ImageView songThumbnail;
 
         public ViewHolder(@NonNull View itemView) {
             super(itemView);
             songTitle = itemView.findViewById(R.id.songTitle);
             artistName = itemView.findViewById(R.id.artistName);
             threeDots = itemView.findViewById(R.id.threeDots);
-            // Handle click events for the three dots icon here if needed
+            songThumbnail = itemView.findViewById(R.id.songThumbnail);
         }
     }
+
+
 }
