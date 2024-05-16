@@ -1,6 +1,5 @@
 package com.example.musicapp.adapter;
 
-import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -9,7 +8,6 @@ import android.widget.TextView;
 
 import androidx.annotation.NonNull;
 import androidx.cardview.widget.CardView;
-import androidx.core.view.GravityCompat;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.bumptech.glide.Glide;
@@ -34,7 +32,7 @@ public class exploreAdapter extends RecyclerView.Adapter<exploreAdapter.myViewHo
             super(itemView);
             cardView = itemView.findViewById(R.id.cardExplore);
             textView = itemView.findViewById(R.id.textExplore);
-            imageView = itemView.findViewById(R.id.imageViewExplore); // Add ImageView
+            imageView = itemView.findViewById(R.id.imageViewExplore);
         }
     }
 
@@ -50,19 +48,21 @@ public class exploreAdapter extends RecyclerView.Adapter<exploreAdapter.myViewHo
         Category category = categories.get(position);
         holder.textView.setText(category.getName());
 
+        Glide.with(holder.itemView.getContext())
+                .load(category.getImageUrl())
+                .placeholder(R.drawable.image_up)
+                .error(R.drawable.image_up)
+                .into(holder.imageView);
+
         if (position % 2 == 0) {
-            // Item chẵn, căn giữa về bên trái
             ViewGroup.MarginLayoutParams layoutParams = (ViewGroup.MarginLayoutParams) holder.cardView.getLayoutParams();
             layoutParams.setMarginStart(0);
             holder.cardView.setLayoutParams(layoutParams);
         } else {
-            // Item lẻ, căn giữa về bên phải
             ViewGroup.MarginLayoutParams layoutParams = (ViewGroup.MarginLayoutParams) holder.cardView.getLayoutParams();
-            layoutParams.setMarginEnd(0); // Set margin end về 0 để căn giữa về bên phải
+            layoutParams.setMarginEnd(0);
             holder.cardView.setLayoutParams(layoutParams);
         }
-
-
     }
 
     @Override
