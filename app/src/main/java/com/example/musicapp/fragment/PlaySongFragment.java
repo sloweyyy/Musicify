@@ -37,7 +37,6 @@ import retrofit2.converter.gson.GsonConverterFactory;
 import retrofit2.http.GET;
 import retrofit2.http.Header;
 import retrofit2.http.Path;
-
 public class PlaySongFragment extends Fragment implements FetchAccessToken.AccessTokenCallback {
 
     private View view;
