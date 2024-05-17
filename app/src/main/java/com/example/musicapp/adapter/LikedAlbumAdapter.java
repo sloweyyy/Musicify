@@ -18,8 +18,6 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.bumptech.glide.Glide;
 import com.example.musicapp.R;
-import com.example.musicapp.fragment.LikedAlbumDetailFragment;
-import com.example.musicapp.model.Album;
 import com.example.musicapp.model.AlbumSimplified;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.QueryDocumentSnapshot;
@@ -40,20 +38,13 @@ import retrofit2.http.GET;
 import retrofit2.http.Header;
 import retrofit2.http.Path;
 
-public class LikedAlbumAdapter extends RecyclerView.Adapter<LikedAlbumAdapter.ViewHolder> implements FetchAccessToken.AccessTokenCallback {
+public class LikedAlbumAdapter extends RecyclerView.Adapter<LikedAlbumAdapter.ViewHolder>{
     private Context context;
-    private List<Album> likedAlbumsList;
-    private String userId;
+    private List<AlbumSimplified> likedAlbumsList;
 
-    private FetchAccessToken fetchAccessToken;
-
-    public LikedAlbumAdapter(Context context, List<Album> likedAlbumsList, String userId) {
+    public LikedAlbumAdapter(Context context, List<AlbumSimplified> likedAlbumsList) {
         this.context = context;
         this.likedAlbumsList = likedAlbumsList;
-        this.userId = userId;
-
-        this.fetchAccessToken = new FetchAccessToken();     //Mới thêm
-        fetchAccessToken.getTokenFromSpotify(this); //Mới thêm
     }
 
 
@@ -61,24 +52,28 @@ public class LikedAlbumAdapter extends RecyclerView.Adapter<LikedAlbumAdapter.Vi
     @Override
     public ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
         View view = LayoutInflater.from(context).inflate(R.layout.item_album, parent, false);
-//        fetchAccessToken = new FetchAccessToken();
-//        fetchAccessToken.getTokenFromSpotify(this);
         return new ViewHolder(view);
     }
 
     @Override
     public void onBindViewHolder(@NonNull ViewHolder holder, int position) {
-        Album album = likedAlbumsList.get(position);
-        holder.bind(album);
+        AlbumSimplified album = likedAlbumsList.get(position);
+        String songName = album.getName();
+        String artistName = album.getArtists().get(0).getName();
+        String imageUrl = album.getImages().get(0).getUrl();
+        holder.albumName.setText(songName);
+        holder.albumArtist.setText(artistName);
+        Glide.with(context).load(imageUrl).into(holder.albumImage);
+
         holder.itemView.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Fragment likedAlbumDetailFragment = LikedAlbumDetailFragment.newInstance(album.getName(), album.getImageResource(), album.getArtistName());
-                FragmentManager fragmentManager = ((AppCompatActivity) context).getSupportFragmentManager();
-                FragmentTransaction transaction = fragmentManager.beginTransaction();
-                transaction.replace(R.id.frame_layout, likedAlbumDetailFragment);
-                transaction.addToBackStack(null);
-                transaction.commit();
+//                Fragment likedAlbumDetailFragment = LikedAlbumDetailFragment.newInstance(album.getName(), album.getImageResource(), album.getArtistName());
+//                FragmentManager fragmentManager = ((AppCompatActivity) context).getSupportFragmentManager();
+//                FragmentTransaction transaction = fragmentManager.beginTransaction();
+//                transaction.replace(R.id.frame_layout, likedAlbumDetailFragment);
+//                transaction.addToBackStack(null);
+//                transaction.commit();
             }
         });
     }
@@ -95,19 +90,14 @@ public class LikedAlbumAdapter extends RecyclerView.Adapter<LikedAlbumAdapter.Vi
 
         public ViewHolder(@NonNull View itemView) {
             super(itemView);
-            albumImage = itemView.findViewById(R.id.albumImage);
-            albumName = itemView.findViewById(R.id.albumName);
-            albumArtist = itemView.findViewById(R.id.albumArtist);
+            albumImage = itemView.findViewById(R.id.albumThumbnail);
+            albumName = itemView.findViewById(R.id.albumTitle);
+            albumArtist = itemView.findViewById(R.id.artistName);
         }
 
-//        public void bind(Album album) {
-//            albumImage.setImageResource(album.getImageResource());
-//            albumName.setText(album.getName());
-//            albumArtist.setText(album.getArtistName());
-//        }
         public void bind(AlbumSimplified album) {
             String songName = album.getName();
-            String artistName = album.getArtist().get(0).getName();
+            String artistName = album.getArtists().get(0).getName();
             String imageUrl = album.getImages().get(0).getUrl();
 
             albumName.setText(songName);
@@ -118,26 +108,26 @@ public class LikedAlbumAdapter extends RecyclerView.Adapter<LikedAlbumAdapter.Vi
 
     // Method to update the likedAlbum list
 
-    public void updateLikedAlbumList(List<Album> albums) {
-        likedAlbumsList.clear();
-        likedAlbumsList.addAll(albums);
-        notifyDataSetChanged();
-    }
-    // Method to fetch liked albums from Firestore based on the user's ID
+//    public void updateLikedAlbumList(List<Album> albums) {
+//        likedAlbumsList.clear();
+//        likedAlbumsList.addAll(albums);
+//        notifyDataSetChanged();
+//    }
+//    // Method to fetch liked albums from Firestore based on the user's ID
 
-    public void fetchLikedAlbums() {
-        FirebaseFirestore db = FirebaseFirestore.getInstance();
-        db.collection("users").whereEqualTo("userId", userId).get().addOnSuccessListener(queryDocumentSnapshots -> {
-            List<Album> albums = new ArrayList<>();
-            for (QueryDocumentSnapshot document : queryDocumentSnapshots) {
-                Album album = document.toObject(Album.class);
-                albums.add(album);
-            }
-            updateLikedAlbumList(albums);
-        }).addOnFailureListener(e -> {
-            // Handle error
-        });
-    }
+//    public void fetchLikedAlbums() {
+//        FirebaseFirestore db = FirebaseFirestore.getInstance();
+//        db.collection("users").whereEqualTo("userId", userId).get().addOnSuccessListener(queryDocumentSnapshots -> {
+//            List<Album> albums = new ArrayList<>();
+//            for (QueryDocumentSnapshot document : queryDocumentSnapshots) {
+//                Album album = document.toObject(Album.class);
+//                albums.add(album);
+//            }
+//            updateLikedAlbumList(albums);
+//        }).addOnFailureListener(e -> {
+//            // Handle error
+//        });
+//    }
     // Method to sort the album list by name
 
     public void sortAlbumByName() {
@@ -161,71 +151,22 @@ public class LikedAlbumAdapter extends RecyclerView.Adapter<LikedAlbumAdapter.Vi
     }
     // Method to delete a liked album from Firestore
 
-    public void unlikeAlbum(Album album) {
-        FirebaseFirestore db = FirebaseFirestore.getInstance();
-        db.collection("users").document(album.getId()).delete().addOnSuccessListener(aVoid -> {
-            fetchLikedAlbums();
-        }).addOnFailureListener(e -> {
-            // Handle error
-        });
-    }
-    @Override
-    public void onTokenReceived(String accessToken) {
-        getAlbum(accessToken);
-    }
+//    public void unlikeAlbum(Album album) {
+//        FirebaseFirestore db = FirebaseFirestore.getInstance();
+//        db.collection("users").document(album.getId()).delete().addOnSuccessListener(aVoid -> {
+//            fetchLikedAlbums();
+//        }).addOnFailureListener(e -> {
+//            // Handle error
+//        });
+//    }
 
-    private void getAlbum (String accessToken){
-        Retrofit retrofit = new Retrofit.Builder().baseUrl("https://api.spotify.com/").addConverterFactory(GsonConverterFactory.create()).build();
-
-        SpotifyApi apiService = retrofit.create(SpotifyApi.class);
-        String albumId = "4aawyAB9vmqN3uQ7FjRGTy";
-        String authorization = "Bearer " + accessToken;
-
-        Call<AlbumSimplified> call = apiService.getAlbum(authorization, albumId);
-        call.enqueue(new Callback<AlbumSimplified>() {
-            @Override
-            public void onResponse(@NonNull Call<AlbumSimplified> call, @NonNull Response<AlbumSimplified> response) {
-                if (response.isSuccessful()) {
-                    AlbumSimplified album = response.body();
-                    if (album != null) {
-                        setupAlbum(album);
-                    }
-                } else {
-                    showError(response);
-                }
-            }
-
-            @Override
-            public void onFailure(Call<AlbumSimplified> call, Throwable throwable) {
-                Log.e("Error fetching track", throwable.getMessage());
-            }
-        });
-    }
     public void setupAlbum(AlbumSimplified album, TextView albumName, TextView albumArtist, ImageView albumImage) {
         String songName = album.getName();
-        String artistName = album.getArtist().get(0).getName();
+        String artistName = album.getArtists().get(0).getName();
         String imageUrl = album.getImages().get(0).getUrl();
 
         albumName.setText(songName);
         albumArtist.setText(artistName);
         Glide.with(context).load(imageUrl).into(albumImage);
     }
-    public void showError(Response<AlbumSimplified> response) {
-        try {
-            String errorReason = response.errorBody().string();
-            AlertDialog.Builder builder = new AlertDialog.Builder(context);
-            builder.setTitle("Error");
-            builder.setMessage(errorReason);
-            builder.setPositiveButton("OK", null);
-            builder.create().show();
-        } catch (IOException e) {
-            Log.e("Error handling response", e.getMessage());
-        }
-    }
-
-    public interface SpotifyApi {
-        @GET("v1/albums/{id}")
-        Call<AlbumSimplified> getAlbum(@Header("Authorization") String authorization, @Path("albumId") String albumId);
-    }
-
 }

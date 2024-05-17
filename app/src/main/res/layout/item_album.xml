@@ -15,48 +15,49 @@
         android:padding="16dp">
 
         <ImageView
-            android:id="@+id/albumImage"
+            android:id="@+id/albumThumbnail"
             android:layout_width="64dp"
             android:layout_height="64dp"
             android:src="@drawable/playlist_image" />
 
+        <!-- Dấu ba chấm -->
         <androidx.constraintlayout.widget.ConstraintLayout
             android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_weight="1"
+            android:layout_height="64dp"
             android:layout_marginStart="16dp"
-            android:layout_marginEnd="10dp">
+            android:layout_marginEnd="10dp"
+            android:layout_weight="1">
 
             <TextView
-                android:id="@+id/albumName"
+                android:id="@+id/albumTitle"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="Album Name"
+                android:text="Album Title"
                 android:textSize="24sp"
                 android:textStyle="bold"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toTopOf="parent" />
 
-
             <TextView
-                android:id="@+id/albumArtist"
+                android:id="@+id/artistName"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="ABC"
+                android:text="Artist Name"
                 android:textSize="18sp"
+                app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@id/albumName" />
+                app:layout_constraintTop_toBottomOf="@id/albumTitle"
+                app:layout_constraintVertical_bias="1.0" />
 
         </androidx.constraintlayout.widget.ConstraintLayout>
 
         <ImageView
-            android:id="@+id/privacyIcon"
-            android:layout_width="88dp"
-            android:layout_height="55dp"
-            android:padding="10dp"
-            android:src="@drawable/ic_private"
-            app:tint="@color/caribbean_current"
-            app:layout_constraintEnd_toEndOf="parent" />
+            android:id="@+id/threeDots"
+            android:layout_width="25dp"
+            android:layout_height="64dp"
+            android:layout_marginStart="8dp"
+            android:src="@drawable/three_dots"
+            app:tint="@color/white" />
 
     </LinearLayout>
 
