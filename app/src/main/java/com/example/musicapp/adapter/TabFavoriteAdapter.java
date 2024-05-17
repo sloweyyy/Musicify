@@ -5,7 +5,7 @@ import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentActivity;
 import androidx.viewpager2.adapter.FragmentStateAdapter;
 
-import com.example.musicapp.fragment.AlbumsFragment;
+import com.example.musicapp.fragment.LikedAlbumsFragment;
 import com.example.musicapp.fragment.ArtistsFragment;
 import com.example.musicapp.fragment.PlaylistsFragment;
 
@@ -22,7 +22,7 @@ public class TabFavoriteAdapter extends FragmentStateAdapter {
         switch (position) {
             case 0: return new PlaylistsFragment();
             case 1: return new ArtistsFragment();
-            case 2: return new AlbumsFragment();
+            case 2: return new LikedAlbumsFragment();
             default: return new PlaylistsFragment();
         }
     }
