@@ -67,7 +67,7 @@ public class LikedAlbumsFragment extends Fragment implements FetchAccessToken.Ac
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
-        view = inflater.inflate(R.layout.fragment_albums, container, false);
+        view = inflater.inflate(R.layout.fragment_liked_albums, container, false);
         recyclerView = view.findViewById(R.id.recyclerView);
         recyclerView.setLayoutManager(new LinearLayoutManager(getActivity()));
         storage = FirebaseStorage.getInstance();
@@ -114,14 +114,14 @@ public class LikedAlbumsFragment extends Fragment implements FetchAccessToken.Ac
                 for (String id : albumids){
                     getAlbum(accessToken,id);
                 }
-                //adapter = new LikedAlbumAdapter(getContext(), albumList);
-                //recyclerView.setAdapter(adapter);
+                adapter = new LikedAlbumAdapter(getContext(), albumList);
+                recyclerView.setAdapter(adapter);
             }
         }).addOnFailureListener(e -> {
         });
     }
     public interface SpotifyApi {
-        @GET("v1/albums/{id}")
+        @GET("v1/albums/{albumId}")
         Call<AlbumSimplified> getAlbum(@Header("Authorization") String authorization, @Path("albumId") String albumId);
     }
     private void getAlbum (String accessToken, String albumId){
@@ -135,13 +135,8 @@ public class LikedAlbumsFragment extends Fragment implements FetchAccessToken.Ac
             public void onResponse(@NonNull Call<AlbumSimplified> call, @NonNull Response<AlbumSimplified> response) {
                 if (response.isSuccessful()) {
                     AlbumSimplified album = response.body();
-                    AlertDialog.Builder builder = new AlertDialog.Builder(requireContext());
-                    builder.setTitle("Cảnh báo");
-                    builder.setMessage(album.getName());
-                    builder.setPositiveButton("OK", null);
-                    builder.show();
-                    //albumList.add(album);
-                    //adapter.notifyItemInserted(albumList.size() - 1);
+                    albumList.add(album);
+                    adapter.notifyItemInserted(albumList.size() - 1);
                 }else {
                     AlertDialog.Builder builder = new AlertDialog.Builder(requireContext());
                     builder.setTitle("Cảnh báo");
