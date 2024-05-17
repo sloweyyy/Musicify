@@ -78,6 +78,14 @@ public class ForgetPasswordActivity extends AppCompatActivity {
                                 Log.d("TAG", "Error sending password reset email");
                                 Toast.makeText(ForgetPasswordActivity.this, "Error sending password reset email", Toast.LENGTH_SHORT). show();
                             }
+                        }).addOnCompleteListener(new OnCompleteListener<Void>() {
+                            @Override
+                            public void onComplete(@NonNull Task<Void> task) {
+                                Toast.makeText(ForgetPasswordActivity.this, "Reset Password link has been sent to your registered Email", Toast.LENGTH_SHORT). show();
+                                Intent intent = new Intent(ForgetPasswordActivity.this, LoginActivity.class);
+                                startActivity (intent);
+                                finish();
+                            }
                         });
             }
 

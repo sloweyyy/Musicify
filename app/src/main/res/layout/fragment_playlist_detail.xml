@@ -84,7 +84,7 @@
         android:textSize="18sp" />
 
     <androidx.recyclerview.widget.RecyclerView
-        android:id="@+id/recyclerView"
+        android:id="@+id/recyclerViewSongDetail"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:layout_below="@id/playlistDescription"
@@ -93,6 +93,7 @@
         android:clipToPadding="false"
         android:padding="8dp"
         android:scrollbars="vertical"
-        tools:listitem="@layout/item_song" />
 
+        />
+<!--    tools:listitem="@layout/item_song"-->
 </RelativeLayout>
