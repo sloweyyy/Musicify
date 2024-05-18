@@ -114,6 +114,7 @@ public class LikedAlbumDetailFragment extends Fragment {
         // Call Spotify API here to fetch songs and populate songList
         // For example:
 
+        adapter.notifyDataSetChanged();
     }
 
 //    @Override

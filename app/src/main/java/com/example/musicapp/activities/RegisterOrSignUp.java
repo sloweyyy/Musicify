@@ -56,7 +56,7 @@ public class RegisterOrSignUp extends AppCompatActivity {
         iconBack.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Intent intent = new Intent(getApplicationContext(), ThemeActivity.class);
+                Intent intent = new Intent(getApplicationContext(), GettingStartedActivity.class);
                 startActivity(intent);
                 finish();
             }

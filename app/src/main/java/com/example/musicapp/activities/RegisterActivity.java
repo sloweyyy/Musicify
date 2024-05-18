@@ -32,9 +32,7 @@ import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.Transaction;
 
-import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 
 public class RegisterActivity extends AppCompatActivity {
@@ -138,93 +136,51 @@ public class RegisterActivity extends AppCompatActivity {
                     msgError.setVisibility(View.VISIBLE);
                     return;
                 }
-<<<<<<< Updated upstream
-                mAuth.createUserWithEmailAndPassword(email, password)
-                        .addOnCompleteListener(new OnCompleteListener<AuthResult>() {
-                            @Override
-                            public void onComplete(@NonNull Task<AuthResult> task) {
-                                if (task.isSuccessful()) {
-                                    Toast.makeText(RegisterActivity.this, "Account created.",
-                                            Toast.LENGTH_SHORT).show();
-                                    FirebaseUser currentUser = mAuth.getCurrentUser();
-                                    if(currentUser != null)
-                                    {
-                                        FirebaseFirestore db = FirebaseFirestore.getInstance();
-                                        DocumentReference counterRef = db.collection("counters").document("userCounter");
-                                    counterRef.get().addOnSuccessListener(new OnSuccessListener<DocumentSnapshot>() {
-                                        @Override
-                                        public void onSuccess(DocumentSnapshot documentSnapshot) {
-                                            double newCounter = documentSnapshot.getDouble("counter") + 1;
-                                            counterRef.update("counter", newCounter).addOnSuccessListener(new OnSuccessListener<Void>() {
-                                                @Override
-                                                public void onSuccess(Void unused) {
-                                                    Log.d("TAG", "Counter Updated!");
-                                                    DocumentReference mFirestore = db.document("users/user" + newCounter);
-
-                                                    Map<String, Object> user = new HashMap<>();
-                                                    user.put("Name", name);
-                                                    user.put("id", currentUser.getUid());
-                                                    user.put("password",password);
-                                                    user.put("email", email);
-                                                    mFirestore.set(user).addOnSuccessListener(new OnSuccessListener<Void>() {
-                                                        @Override
-                                                        public void onSuccess(Void unused) {
-                                                            Log.d("TAG", "User Data Saved Successfully!");
-
-                                                            Intent intent = new Intent(getApplicationContext(), LoginActivity.class);
-                                                            startActivity(intent);
-                                                            finish();
-                                                        }
-                                                    }).addOnFailureListener(new OnFailureListener() {
-                                                        @Override
-                                                        public void onFailure(@NonNull Exception e) {
-                                                            Log.w("TAG", "Failed to save user data.", e);
-                                                        }
-                                                    });
-=======
                 mAuth.createUserWithEmailAndPassword(email, password).addOnCompleteListener(new OnCompleteListener<AuthResult>() {
                     @Override
                     public void onComplete(@NonNull Task<AuthResult> task) {
                         if (task.isSuccessful()) {
                             Toast.makeText(RegisterActivity.this, "Account created.", Toast.LENGTH_SHORT).show();
-                            List<String> likedSongs = new ArrayList<>();
-                            List<String> likedAlbums = new ArrayList<>();
-                            List<String> likedArtists = new ArrayList<>();
+
                             FirebaseUser currentUser = mAuth.getCurrentUser();
                             if(currentUser != null) {
                                 FirebaseFirestore db = FirebaseFirestore.getInstance();
-
+                                List<String> likedSongs = new ArrayList<>();
+                                List<String> likedAlbums = new ArrayList<>();
+                                List<String> likedArtists = new ArrayList<>();
                                 Map<String, Object> user = new HashMap<>();
                                 user.put("Name", name);
                                 user.put("id", currentUser.getUid());
                                 user.put("password", password);
-                                user.put("email", email);
+                                user.put("email", email); 
                                 user.put("likedsong",likedSongs);
                                 user.put("likedAlbums", likedAlbums);
                                 user.put("likedArtists", likedArtists);
->>>>>>> Stashed changes
+                                user.put("notificationCount",0);
+                              
 
-                                                }
-                                            }).addOnFailureListener(new OnFailureListener() {
-                                                @Override
-                                                public void onFailure(@NonNull Exception e) {
-                                                    Log.w("TAG", "Failed to update counter.", e);
-                                                }
-                                            }).addOnFailureListener(new OnFailureListener() {
-                                                @Override
-                                                public void onFailure(@NonNull Exception e) {
-                                                    Log.w("TAG", "Failed to get counter.", e);
-                                                }
-                                            });
-                                        }
-                                    });
+                                DocumentReference userDocRef = db.collection("users").document(currentUser.getUid());
+                                userDocRef.set(user).addOnSuccessListener(new OnSuccessListener<Void>() {
+                                    @Override
+                                    public void onSuccess(Void unused) {
+                                        Log.d("TAG", "User data saved successfully!");
+
+                                        Intent intent = new Intent(getApplicationContext(), LoginActivity.class);
+                                        startActivity(intent);
+                                        finish();
                                     }
-                                } else {
-                                    Toast.makeText(RegisterActivity.this, "Authentication failed.",
-                                            Toast.LENGTH_SHORT).show();
-                                }
+                                }).addOnFailureListener(new OnFailureListener() {
+                                    @Override
+                                    public void onFailure(@NonNull Exception e) {
+                                        Log.w("TAG", "Failed to save user data.", e);
+                                    }
+                                });
                             }
-                        });
+                        } else {
+                            Toast.makeText(RegisterActivity.this, "Authentication failed.", Toast.LENGTH_SHORT).show();
+                        }
+                    }
+                });
             }
         });
 
