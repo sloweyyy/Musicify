@@ -113,9 +113,7 @@ public class LikedAlbumDetailFragment extends Fragment {
     private void loadSongsFromSpotify() {
         // Call Spotify API here to fetch songs and populate songList
         // For example:
-        songList.add(new Song("Song 1", "Artist 1"));
-        songList.add(new Song("Song 2", "Artist 2"));
-        songList.add(new Song("Song 3", "Artist 3"));
+
         adapter.notifyDataSetChanged();
     }
 

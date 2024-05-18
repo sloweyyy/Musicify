@@ -52,12 +52,14 @@
         </androidx.constraintlayout.widget.ConstraintLayout>
 
         <ImageView
-            android:id="@+id/threeDots"
+            android:id="@+id/heartBtn"
             android:layout_width="25dp"
+            android:contentDescription="addToLikedSong"
             android:layout_height="64dp"
             android:layout_marginStart="8dp"
-            android:src="@drawable/three_dots"
-            app:tint="@color/white" />
+            android:src="@drawable/heart_green_ouline"
+            app:tint="@color/btnPressed"
+            />
 
     </LinearLayout>
 

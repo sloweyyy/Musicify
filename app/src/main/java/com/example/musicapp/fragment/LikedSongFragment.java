@@ -4,12 +4,20 @@ import android.app.AlertDialog;
 import android.net.Uri;
 import android.os.Bundle;
 import android.security.keystore.StrongBoxUnavailableException;
+import android.text.Editable;
+import android.text.TextWatcher;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Button;
+import android.widget.EditText;
+import android.widget.LinearLayout;
 import android.widget.TextView;
 
+import androidx.appcompat.app.AppCompatActivity;
 import androidx.fragment.app.Fragment;
+import androidx.fragment.app.FragmentManager;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
@@ -40,8 +48,14 @@ public class LikedSongFragment extends Fragment implements FetchAccessToken.Acce
     private TextView songCount;
     private FetchAccessToken fetchAccessToken;
     private String accessToken;
+    private LinearLayout backButtonLayout;
     List<Song> songs = new ArrayList<>();
     private RecyclerView recyclerView;
+
+    private RecyclerView recyclerViewSearch;
+    private EditText search;
+
+    private Button backBtn;
     private SongAdapter songAdapter;
 
     @Override
@@ -79,13 +93,76 @@ public class LikedSongFragment extends Fragment implements FetchAccessToken.Acce
         view = inflater.inflate(R.layout.likedsong_fragment, container, false);
         recyclerView = view.findViewById(R.id.recyclerView);
         LinearLayoutManager layoutManager = new LinearLayoutManager(getActivity());
+        LinearLayoutManager layoutManagerNew = new LinearLayoutManager(getActivity());
         recyclerView.setLayoutManager(layoutManager);
+        backButtonLayout = view.findViewById(R.id.backButtonLayout);
+        backBtn = view.findViewById(R.id.iconBack);
+        recyclerViewSearch = view.findViewById(R.id.recyclerViewSearch);
+        recyclerViewSearch.setLayoutManager(layoutManagerNew);
+        search = view.findViewById(R.id.searchSong);
         songCount = view.findViewById(R.id.songCount);
         storage = FirebaseStorage.getInstance();
         fetchAccessToken = new FetchAccessToken();
         fetchAccessToken.getTokenFromSpotify(this);
+        backButtonLayout.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                FragmentManager fragmentManager = getParentFragmentManager();
+                fragmentManager.popBackStack();
+            }
+        });
+
+        backBtn.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                FragmentManager fragmentManager = getParentFragmentManager();
+                fragmentManager.popBackStack();
+            }
+        });
+
+        search.addTextChangedListener(new TextWatcher() {
+            @Override
+            public void beforeTextChanged(CharSequence s, int start, int count, int after) {
+                // Not used
+            }
+
+            @Override
+            public void onTextChanged(CharSequence s, int start, int before, int count) {
+                String query = s.toString();
+                searchSongs(query);
+            }
+
+            @Override
+            public void afterTextChanged(Editable s) {
+                // Not used
+            }
+        });
 
         return view;
+    }
+
+    public void searchSongs(String query){
+        if (query.isEmpty()){
+            recyclerViewSearch.setVisibility(View.GONE);
+            recyclerView.setVisibility(View.VISIBLE);
+            songAdapter.notifyDataSetChanged();
+            return;
+        }
+        else {
+            recyclerViewSearch.setVisibility(View.VISIBLE);
+            recyclerView.setVisibility(View.GONE);
+            List<Song> filteredSongs = new ArrayList<>();
+            for (Song song : songs) {
+                if (song.getTitle().toLowerCase().contains(query.toLowerCase())) {
+                    filteredSongs.add(song);
+                    Log.e("FilteredSong: " + "", filteredSongs.toString());
+                }
+            }
+            songAdapter = new SongAdapter(getContext(), filteredSongs);
+            songAdapter.notifyDataSetChanged();
+            recyclerViewSearch.setAdapter(songAdapter);
+        }
+
     }
 
     private void getTrack(String accessToken, String songId) {
@@ -122,6 +199,10 @@ public class LikedSongFragment extends Fragment implements FetchAccessToken.Acce
 
         });
     }
+
+
+
+
     public interface SpotifyApi {
         @GET("v1/tracks/{songId}")
         Call<SimplifiedTrack> getTrack(@Header("Authorization") String authorization, @Path("songId") String songId);

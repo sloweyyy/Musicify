@@ -8,6 +8,9 @@ public class SimplifiedTrack {
     @SerializedName("name")
     private String name;
 
+    @SerializedName("id")
+    private String id;
+
     @SerializedName("artists")
     private List<Artist> artists;
     @SerializedName("album")
@@ -25,4 +28,7 @@ public class SimplifiedTrack {
         return album;
     }
 
+    public String getId() {
+        return id;
+    }
 }
