@@ -2,18 +2,26 @@ package com.example.musicapp.model;
 
 public class Song {
     private String title;
+
+    private boolean isLiked;
+
+    private String id;
     private String artist;
     private String imageUrl;
 
-    public Song(String title, String artist) {
+    public Song(String title, String artist, String id) {
         this.title = title;
         this.artist = artist;
+        this.id = id;
+        this.isLiked = false;
     }
 
-    public Song(String title, String artist, String imageUrl) {
+    public Song(String title, String artist, String imageUrl, String id) {
         this.title = title;
         this.artist = artist;
         this.imageUrl = imageUrl;
+        this.id = id;
+        this.isLiked = false;
     }
 
     public String getTitle() {
@@ -28,12 +36,24 @@ public class Song {
         return imageUrl;
     }
 
+    public String getId() {
+        return id;
+    }
+
+    public boolean isLiked() {
+        return isLiked;
+    }
+
     public void setImageUrl(String imageUrl) {
         this.imageUrl = imageUrl;
     }
 
     public void setTitle(String title) {
         this.title = title;
+    }
+
+    public void setLiked(boolean liked) {
+        isLiked = liked;
     }
 
     public void setArtist(String artist) {
@@ -43,6 +63,7 @@ public class Song {
     public static Song fromSimplifiedTrack(SimplifiedTrack track) {
         String artistName = "";
         String imageUrl = "";
+        String id = "";
 
         if (track.getArtists() != null && !track.getArtists().isEmpty()) {
             artistName = track.getArtists().get(0).getName();
@@ -52,6 +73,10 @@ public class Song {
             imageUrl = track.getAlbum().getImages().get(0).getUrl();
         }
 
-        return new Song(track.getName(), artistName, imageUrl);
+        if (track.getId() != null) {
+            id = track.getId();
+        }
+
+        return new Song(track.getName(), artistName, imageUrl, id);
     }
 }

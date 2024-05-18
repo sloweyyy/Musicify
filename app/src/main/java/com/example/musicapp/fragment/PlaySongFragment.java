@@ -4,7 +4,6 @@ import android.annotation.SuppressLint;
 import android.app.AlertDialog;
 import android.media.AudioAttributes;
 import android.media.MediaPlayer;
-import android.net.Uri;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Looper;
@@ -12,18 +11,27 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Button;
 import android.widget.ImageButton;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.SeekBar;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
+import androidx.fragment.app.FragmentManager;
 
 import com.bumptech.glide.Glide;
 import com.example.musicapp.R;
 import com.example.musicapp.adapter.FetchAccessToken;
+import com.example.musicapp.model.BottomAppBarListener;
+import com.example.musicapp.adapter.SongAdapter;
+import com.google.firebase.firestore.DocumentSnapshot;
+import com.google.firebase.firestore.FieldValue;
+import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.gson.annotations.SerializedName;
 
 import java.io.IOException;
@@ -37,6 +45,7 @@ import retrofit2.converter.gson.GsonConverterFactory;
 import retrofit2.http.GET;
 import retrofit2.http.Header;
 import retrofit2.http.Path;
+
 public class PlaySongFragment extends Fragment implements FetchAccessToken.AccessTokenCallback {
 
     private View view;
@@ -45,12 +54,20 @@ public class PlaySongFragment extends Fragment implements FetchAccessToken.Acces
     private TextView songname, artistname, duration_played, duration_total;
     private ImageView cover_art;
     private ImageButton repeateBtn, previousBtn, pauseBtn, nextBtn, shuffleBtn;
+
+    private LinearLayout backButtonLayout;
+
+    private Button iconBackPlaying;
+
     private SeekBar seekBar;
     private MediaPlayer mediaPlayer;
     private boolean isPlaying = false;
     private int position = -1;
     private FetchAccessToken fetchAccessToken;
     private String accessToken;
+
+    private ImageView heartBtn;
+    private String songId;
 
     @Override
     public void onTokenReceived(String accessToken) {
@@ -60,11 +77,43 @@ public class PlaySongFragment extends Fragment implements FetchAccessToken.Acces
 
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
+
         view = inflater.inflate(R.layout.play_song, container, false);
+        // hide bottom navigation bar
+        ((BottomAppBarListener) requireActivity()).hideBottomAppBar();
         fetchAccessToken = new FetchAccessToken();
         fetchAccessToken.getTokenFromSpotify(this);
         initializeViews();
+        if (getArguments() != null) {
+            songId = getArguments().getString("songId");
+        }
+        backButtonLayout.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                FragmentManager fragmentManager = getParentFragmentManager();
+                fragmentManager.popBackStack();
+            }
+        });
+
+        iconBackPlaying.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                FragmentManager fragmentManager = getParentFragmentManager();
+                fragmentManager.popBackStack();
+            }
+        });
+
         return view;
+    }
+
+    @Override
+    public void onDestroyView() {
+        super.onDestroyView();
+        ((BottomAppBarListener) requireActivity()).showBottomAppBar();
+    }
+
+    public void setSongId(String songId) {
+        this.songId = songId;
     }
 
     private void initializeViews() {
@@ -79,6 +128,111 @@ public class PlaySongFragment extends Fragment implements FetchAccessToken.Acces
         shuffleBtn = view.findViewById(R.id.shuffleBtn);
         cover_art = view.findViewById(R.id.imageCon);
         seekBar = view.findViewById(R.id.seekbar);
+        backButtonLayout = view.findViewById(R.id.backButtonLayout);
+        iconBackPlaying = view.findViewById(R.id.iconBackPlaying);
+        heartBtn = view.findViewById(R.id.heartBtn);
+
+        checkIsLiked(songId, new OnIsLikedCallback() {
+            @Override
+            public void onResult(boolean isLiked) {
+                if (isLiked) {
+                    heartBtn.setImageResource(R.drawable.favourite_filled);
+                } else {
+                    heartBtn.setImageResource(R.drawable.favourite_outline);
+                }
+            }
+        });
+
+        heartBtn.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                checkIsLiked(songId, new OnIsLikedCallback() {
+                    @Override
+                    public void onResult(boolean isLiked) {
+                        if (isLiked) {
+                            removeSongFromLikedSongs(songId);
+                            heartBtn.setImageResource(R.drawable.favourite_outline);
+                        } else {
+                            addSongToLikedSongs(songId);
+                            heartBtn.setImageResource(R.drawable.favourite_filled);
+                        }
+                    }
+                });
+            }
+        });
+
+    }
+
+    private void checkIsLiked(String id, OnIsLikedCallback callback) {
+        String userId = "4k4kPnoXFCTgzBAvaDNw25XVFpy1";
+        FirebaseFirestore db = FirebaseFirestore.getInstance();
+
+        db.collection("users")
+                .whereEqualTo("id", userId)
+                .get()
+                .addOnSuccessListener(queryDocumentSnapshots -> {
+                    if (!queryDocumentSnapshots.isEmpty()) {
+                        DocumentSnapshot userDoc = queryDocumentSnapshots.getDocuments().get(0);
+                        List<String> likedSongs = (List<String>) userDoc.get("likedsong");
+                        callback.onResult(likedSongs.contains(id));
+                    }
+                })
+                .addOnFailureListener(e -> {
+                    Log.e("SongAdapter", "Failed to retrieve user document: " + e.getMessage());
+                    callback.onResult(false);
+                });
+    }
+
+    private void removeSongFromLikedSongs(String songId) {
+        String userId = "4k4kPnoXFCTgzBAvaDNw25XVFpy1";
+        FirebaseFirestore db = FirebaseFirestore.getInstance();
+
+        db.collection("users")
+                .whereEqualTo("id", userId)
+                .get()
+                .addOnSuccessListener(queryDocumentSnapshots -> {
+                    if (!queryDocumentSnapshots.isEmpty()) {
+                        DocumentSnapshot userDoc = queryDocumentSnapshots.getDocuments().get(0);
+                        userDoc.getReference().update("likedsong", FieldValue.arrayRemove(songId))
+                                .addOnSuccessListener(aVoid -> {
+                                    Toast.makeText(requireContext(), "Removed from liked songs successfully", Toast.LENGTH_SHORT).show();
+                                })
+                                .addOnFailureListener(e -> {
+                                    Log.e("SongAdapter", "Failed to remove song from liked songs: " + e.getMessage());
+                                });
+                    } else {
+                        Log.e("SongAdapter", "No user document found with userId: " + userId);
+                    }
+                })
+                .addOnFailureListener(e -> {
+                    Log.e("SongAdapter", "Failed to retrieve user document: " + e.getMessage());
+                });
+    }
+    public void addSongToLikedSongs(String songId) {
+        String userId = "4k4kPnoXFCTgzBAvaDNw25XVFpy1";
+        FirebaseFirestore db = FirebaseFirestore.getInstance();
+        db.collection("users")
+                .whereEqualTo("id", userId)
+                .get()
+                .addOnSuccessListener(queryDocumentSnapshots -> {
+                    if (!queryDocumentSnapshots.isEmpty()) {
+                        DocumentSnapshot userDoc = queryDocumentSnapshots.getDocuments().get(0);
+                        userDoc.getReference().update("likedsong", FieldValue.arrayUnion(songId))
+                                .addOnSuccessListener(aVoid -> {
+
+                                    Toast.makeText(requireContext(), "Add to liked songs successfully", Toast.LENGTH_SHORT).show();
+                                })
+                                .addOnFailureListener(e -> {
+                                    // Handle the error
+                                    Log.e("SongAdapter", "Failed to add song to liked songs: " + e.getMessage());
+                                });
+                    } else {
+                        Log.e("SongAdapter", "No user document found with userId: " + userId);
+                    }
+                })
+                .addOnFailureListener(e -> {
+                    Log.e("SongAdapter", "Failed to retrieve user document: " + e.getMessage());
+                });
     }
 
     private void getTrack(String accessToken) {
@@ -88,9 +242,7 @@ public class PlaySongFragment extends Fragment implements FetchAccessToken.Acces
                 .build();
 
         SpotifyApi apiService = retrofit.create(SpotifyApi.class);
-        String songId = "3ukrFH17Zl6iEZ2QJ1Zwiy"; // Replace with the actual track ID
         String authorization = "Bearer " + accessToken;
-
         Call<TrackModel> call = apiService.getTrack(authorization, songId);
         call.enqueue(new Callback<TrackModel>() {
             @Override
@@ -230,6 +382,10 @@ public class PlaySongFragment extends Fragment implements FetchAccessToken.Acces
             mediaPlayer = null;
         }
         handler.removeCallbacks(updateSeekBarRunnable);
+    }
+
+    private interface OnIsLikedCallback {
+        void onResult(boolean isLiked);
     }
 
     public interface SpotifyApi {
