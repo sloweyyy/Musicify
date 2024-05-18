@@ -52,7 +52,7 @@ public class PlaylistDetailAPI extends Fragment implements FetchAccessToken.Acce
 
     private TextView playlistDescription;
 
-private ImageView imageView;
+    private ImageView imageView;
 
     private SongAdapter songAdapter;
 
