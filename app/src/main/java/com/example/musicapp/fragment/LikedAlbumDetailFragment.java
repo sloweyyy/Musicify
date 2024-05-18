@@ -148,7 +148,6 @@ public class LikedAlbumDetailFragment extends Fragment implements FetchAccessTok
         recyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
         recyclerView.setAdapter(songAdapter);
     }
-
     @Override
     public void onTokenReceived(String accessToken) {
         this.accessToken = accessToken;
