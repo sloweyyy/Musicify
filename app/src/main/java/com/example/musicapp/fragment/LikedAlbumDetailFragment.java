@@ -39,7 +39,7 @@ import retrofit2.http.Path;
 
 import com.example.musicapp.adapter.FetchAccessToken;
 
-public class LikedAlbumDetailFragment extends Fragment implements FetchAccessToken.AccessTokenCallback{
+public class LikedAlbumDetailFragment extends Fragment implements FetchAccessToken.AccessTokenCallback {
     private RecyclerView recyclerView;
     private SongAdapter songAdapter;
     private List<Song> songList;
@@ -47,30 +47,13 @@ public class LikedAlbumDetailFragment extends Fragment implements FetchAccessTok
     private Button backButton;
     private View view;
     private String albumId;
+    private String accessToken;
     private FetchAccessToken fetchAccessToken;
     private TextView albumName;
 
     private ImageView imageView;
 
-    public LikedAlbumDetailFragment () {}
-
-//    private static final String ARG_ALBUM_NAME = "albumName";
-//    private static final List <String> ARG_ALBUM_ARTISTNAME = Collections.singletonList("albumAristName");
-//    private static final String ARG_ALBUM_THUMBNAIL = "albumThumbnail";
-//
-//    private String mAlbumName;
-//    private String mAlbumAristName;
-//    private int mAlbumThumbnail;
-
-//    public static LikedAlbumDetailFragment newInstance(String albumName, int albumThumbnail, String albumAristName) {
-//        LikedAlbumDetailFragment fragment = new LikedAlbumDetailFragment();
-//        Bundle args = new Bundle();
-//        args.putString(ARG_ALBUM_NAME, albumName);
-//        args.putInt(ARG_ALBUM_THUMBNAIL, albumThumbnail);
-//        args.putString(ARG_ALBUM_ARTISTNAME, albumAristName);
-//        fragment.setArguments(args);
-//        return fragment;
-//    }
+    public LikedAlbumDetailFragment() {}
 
     @Nullable
     @Override
@@ -85,6 +68,7 @@ public class LikedAlbumDetailFragment extends Fragment implements FetchAccessTok
         if (getArguments() != null) {
             albumId = getArguments().getString("albumId");
         }
+//        setupBackButton();
         fetchAccessToken = new FetchAccessToken();
         fetchAccessToken.getTokenFromSpotify(this);
         return view;
@@ -94,7 +78,7 @@ public class LikedAlbumDetailFragment extends Fragment implements FetchAccessTok
         this.albumId = albumId;
     }
 
-   public void getSongs (String accessToken){
+    public void getSongs(String accessToken) {
         Retrofit retrofit = new Retrofit.Builder()
                 .baseUrl("https://api.spotify.com/")
                 .addConverterFactory(GsonConverterFactory.create())
@@ -110,19 +94,18 @@ public class LikedAlbumDetailFragment extends Fragment implements FetchAccessTok
                 if (response.isSuccessful()) {
                     AlbumSimplified albumSimplified = response.body();
                     albumName.setText(albumSimplified.getName());
-//                    playlistDescription.setText(playlist.getDescription());
                     Glide.with(requireContext()).load(albumSimplified.getImages().get(0).getUrl()).into(imageView);
                     List<Song> songs = new ArrayList<>();
-                   for (SimplifiedTrack simplifiedTrack: albumSimplified.getTracksContainer().tracks) {
-                       songs.add(Song.fromSimplifiedTrack(simplifiedTrack));
-                  }
+                    for (SimplifiedTrack simplifiedTrack : albumSimplified.getTracksContainer().tracks) {
+                        songs.add(Song.fromSimplifiedTrack(simplifiedTrack));
+                    }
                     songAdapter = new SongAdapter(getContext(), songs);
                     recyclerView.setAdapter(songAdapter);
                     recyclerView.setVisibility(View.VISIBLE);
 
                 } else {
                     builder.setTitle("Cảnh báo");
-                    builder.setMessage(response.body().getName());
+                    builder.setMessage(response.message());
                     builder.setPositiveButton("OK", null);
                     builder.show();
                 }
@@ -135,9 +118,11 @@ public class LikedAlbumDetailFragment extends Fragment implements FetchAccessTok
         });
 
     }
-    public interface SpotifyApiService {
-        @GET("v1/albums/{albumId}")
-        Call<AlbumSimplified> getSongs(@Header("Authorization") String authorization, @Path("albumId") String albumId);
+
+    @Override
+    public void onViewCreated(View view, @Nullable Bundle savedInstanceState) {
+        super.onViewCreated(view, savedInstanceState);
+        setupBackButton();
     }
 
     private void setupBackButton() {
@@ -145,11 +130,16 @@ public class LikedAlbumDetailFragment extends Fragment implements FetchAccessTok
         backButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                if (getFragmentManager() != null) {
-                    getFragmentManager().popBackStack();
+                if (getActivity() != null && getActivity().getSupportFragmentManager() != null) {
+                    getActivity().getSupportFragmentManager().popBackStack();
                 }
             }
         });
+    }
+    public interface SpotifyApiService {
+        @GET("v1/albums/{albumId}")
+        Call<AlbumSimplified> getSongs(@Header("Authorization") String authorization, @Path("albumId") String albumId);
+
     }
 
     private void setupRecyclerView() {
@@ -159,68 +149,9 @@ public class LikedAlbumDetailFragment extends Fragment implements FetchAccessTok
         recyclerView.setAdapter(songAdapter);
     }
 
-    private void loadSongsFromSpotify() {
-        // Call Spotify API here to fetch songs and populate songList
-        // For example:
-        songList.add(new Song("Song 1", "Artist 1"));
-        songList.add(new Song("Song 2", "Artist 2"));
-        songList.add(new Song("Song 3", "Artist 3"));
-        songAdapter.notifyDataSetChanged();
-    }
-
     @Override
     public void onTokenReceived(String accessToken) {
-
+        this.accessToken = accessToken;
+        getSongs(accessToken);
     }
-
-//    @Override
-//    public void onTokenReceived(String accessToken) {
-//        getAlbum(accessToken);
-//    }
-//
-//    private void getAlbum (String accessToken){
-//        Retrofit retrofit = new Retrofit.Builder().baseUrl("https://api.spotify.com/").addConverterFactory(GsonConverterFactory.create()).build();
-//
-//        PlaySongFragment.SpotifyApi apiService = retrofit.create(PlaySongFragment.SpotifyApi.class);
-//        String authorization = "Bearer " + accessToken;
-//
-//        Call<PlaySongFragment.TrackModel> call = apiService.getTrack(authorization, songId);
-//        call.enqueue(new Callback<PlaySongFragment.TrackModel>() {
-//            @Override
-//            public void onResponse(@NonNull Call<PlaySongFragment.TrackModel> call, @NonNull Response<PlaySongFragment.TrackModel> response) {
-//                if (response.isSuccessful()) {
-//                    PlaySongFragment.TrackModel track = response.body();
-//                    if (track != null) {
-//                        setupTrack(track);
-//                    }
-//                } else {
-//                    showError(response);
-//                }
-//            }
-//
-//            @Override
-//            public void onFailure(Call<PlaySongFragment.TrackModel> call, Throwable throwable) {
-//                Log.e("Error fetching track", throwable.getMessage());
-//            }
-//        });
-//    }
-//    public void setupTrack(PlaySongFragment.TrackModel track) {
-//        String songName = track.getName();
-//        String artistName = track.artists.get(0).getName();
-//        String imageUrl = track.album.images.get(0).getUrl();
-//        String playUrl = track.getPreview_url();
-//
-//        songname.setText(songName);
-//        artistname.setText(artistName);
-//        Glide.with(getActivity()).load(imageUrl).into(cover_art);
-//
-////        setupMediaPlayer(playUrl);
-//        if (spotifyAppRemote != null) {
-//            spotifyAppRemote.getPlayerApi().play("spotify:track:7ouMYWpwJ422jRcDASZB7P");
-//        }
-//        setupSeekBar();
-//        setupPauseButton();
-//    }
 }
-
-
