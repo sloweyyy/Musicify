@@ -25,6 +25,7 @@ import androidx.recyclerview.widget.RecyclerView;
 import com.bumptech.glide.Glide;
 import com.example.musicapp.R;
 import com.example.musicapp.adapter.SongAdapter;
+import com.example.musicapp.model.BottomAppBarListener;
 import com.example.musicapp.model.Playlist;
 import com.example.musicapp.model.Song;
 import com.google.android.gms.tasks.OnCompleteListener;
@@ -155,11 +156,7 @@ public class PlaylistDetailFragment extends Fragment {
     }
 
     private void loadSongsFromSpotify() {
-        // Call Spotify API here to fetch songs and populate songList
-        // For example:
-        songList.add(new Song("Song 1", "Artist 1"));
-        songList.add(new Song("Song 2", "Artist 2"));
-        songList.add(new Song("Song 3", "Artist 3"));
+
         adapter.notifyDataSetChanged();
     }
 

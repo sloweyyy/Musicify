@@ -90,7 +90,6 @@ public class PlaylistDetailAPI extends Fragment implements FetchAccessToken.Acce
         String authorization = "Bearer " + accessToken;
         Call<PlaylistSimplified> call = apiService.getSongs(authorization, playlistId);
         call.enqueue(new Callback<PlaylistSimplified>() {
-
             @Override
             public void onResponse(Call<PlaylistSimplified> call, Response<PlaylistSimplified> response) {
                 AlertDialog.Builder builder = new AlertDialog.Builder(requireContext());
