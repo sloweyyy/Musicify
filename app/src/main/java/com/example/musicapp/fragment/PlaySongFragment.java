@@ -18,6 +18,7 @@ import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.SeekBar;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -27,6 +28,10 @@ import androidx.fragment.app.FragmentManager;
 import com.bumptech.glide.Glide;
 import com.example.musicapp.R;
 import com.example.musicapp.adapter.FetchAccessToken;
+import com.example.musicapp.adapter.SongAdapter;
+import com.google.firebase.firestore.DocumentSnapshot;
+import com.google.firebase.firestore.FieldValue;
+import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.gson.annotations.SerializedName;
 
 import java.io.IOException;
@@ -60,6 +65,7 @@ public class PlaySongFragment extends Fragment implements FetchAccessToken.Acces
     private FetchAccessToken fetchAccessToken;
     private String accessToken;
 
+    private ImageView heartBtn;
     private String songId;
 
     @Override
@@ -114,6 +120,109 @@ public class PlaySongFragment extends Fragment implements FetchAccessToken.Acces
         seekBar = view.findViewById(R.id.seekbar);
         backButtonLayout = view.findViewById(R.id.backButtonLayout);
         iconBackPlaying = view.findViewById(R.id.iconBackPlaying);
+        heartBtn = view.findViewById(R.id.heartBtn);
+
+        checkIsLiked(songId, new OnIsLikedCallback() {
+            @Override
+            public void onResult(boolean isLiked) {
+                if (isLiked) {
+                    heartBtn.setImageResource(R.drawable.favourite_filled);
+                } else {
+                    heartBtn.setImageResource(R.drawable.favourite_outline);
+                }
+            }
+        });
+
+        heartBtn.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                checkIsLiked(songId, new OnIsLikedCallback() {
+                    @Override
+                    public void onResult(boolean isLiked) {
+                        if (isLiked) {
+                            removeSongFromLikedSongs(songId);
+                            heartBtn.setImageResource(R.drawable.favourite_outline);
+                        } else {
+                            addSongToLikedSongs(songId);
+                            heartBtn.setImageResource(R.drawable.favourite_filled);
+                        }
+                    }
+                });
+            }
+        });
+
+    }
+
+    private void checkIsLiked(String id, OnIsLikedCallback callback) {
+        String userId = "4k4kPnoXFCTgzBAvaDNw25XVFpy1";
+        FirebaseFirestore db = FirebaseFirestore.getInstance();
+
+        db.collection("users")
+                .whereEqualTo("id", userId)
+                .get()
+                .addOnSuccessListener(queryDocumentSnapshots -> {
+                    if (!queryDocumentSnapshots.isEmpty()) {
+                        DocumentSnapshot userDoc = queryDocumentSnapshots.getDocuments().get(0);
+                        List<String> likedSongs = (List<String>) userDoc.get("likedsong");
+                        callback.onResult(likedSongs.contains(id));
+                    }
+                })
+                .addOnFailureListener(e -> {
+                    Log.e("SongAdapter", "Failed to retrieve user document: " + e.getMessage());
+                    callback.onResult(false);
+                });
+    }
+
+    private void removeSongFromLikedSongs(String songId) {
+        String userId = "4k4kPnoXFCTgzBAvaDNw25XVFpy1";
+        FirebaseFirestore db = FirebaseFirestore.getInstance();
+
+        db.collection("users")
+                .whereEqualTo("id", userId)
+                .get()
+                .addOnSuccessListener(queryDocumentSnapshots -> {
+                    if (!queryDocumentSnapshots.isEmpty()) {
+                        DocumentSnapshot userDoc = queryDocumentSnapshots.getDocuments().get(0);
+                        userDoc.getReference().update("likedsong", FieldValue.arrayRemove(songId))
+                                .addOnSuccessListener(aVoid -> {
+                                    Toast.makeText(requireContext(), "Removed from liked songs successfully", Toast.LENGTH_SHORT).show();
+                                })
+                                .addOnFailureListener(e -> {
+                                    Log.e("SongAdapter", "Failed to remove song from liked songs: " + e.getMessage());
+                                });
+                    } else {
+                        Log.e("SongAdapter", "No user document found with userId: " + userId);
+                    }
+                })
+                .addOnFailureListener(e -> {
+                    Log.e("SongAdapter", "Failed to retrieve user document: " + e.getMessage());
+                });
+    }
+    public void addSongToLikedSongs(String songId) {
+        String userId = "4k4kPnoXFCTgzBAvaDNw25XVFpy1";
+        FirebaseFirestore db = FirebaseFirestore.getInstance();
+        db.collection("users")
+                .whereEqualTo("id", userId)
+                .get()
+                .addOnSuccessListener(queryDocumentSnapshots -> {
+                    if (!queryDocumentSnapshots.isEmpty()) {
+                        DocumentSnapshot userDoc = queryDocumentSnapshots.getDocuments().get(0);
+                        userDoc.getReference().update("likedsong", FieldValue.arrayUnion(songId))
+                                .addOnSuccessListener(aVoid -> {
+
+                                    Toast.makeText(requireContext(), "Add to liked songs successfully", Toast.LENGTH_SHORT).show();
+                                })
+                                .addOnFailureListener(e -> {
+                                    // Handle the error
+                                    Log.e("SongAdapter", "Failed to add song to liked songs: " + e.getMessage());
+                                });
+                    } else {
+                        Log.e("SongAdapter", "No user document found with userId: " + userId);
+                    }
+                })
+                .addOnFailureListener(e -> {
+                    Log.e("SongAdapter", "Failed to retrieve user document: " + e.getMessage());
+                });
     }
 
     private void getTrack(String accessToken) {
@@ -263,6 +372,10 @@ public class PlaySongFragment extends Fragment implements FetchAccessToken.Acces
             mediaPlayer = null;
         }
         handler.removeCallbacks(updateSeekBarRunnable);
+    }
+
+    private interface OnIsLikedCallback {
+        void onResult(boolean isLiked);
     }
 
     public interface SpotifyApi {

@@ -193,7 +193,7 @@ public class SongAdapter extends RecyclerView.Adapter<SongAdapter.ViewHolder> {
                     Log.e("SongAdapter", "Failed to retrieve user document: " + e.getMessage());
                 });
     }
-        public void addSongToLikedSongs(String songId) {
+    public void addSongToLikedSongs(String songId) {
             String userId = "4k4kPnoXFCTgzBAvaDNw25XVFpy1";
             FirebaseFirestore db = FirebaseFirestore.getInstance();
                 db.collection("users")
