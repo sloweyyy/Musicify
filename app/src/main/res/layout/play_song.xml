@@ -110,11 +110,12 @@
 
     </LinearLayout>
         <ImageView
+            android:id="@+id/heartBtn"
             android:layout_width="@dimen/_24sdp"
             android:layout_height="@dimen/_24sdp"
             android:src="@drawable/heart_green_ouline"
-
             android:layout_gravity="center_vertical"
+            app:tint="@color/btnPressed"
             />
     </LinearLayout>
 
