@@ -91,7 +91,7 @@ public class LikedAlbumsFragment extends Fragment implements FetchAccessToken.Ac
                 } else {
                     //recentlyAddedIcon.setImageResource(R.drawable.up_arrow);
                     recentlyAddedText.setText("Recently Added");
-                    adapter.sortAlbumByName();
+                    adapter.sortAlbumByRecentlyAdded();
                 }
             }
         };
