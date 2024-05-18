@@ -12,14 +12,17 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Button;
 import android.widget.ImageButton;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.SeekBar;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
+import androidx.fragment.app.FragmentManager;
 
 import com.bumptech.glide.Glide;
 import com.example.musicapp.R;
@@ -45,12 +48,19 @@ public class PlaySongFragment extends Fragment implements FetchAccessToken.Acces
     private TextView songname, artistname, duration_played, duration_total;
     private ImageView cover_art;
     private ImageButton repeateBtn, previousBtn, pauseBtn, nextBtn, shuffleBtn;
+
+    private LinearLayout backButtonLayout;
+
+    private Button iconBackPlaying;
+
     private SeekBar seekBar;
     private MediaPlayer mediaPlayer;
     private boolean isPlaying = false;
     private int position = -1;
     private FetchAccessToken fetchAccessToken;
     private String accessToken;
+
+    private String songId;
 
     @Override
     public void onTokenReceived(String accessToken) {
@@ -64,7 +74,30 @@ public class PlaySongFragment extends Fragment implements FetchAccessToken.Acces
         fetchAccessToken = new FetchAccessToken();
         fetchAccessToken.getTokenFromSpotify(this);
         initializeViews();
+        if (getArguments() != null) {
+            songId = getArguments().getString("songId");
+        }
+        backButtonLayout.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                FragmentManager fragmentManager = getParentFragmentManager();
+                fragmentManager.popBackStack();
+            }
+        });
+
+        iconBackPlaying.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                FragmentManager fragmentManager = getParentFragmentManager();
+                fragmentManager.popBackStack();
+            }
+        });
+
         return view;
+    }
+
+    public void setSongId(String songId) {
+        this.songId = songId;
     }
 
     private void initializeViews() {
@@ -79,6 +112,8 @@ public class PlaySongFragment extends Fragment implements FetchAccessToken.Acces
         shuffleBtn = view.findViewById(R.id.shuffleBtn);
         cover_art = view.findViewById(R.id.imageCon);
         seekBar = view.findViewById(R.id.seekbar);
+        backButtonLayout = view.findViewById(R.id.backButtonLayout);
+        iconBackPlaying = view.findViewById(R.id.iconBackPlaying);
     }
 
     private void getTrack(String accessToken) {
@@ -88,9 +123,7 @@ public class PlaySongFragment extends Fragment implements FetchAccessToken.Acces
                 .build();
 
         SpotifyApi apiService = retrofit.create(SpotifyApi.class);
-        String songId = "3ukrFH17Zl6iEZ2QJ1Zwiy"; // Replace with the actual track ID
         String authorization = "Bearer " + accessToken;
-
         Call<TrackModel> call = apiService.getTrack(authorization, songId);
         call.enqueue(new Callback<TrackModel>() {
             @Override

@@ -32,7 +32,9 @@ import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.Transaction;
 
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 public class RegisterActivity extends AppCompatActivity {
@@ -136,6 +138,7 @@ public class RegisterActivity extends AppCompatActivity {
                     msgError.setVisibility(View.VISIBLE);
                     return;
                 }
+<<<<<<< Updated upstream
                 mAuth.createUserWithEmailAndPassword(email, password)
                         .addOnCompleteListener(new OnCompleteListener<AuthResult>() {
                             @Override
@@ -178,6 +181,28 @@ public class RegisterActivity extends AppCompatActivity {
                                                             Log.w("TAG", "Failed to save user data.", e);
                                                         }
                                                     });
+=======
+                mAuth.createUserWithEmailAndPassword(email, password).addOnCompleteListener(new OnCompleteListener<AuthResult>() {
+                    @Override
+                    public void onComplete(@NonNull Task<AuthResult> task) {
+                        if (task.isSuccessful()) {
+                            Toast.makeText(RegisterActivity.this, "Account created.", Toast.LENGTH_SHORT).show();
+                            List<String> likedSongs = new ArrayList<>();
+                            List<String> likedAlbums = new ArrayList<>();
+                            List<String> likedArtists = new ArrayList<>();
+                            FirebaseUser currentUser = mAuth.getCurrentUser();
+                            if(currentUser != null) {
+                                FirebaseFirestore db = FirebaseFirestore.getInstance();
+
+                                Map<String, Object> user = new HashMap<>();
+                                user.put("Name", name);
+                                user.put("id", currentUser.getUid());
+                                user.put("password", password);
+                                user.put("email", email);
+                                user.put("likedsong",likedSongs);
+                                user.put("likedAlbums", likedAlbums);
+                                user.put("likedArtists", likedArtists);
+>>>>>>> Stashed changes
 
                                                 }
                                             }).addOnFailureListener(new OnFailureListener() {
