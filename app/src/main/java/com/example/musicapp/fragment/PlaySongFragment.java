@@ -4,7 +4,6 @@ import android.annotation.SuppressLint;
 import android.app.AlertDialog;
 import android.media.AudioAttributes;
 import android.media.MediaPlayer;
-import android.net.Uri;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Looper;
@@ -27,6 +26,7 @@ import androidx.fragment.app.FragmentManager;
 import com.bumptech.glide.Glide;
 import com.example.musicapp.R;
 import com.example.musicapp.adapter.FetchAccessToken;
+import com.example.musicapp.model.BottomAppBarListener;
 import com.google.gson.annotations.SerializedName;
 
 import java.io.IOException;
@@ -40,6 +40,7 @@ import retrofit2.converter.gson.GsonConverterFactory;
 import retrofit2.http.GET;
 import retrofit2.http.Header;
 import retrofit2.http.Path;
+
 public class PlaySongFragment extends Fragment implements FetchAccessToken.AccessTokenCallback {
 
     private View view;
@@ -70,7 +71,10 @@ public class PlaySongFragment extends Fragment implements FetchAccessToken.Acces
 
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
+
         view = inflater.inflate(R.layout.play_song, container, false);
+        // hide bottom navigation bar
+        ((BottomAppBarListener) requireActivity()).hideBottomAppBar();
         fetchAccessToken = new FetchAccessToken();
         fetchAccessToken.getTokenFromSpotify(this);
         initializeViews();
@@ -94,6 +98,12 @@ public class PlaySongFragment extends Fragment implements FetchAccessToken.Acces
         });
 
         return view;
+    }
+
+    @Override
+    public void onDestroyView() {
+        super.onDestroyView();
+        ((BottomAppBarListener) requireActivity()).showBottomAppBar();
     }
 
     public void setSongId(String songId) {
