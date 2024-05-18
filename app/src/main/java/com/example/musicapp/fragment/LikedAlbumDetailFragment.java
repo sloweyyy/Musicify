@@ -1,6 +1,6 @@
 package com.example.musicapp.fragment;
 
-import android.util.Log;
+import android.app.AlertDialog;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -20,9 +20,12 @@ import com.bumptech.glide.Glide;
 import com.example.musicapp.R;
 import com.example.musicapp.adapter.FetchAccessToken;
 import com.example.musicapp.adapter.SongAdapter;
+import com.example.musicapp.model.SimplifiedTrack;
 import com.example.musicapp.model.Song;
+import com.example.musicapp.model.AlbumSimplified;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 import retrofit2.Call;
@@ -30,65 +33,111 @@ import retrofit2.Callback;
 import retrofit2.Response;
 import retrofit2.Retrofit;
 import retrofit2.converter.gson.GsonConverterFactory;
+import retrofit2.http.GET;
+import retrofit2.http.Header;
+import retrofit2.http.Path;
 
 import com.example.musicapp.adapter.FetchAccessToken;
 
-public class LikedAlbumDetailFragment extends Fragment {
+public class LikedAlbumDetailFragment extends Fragment implements FetchAccessToken.AccessTokenCallback{
     private RecyclerView recyclerView;
-    private SongAdapter adapter;
+    private SongAdapter songAdapter;
     private List<Song> songList;
+    private AlbumSimplified albumSimplified;
     private Button backButton;
     private View view;
+    private String albumId;
     private FetchAccessToken fetchAccessToken;
+    private TextView albumName;
+
+    private ImageView imageView;
 
     public LikedAlbumDetailFragment () {}
 
-    private static final String ARG_ALBUM_NAME = "albumName";
-    private static final String ARG_ALBUM_ARTISTNAME = "albumAristName";
-    private static final String ARG_ALBUM_THUMBNAIL = "albumThumbnail";
+//    private static final String ARG_ALBUM_NAME = "albumName";
+//    private static final List <String> ARG_ALBUM_ARTISTNAME = Collections.singletonList("albumAristName");
+//    private static final String ARG_ALBUM_THUMBNAIL = "albumThumbnail";
+//
+//    private String mAlbumName;
+//    private String mAlbumAristName;
+//    private int mAlbumThumbnail;
 
-    private String mAlbumName;
-    private String mAlbumAristName;
-    private int mAlbumThumbnail;
-
-    public static LikedAlbumDetailFragment newInstance(String albumName, int albumThumbnail, String albumAristName) {
-        LikedAlbumDetailFragment fragment = new LikedAlbumDetailFragment();
-        Bundle args = new Bundle();
-        args.putString(ARG_ALBUM_NAME, albumName);
-        args.putInt(ARG_ALBUM_THUMBNAIL, albumThumbnail);
-        args.putString(ARG_ALBUM_ARTISTNAME, albumAristName);
-        fragment.setArguments(args);
-        return fragment;
-    }
+//    public static LikedAlbumDetailFragment newInstance(String albumName, int albumThumbnail, String albumAristName) {
+//        LikedAlbumDetailFragment fragment = new LikedAlbumDetailFragment();
+//        Bundle args = new Bundle();
+//        args.putString(ARG_ALBUM_NAME, albumName);
+//        args.putInt(ARG_ALBUM_THUMBNAIL, albumThumbnail);
+//        args.putString(ARG_ALBUM_ARTISTNAME, albumAristName);
+//        fragment.setArguments(args);
+//        return fragment;
+//    }
 
     @Nullable
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         view = inflater.inflate(R.layout.fragment_album_detail, container, false);
+        recyclerView = view.findViewById(R.id.recyclerView);
+        albumName = view.findViewById(R.id.albumName);
 
+        imageView = view.findViewById(R.id.albumBanner);
+        LinearLayoutManager layoutManager = new LinearLayoutManager(getActivity());
+        recyclerView.setLayoutManager(layoutManager);
+        if (getArguments() != null) {
+            albumId = getArguments().getString("albumId");
+        }
+        fetchAccessToken = new FetchAccessToken();
+        fetchAccessToken.getTokenFromSpotify(this);
         return view;
     }
 
-    @Override
-    public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
-        super.onViewCreated(view, savedInstanceState);
-        setupBackButton();
+    public void setAlbumId(String albumId) {
+        this.albumId = albumId;
+    }
 
-        if (getArguments() != null) {
-            mAlbumName = getArguments().getString(ARG_ALBUM_NAME);
-            mAlbumAristName = getArguments().getString(ARG_ALBUM_ARTISTNAME);
-            mAlbumThumbnail = getArguments().getInt(ARG_ALBUM_THUMBNAIL);
-        }
-        ImageView thumbnailImageView = view.findViewById(R.id.albumBanner);
-        TextView nameTextView = view.findViewById(R.id.albumName);
-        TextView artistNameTextView = view.findViewById(R.id.albumArtistName);
-        thumbnailImageView.setImageResource(mAlbumThumbnail);
-        nameTextView.setText(mAlbumName);
-        artistNameTextView.setText(mAlbumAristName);
+   public void getSongs (String accessToken){
+        Retrofit retrofit = new Retrofit.Builder()
+                .baseUrl("https://api.spotify.com/")
+                .addConverterFactory(GsonConverterFactory.create())
+                .build();
+        SpotifyApiService apiService = retrofit.create(LikedAlbumDetailFragment.SpotifyApiService.class);
+        String authorization = "Bearer " + accessToken;
+        Call<AlbumSimplified> call = apiService.getSongs(authorization, albumId);
+        call.enqueue(new Callback<AlbumSimplified>() {
 
-        recyclerView = view.findViewById(R.id.recyclerView);
-        setupRecyclerView();
-        loadSongsFromSpotify();
+            @Override
+            public void onResponse(Call<AlbumSimplified> call, Response<AlbumSimplified> response) {
+                AlertDialog.Builder builder = new AlertDialog.Builder(requireContext());
+                if (response.isSuccessful()) {
+                    AlbumSimplified albumSimplified = response.body();
+                    albumName.setText(albumSimplified.getName());
+//                    playlistDescription.setText(playlist.getDescription());
+                    Glide.with(requireContext()).load(albumSimplified.getImages().get(0).getUrl()).into(imageView);
+                    List<Song> songs = new ArrayList<>();
+                   for (SimplifiedTrack simplifiedTrack: albumSimplified.getTracksContainer().tracks) {
+                       songs.add(Song.fromSimplifiedTrack(simplifiedTrack));
+                  }
+                    songAdapter = new SongAdapter(getContext(), songs);
+                    recyclerView.setAdapter(songAdapter);
+                    recyclerView.setVisibility(View.VISIBLE);
+
+                } else {
+                    builder.setTitle("Cảnh báo");
+                    builder.setMessage(response.body().getName());
+                    builder.setPositiveButton("OK", null);
+                    builder.show();
+                }
+            }
+
+            @Override
+            public void onFailure(Call<AlbumSimplified> call, Throwable throwable) {
+
+            }
+        });
+
+    }
+    public interface SpotifyApiService {
+        @GET("v1/albums/{albumId}")
+        Call<AlbumSimplified> getSongs(@Header("Authorization") String authorization, @Path("albumId") String albumId);
     }
 
     private void setupBackButton() {
@@ -105,9 +154,9 @@ public class LikedAlbumDetailFragment extends Fragment {
 
     private void setupRecyclerView() {
         songList = new ArrayList<>();
-        adapter = new SongAdapter(getContext(), songList);
+        songAdapter = new SongAdapter(getContext(), songList);
         recyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
-        recyclerView.setAdapter(adapter);
+        recyclerView.setAdapter(songAdapter);
     }
 
     private void loadSongsFromSpotify() {
@@ -116,7 +165,12 @@ public class LikedAlbumDetailFragment extends Fragment {
         songList.add(new Song("Song 1", "Artist 1"));
         songList.add(new Song("Song 2", "Artist 2"));
         songList.add(new Song("Song 3", "Artist 3"));
-        adapter.notifyDataSetChanged();
+        songAdapter.notifyDataSetChanged();
+    }
+
+    @Override
+    public void onTokenReceived(String accessToken) {
+
     }
 
 //    @Override

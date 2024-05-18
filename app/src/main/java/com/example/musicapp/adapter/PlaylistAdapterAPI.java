@@ -100,7 +100,6 @@ public class PlaylistAdapterAPI extends RecyclerView.Adapter<PlaylistAdapterAPI.
                         .addToBackStack(null)
                         .commit();
             }
-
         }
 
         public void setOnItemClickListener(PlaylistAdapterAPI.OnItemClickListener listenerInput) {

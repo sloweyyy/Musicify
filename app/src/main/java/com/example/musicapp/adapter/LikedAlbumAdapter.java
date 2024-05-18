@@ -2,6 +2,7 @@ package com.example.musicapp.adapter;
 
 import android.app.AlertDialog;
 import android.content.Context;
+import android.os.Bundle;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -18,9 +19,14 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.bumptech.glide.Glide;
 import com.example.musicapp.R;
+import com.example.musicapp.fragment.AlbumDetailFragment;
+import com.example.musicapp.fragment.PlaylistDetailAPI;
 import com.example.musicapp.model.AlbumSimplified;
+import com.example.musicapp.fragment.LikedAlbumDetailFragment;
+import com.example.musicapp.model.PlaylistAPI;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.QueryDocumentSnapshot;
+
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -65,17 +71,21 @@ public class LikedAlbumAdapter extends RecyclerView.Adapter<LikedAlbumAdapter.Vi
         holder.albumArtist.setText(artistName);
         Glide.with(context).load(imageUrl).into(holder.albumImage);
 
-        holder.itemView.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-//                Fragment likedAlbumDetailFragment = LikedAlbumDetailFragment.newInstance(album.getName(), album.getImageResource(), album.getArtistName());
+//        holder.itemView.setOnClickListener(new View.OnClickListener() {
+//            @Override
+//            public void onClick(View v) {
+//                Fragment likedAlbumDetailFragment = LikedAlbumDetailFragment.newInstance(album.getName(), album.getImages(), album.getArtists());
 //                FragmentManager fragmentManager = ((AppCompatActivity) context).getSupportFragmentManager();
 //                FragmentTransaction transaction = fragmentManager.beginTransaction();
 //                transaction.replace(R.id.frame_layout, likedAlbumDetailFragment);
 //                transaction.addToBackStack(null);
 //                transaction.commit();
-            }
-        });
+//            }
+
+//        });
+    }
+    public interface OnItemClickListener {
+        void onItemClick(AlbumSimplified albumSimplified);
     }
 
     @Override
@@ -83,16 +93,19 @@ public class LikedAlbumAdapter extends RecyclerView.Adapter<LikedAlbumAdapter.Vi
         return likedAlbumsList.size();
     }
 
-    public class ViewHolder extends RecyclerView.ViewHolder {
+    public class ViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener{
         private ImageView albumImage;
         private TextView albumName;
         private TextView albumArtist;
+        private LikedAlbumAdapter.OnItemClickListener listener;
 
         public ViewHolder(@NonNull View itemView) {
             super(itemView);
+            itemView.setOnClickListener(this);
             albumImage = itemView.findViewById(R.id.albumThumbnail);
             albumName = itemView.findViewById(R.id.albumTitle);
             albumArtist = itemView.findViewById(R.id.artistName);
+            this.listener = listener;
         }
 
         public void bind(AlbumSimplified album) {
@@ -103,6 +116,28 @@ public class LikedAlbumAdapter extends RecyclerView.Adapter<LikedAlbumAdapter.Vi
             albumName.setText(songName);
             albumArtist.setText(artistName);
             Glide.with(context).load(imageUrl).into(albumImage);
+        }
+        @Override
+        public void onClick(View v) {
+            Log.e("Clicked On item", "hehe");
+            int position = getAbsoluteAdapterPosition();
+            if (position != RecyclerView.NO_POSITION) {
+                AlbumSimplified selected = likedAlbumsList.get(position);
+                LikedAlbumDetailFragment likedAlbumDetailFragment= new LikedAlbumDetailFragment();
+                likedAlbumDetailFragment.setAlbumId(selected.getId());
+                Bundle args = new Bundle();
+                args.putString("albumId", selected.getId());
+                likedAlbumDetailFragment.setArguments(args);
+                // Add the Fragment to the Activity
+                ((AppCompatActivity)v.getContext()).getSupportFragmentManager()
+                        .beginTransaction()
+                        .replace(R.id.frame_layout, likedAlbumDetailFragment)
+                        .addToBackStack(null)
+                        .commit();
+            }
+        }
+        public void setOnItemClickListener(LikedAlbumAdapter.OnItemClickListener listenerInput) {
+            listener = listenerInput;
         }
     }
 
