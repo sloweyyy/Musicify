@@ -36,8 +36,11 @@ import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.storage.FirebaseStorage;
 
+import java.time.LocalDateTime;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import retrofit2.Call;
 import retrofit2.Callback;
@@ -52,7 +55,8 @@ public class LikedAlbumsFragment extends Fragment implements FetchAccessToken.Ac
     private View view;
     private RecyclerView recyclerView;
     private LikedAlbumAdapter adapter;
-    List<AlbumSimplified> albumList = new ArrayList<>();
+//  List<AlbumSimplified> albumList = new ArrayList<>();
+    private Map<AlbumSimplified, LocalDateTime> likedAlbums= new HashMap<>(); ;
     private FetchAccessToken fetchAccessToken;
     private String accessToken;
     private enum SortState {
@@ -114,11 +118,11 @@ public class LikedAlbumsFragment extends Fragment implements FetchAccessToken.Ac
                 for (String id : albumids){
                     getAlbum(accessToken,id);
                 }
-                adapter = new LikedAlbumAdapter(getContext(), albumList);
+//                adapter = new LikedAlbumAdapter(getContext(), albumList);
+                adapter = new LikedAlbumAdapter(getContext(), likedAlbums);
                 recyclerView.setAdapter(adapter);
             }
-        }).addOnFailureListener(e -> {
-        });
+        }).addOnFailureListener(e -> {});
     }
     public interface SpotifyApi {
         @GET("v1/albums/{albumId}")
@@ -135,8 +139,8 @@ public class LikedAlbumsFragment extends Fragment implements FetchAccessToken.Ac
             public void onResponse(@NonNull Call<AlbumSimplified> call, @NonNull Response<AlbumSimplified> response) {
                 if (response.isSuccessful()) {
                     AlbumSimplified album = response.body();
-                    albumList.add(album);
-                    adapter.notifyItemInserted(albumList.size() - 1);
+                    likedAlbums.put(album, LocalDateTime.now());
+                    adapter.notifyItemInserted(likedAlbums.size() - 1);
                 }else {
                     AlertDialog.Builder builder = new AlertDialog.Builder(requireContext());
                     builder.setTitle("Cảnh báo");
