@@ -151,6 +151,7 @@ public class RegisterActivity extends AppCompatActivity {
                                 user.put("id", currentUser.getUid());
                                 user.put("password", password);
                                 user.put("email", email);
+                                user.put("notificationCount",0);
 
                                 DocumentReference userDocRef = db.collection("users").document(currentUser.getUid());
                                 userDocRef.set(user).addOnSuccessListener(new OnSuccessListener<Void>() {
