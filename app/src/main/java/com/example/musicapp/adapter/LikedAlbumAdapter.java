@@ -22,7 +22,7 @@ import com.bumptech.glide.Glide;
 import com.example.musicapp.R;
 import com.example.musicapp.fragment.AlbumDetailFragment;
 import com.example.musicapp.model.AlbumSimplified;
-import com.example.musicapp.fragment.LikedAlbumDetailFragment;
+import com.example.musicapp.fragment.AlbumDetailFragment;
 import com.example.musicapp.model.Song;
 import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.DocumentSnapshot;
@@ -175,7 +175,7 @@ public class LikedAlbumAdapter extends RecyclerView.Adapter<LikedAlbumAdapter.Vi
             if (position != RecyclerView.NO_POSITION) {
 //                AlbumSimplified selected = likedAlbums.get(position);
                 AlbumSimplified selected = (AlbumSimplified) likedAlbums.keySet().toArray()[position];
-                LikedAlbumDetailFragment likedAlbumDetailFragment= new LikedAlbumDetailFragment();
+                AlbumDetailFragment likedAlbumDetailFragment= new AlbumDetailFragment();
                 likedAlbumDetailFragment.setAlbumId(selected.getId());
                 Bundle args = new Bundle();
                 args.putString("albumId", selected.getId());

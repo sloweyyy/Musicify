@@ -51,7 +51,7 @@ import retrofit2.http.GET;
 import retrofit2.http.Header;
 import retrofit2.http.Path;
 
-public class LikedAlbumsFragment extends Fragment implements FetchAccessToken.AccessTokenCallback  {
+public class LikedAlbumsFragment extends Fragment implements FetchAccessToken.AccessTokenCallback {
     private View view;
     private RecyclerView recyclerView;
     private LikedAlbumAdapter adapter;
