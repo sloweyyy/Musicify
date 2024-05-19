@@ -32,7 +32,9 @@ import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.Transaction;
 
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 public class RegisterActivity extends AppCompatActivity {
@@ -145,12 +147,17 @@ public class RegisterActivity extends AppCompatActivity {
                             FirebaseUser currentUser = mAuth.getCurrentUser();
                             if(currentUser != null) {
                                 FirebaseFirestore db = FirebaseFirestore.getInstance();
-
+                                List<String> likedSongs = new ArrayList<>();
+                                List<String> likedAlbums = new ArrayList<>();
+                                List<String> likedArtists = new ArrayList<>();
                                 Map<String, Object> user = new HashMap<>();
                                 user.put("Name", name);
                                 user.put("id", currentUser.getUid());
                                 user.put("password", password);
-                                user.put("email", email);
+                                user.put("email", email); 
+                                user.put("likedsong",likedSongs);
+                                user.put("likedAlbums", likedAlbums);
+                                user.put("likedArtists", likedArtists);
                                 user.put("notificationCount",0);
 
                                 DocumentReference userDocRef = db.collection("users").document(currentUser.getUid());

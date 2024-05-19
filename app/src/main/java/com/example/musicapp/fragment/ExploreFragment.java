@@ -64,7 +64,6 @@ public class ExploreFragment extends Fragment implements FetchAccessToken.Access
         view = inflater.inflate(R.layout.layout_explore, container, false);
         recyclerView = view.findViewById(R.id.recyclerViewExplore);
         recyclerViewSongs = view.findViewById(R.id.recyclerViewSongs);
-
         recyclerViewSongs.setLayoutManager(new LinearLayoutManager(getContext()));
         int spanCount = 2;
         GridLayoutManager layoutManager = new GridLayoutManager(getActivity(), spanCount);
