@@ -208,11 +208,14 @@ public class LoginActivity extends AppCompatActivity {
                     public void onComplete(@NonNull Task<AuthResult> task) {
                         if (task.isSuccessful()) {
                             Toast.makeText(LoginActivity.this, "Successfully signed in", Toast.LENGTH_SHORT).show();
+
+                            msgError.setVisibility(View.GONE);
+                            boolean isNew = task.getResult().getAdditionalUserInfo().isNewUser();
                             Intent intent = new Intent(getApplicationContext(), MainActivity.class);
+                            intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+                            intent.putExtra("isNew", isNew);
                             startActivity(intent);
                             finish();
-                            msgError.setVisibility(View.GONE);
-
                                 } else {
                                     try {
                                         throw task.getException();
