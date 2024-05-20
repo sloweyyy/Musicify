@@ -135,9 +135,38 @@ public class PlaySongFragment extends Fragment implements FetchAccessToken.Acces
             }
         });
 
+        repeateBtn.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                mediaPlayerManager.setCurrentPosition(0);
+                mediaPlayerManager.getMediaPlayer().seekTo(0);
+            }
+        });
+
         previousBtn.setOnClickListener(v -> {
+            mediaPlayerManager.getMediaPlayer().pause();
+            mediaPlayerManager.setCurrentPosition(0);
             PlayPreviousSong();
         });
+
+        nextBtn.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                mediaPlayerManager.getMediaPlayer().pause();
+                mediaPlayerManager.setCurrentPosition(0);
+                PlayNextSong();
+            }
+        });
+
+        shuffleBtn.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                mediaPlayerManager.getMediaPlayer().pause();
+                mediaPlayerManager.setCurrentPosition(0);
+                PlayRandomSong();
+            }
+        });
+
 
         return view;
     }
@@ -181,7 +210,54 @@ public class PlaySongFragment extends Fragment implements FetchAccessToken.Acces
                 .addToBackStack(null)
                 .commit();
     }
+    private void PlayNextSong(){
+        ((BottomAppBarListener) requireActivity()).hideBottomAppBar();
+        int currentIndex = getCurrentSongIndex(songId);
+        String nextSongId = "";
+        if (currentIndex < songList.size()-1) {
+            nextSongId = songList.get(currentIndex + 1).getId();
+        }
+        else {
+            nextSongId = songList.get(0).getId();
+        }
+        if (playSongFragment == null) {
+            playSongFragment = new PlaySongFragment();
+            playSongFragment.setCurrentSongList(songList, nextSongId);
+            Bundle args = new Bundle();
+            args.putString("songId", nextSongId);
+            playSongFragment.setArguments(args);
+        } else {
+            playSongFragment.setCurrentSongList(songList, nextSongId);
+        }
 
+        ((AppCompatActivity) requireContext())
+                .getSupportFragmentManager()
+                .beginTransaction()
+                .replace(R.id.frame_layout, playSongFragment)
+                .addToBackStack(null)
+                .commit();
+    }
+    private void PlayRandomSong(){
+        ((BottomAppBarListener) requireActivity()).hideBottomAppBar();
+        int randomIndex = (int)(Math.random() * songList.size());
+        String nextSongId = songList.get(randomIndex).getId();
+        if (playSongFragment == null) {
+            playSongFragment = new PlaySongFragment();
+            playSongFragment.setCurrentSongList(songList, nextSongId);
+            Bundle args = new Bundle();
+            args.putString("songId", nextSongId);
+            playSongFragment.setArguments(args);
+        } else {
+            playSongFragment.setCurrentSongList(songList, nextSongId);
+        }
+
+        ((AppCompatActivity) requireContext())
+                .getSupportFragmentManager()
+                .beginTransaction()
+                .replace(R.id.frame_layout, playSongFragment)
+                .addToBackStack(null)
+                .commit();
+    }
     private Song getSongById(String songId) {
         for (Song song : songList) {
             if (song.getId().equals(songId)) {
