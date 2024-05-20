@@ -6,20 +6,38 @@
     app:cardBackgroundColor="@android:color/transparent"
     android:padding="20dp"
     android:layout_margin="20dp"
-    android:layout_height="245dp">
+    android:layout_height="275dp">
     <LinearLayout
         android:layout_width="match_parent"
         android:orientation="vertical"
         android:layout_height="wrap_content"
         android:background="@android:color/transparent">
+        <androidx.constraintlayout.widget.ConstraintLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content">
 
         <ImageView
             android:id="@+id/artistPic"
             android:layout_width="200dp"
             android:layout_height="170dp"
             android:src="@drawable/artist_image_demo"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
             android:background="@drawable/image_view_rounded_bg" />
 
+            <ImageButton
+                android:id="@+id/playButton"
+                android:layout_width="40dp"
+                android:layout_height="40dp"
+                android:background="@drawable/back_btn_custom"
+                android:padding="10dp"
+                android:src="@drawable/play_arrow_24dp_fill0_wght400_grad0_opsz24"
+                app:layout_constraintTop_toBottomOf="@+id/artistPic"
+                app:layout_constraintEnd_toEndOf="@+id/artistPic"
+                android:translationY="-20dp"
+                android:elevation="6dp" />
+        </androidx.constraintlayout.widget.ConstraintLayout>
         <TextView
             android:id="@+id/trackName"
             android:layout_width="match_parent"
