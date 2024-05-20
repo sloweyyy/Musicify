@@ -161,6 +161,7 @@ public class SongAdapter extends RecyclerView.Adapter<SongAdapter.ViewHolder> {
                 String preId = (position == 0) ? songList.get(songList.size() - 1).getId() : songList.get(position - 1).getId();
                 String nextId = (position == songList.size() - 1) ? songList.get(0).getId() : songList.get(position + 1).getId();
 
+                // Open PlaySongFragment as a BottomSheet
                 PlaySongFragment fragment = new PlaySongFragment();
                 fragment.setSongId(selected.getId());
                 fragment.setCurrentSongList(songList, selected.getId());
@@ -170,8 +171,7 @@ public class SongAdapter extends RecyclerView.Adapter<SongAdapter.ViewHolder> {
                 args.putString("nextSongId", nextId);
                 fragment.setArguments(args);
 
-                // Add the Fragment to the Activity
-                ((AppCompatActivity) v.getContext()).getSupportFragmentManager().beginTransaction().replace(R.id.frame_layout, fragment).addToBackStack(null).commit();
+                fragment.show(((AppCompatActivity) v.getContext()).getSupportFragmentManager(), "PlaySongFragment");
             }
         }
     }
