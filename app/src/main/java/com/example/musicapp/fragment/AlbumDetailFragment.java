@@ -61,7 +61,6 @@ public class AlbumDetailFragment extends Fragment implements FetchAccessToken.Ac
         view = inflater.inflate(R.layout.fragment_album_detail, container, false);
         recyclerView = view.findViewById(R.id.recyclerView);
         albumName = view.findViewById(R.id.albumName);
-
         imageView = view.findViewById(R.id.albumBanner);
         LinearLayoutManager layoutManager = new LinearLayoutManager(getActivity());
         recyclerView.setLayoutManager(layoutManager);
