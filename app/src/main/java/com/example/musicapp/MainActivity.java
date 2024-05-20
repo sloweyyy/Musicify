@@ -8,16 +8,17 @@ import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentManager;
 import androidx.fragment.app.FragmentTransaction;
 
+import com.example.musicapp.adapter.SongAdapter;
 import com.example.musicapp.databinding.ActivityMainBinding;
 import com.example.musicapp.fragment.ExploreFragment;
 import com.example.musicapp.fragment.FavouriteFragment;
 import com.example.musicapp.fragment.HomeFragment;
+import com.example.musicapp.fragment.PlaySongFragment;
 import com.example.musicapp.fragment.ProfileFragment;
 import com.example.musicapp.model.BottomAppBarListener;
 
 public class MainActivity extends AppCompatActivity implements BottomAppBarListener {
     ActivityMainBinding binding;
-
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -61,6 +62,15 @@ public class MainActivity extends AppCompatActivity implements BottomAppBarListe
     public void showBottomAppBar() {
         binding.bottomAppBar.setVisibility(View.VISIBLE);
     }
-
+    @Override
+    public boolean onSupportNavigateUp() {
+        FragmentManager fragmentManager = getSupportFragmentManager();
+        if (fragmentManager.getBackStackEntryCount() > 1) {
+            fragmentManager.popBackStack();
+            return true;
+        } else {
+            return super.onSupportNavigateUp();
+        }
+    }
 
 }

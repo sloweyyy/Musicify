@@ -43,16 +43,11 @@ public class PlaylistDetailAPI extends Fragment implements FetchAccessToken.Acce
     View view;
     RecyclerView recyclerView;
     private FetchAccessToken fetchAccessToken;
-
     private PlaylistSimplified playlistSimplified;
-
     private String playlistId;
-
     private TextView playlistName;
-
     private TextView playlistDescription;
-
-private ImageView imageView;
+    private ImageView imageView;
 
     private SongAdapter songAdapter;
 
