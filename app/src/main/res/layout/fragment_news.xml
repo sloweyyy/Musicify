@@ -6,6 +6,13 @@
 
     android:layout_height="match_parent"
     tools:context=".fragment.NewsFragment">
+    <TextView
+        android:id="@+id/recentSongTitle"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="New release songs"
+        android:padding="16dp"
+        android:textAppearance="?android:attr/textAppearanceMedium" />
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/horizontal_recyclerView"
         android:layout_width="match_parent"
