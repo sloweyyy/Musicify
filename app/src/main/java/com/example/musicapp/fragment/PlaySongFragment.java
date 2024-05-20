@@ -100,6 +100,7 @@ public class PlaySongFragment extends Fragment implements FetchAccessToken.Acces
         backButtonLayout.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                mediaPlayerManager.getMediaPlayer().seekTo(0);
                 FragmentManager fragmentManager = getParentFragmentManager();
                 fragmentManager.popBackStack();
             }
@@ -108,6 +109,7 @@ public class PlaySongFragment extends Fragment implements FetchAccessToken.Acces
         iconBackPlaying.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                mediaPlayerManager.setCurrentPosition(0);
                 FragmentManager fragmentManager = getParentFragmentManager();
                 fragmentManager.popBackStack();
             }
@@ -391,7 +393,6 @@ public class PlaySongFragment extends Fragment implements FetchAccessToken.Acces
     public void onPause() {
         super.onPause();
         if (mediaPlayerManager.getMediaPlayer() != null) {
-            mediaPlayerManager.getMediaPlayer().seekTo(mediaPlayerManager.getMediaPlayer().getCurrentPosition());
         }
     }
     @Override
