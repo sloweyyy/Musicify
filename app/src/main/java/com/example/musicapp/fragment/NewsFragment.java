@@ -14,7 +14,6 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.musicapp.R;
 import com.example.musicapp.adapter.FetchAccessToken;
-import com.example.musicapp.adapter.PlaylistAdapterAPI;
 import com.example.musicapp.adapter.PlaylistHomeAdapter;
 import com.example.musicapp.adapter.SongHomeAdapter;
 import com.example.musicapp.model.PlaylistAPI;
@@ -63,7 +62,7 @@ public class NewsFragment extends Fragment implements FetchAccessToken.AccessTok
     @Override
     public void onTokenReceived(String accessToken) {
 
-        this.accesstoken=accessToken;
+        this.accesstoken = accessToken;
         Log.d("AccessToken", "Token: " + accessToken);
         getSongs(accesstoken);
     }
@@ -76,7 +75,7 @@ public class NewsFragment extends Fragment implements FetchAccessToken.AccessTok
         SpotifyApiService apiService = retrofit.create(SpotifyApiService.class);
         String authorization = "Bearer " + accessToken;
         Call<PlaylistSimplified> call1 = apiService.getSongs(authorization, playlistId);
-        Call <PlaylistsModel> call2 = apiService.getPlaylists(authorization, categoryId);
+        Call<PlaylistsModel> call2 = apiService.getPlaylists(authorization, categoryId);
 //        AlertDialog.Builder alertDialog = new AlertDialog.Builder(requireContext());
 //        alertDialog.setTitle("Error");
 //        alertDialog.setPositiveButton("OK", null);
@@ -90,7 +89,7 @@ public class NewsFragment extends Fragment implements FetchAccessToken.AccessTok
                 if (response.isSuccessful()) {
                     PlaylistSimplified playlistSimplified = response.body();
                     List<Song> songs = new ArrayList<>();
-                    for ( PlaylistSimplified.TracksModel.ItemModel item : playlistSimplified.tracksContainer.tracks) {
+                    for (PlaylistSimplified.TracksModel.ItemModel item : playlistSimplified.tracksContainer.tracks) {
                         SimplifiedTrack track = item.track;
                         songs.add(Song.fromSimplifiedTrack(track));
                     }
@@ -117,7 +116,7 @@ public class NewsFragment extends Fragment implements FetchAccessToken.AccessTok
                 if (response.isSuccessful()) {
                     PlaylistsModel playlistsContainer = response.body();
                     if (playlistsContainer != null) {
-                         ShowPlaylist(playlistsContainer.Playlists.PlaylistsArray);
+                        ShowPlaylist(playlistsContainer.Playlists.PlaylistsArray);
                     }
                     Log.d("HUHUHUHU", "Token: " + accessToken);
                 }
@@ -136,7 +135,8 @@ public class NewsFragment extends Fragment implements FetchAccessToken.AccessTok
         });
         Log.d("HIHIHIHI", "Token: " + accessToken);
     }
-    public void ShowPlaylist(List<PlaylistAPI> playlists){
+
+    public void ShowPlaylist(List<PlaylistAPI> playlists) {
         if (playlists != null) {
 //            PlaylistAdapterAPI adapter = new PlaylistAdapterAPI(playlists);
             playlistHomeAdapter = new PlaylistHomeAdapter(getContext(), playlists);
@@ -146,15 +146,19 @@ public class NewsFragment extends Fragment implements FetchAccessToken.AccessTok
         }
 
     }
+
     public interface SpotifyApiService {
         @GET("v1/browse/categories/{categoryId}/playlists")
-        Call<PlaylistsModel> getPlaylists(@Header("Authorization") String authorization, @Path("categoryId") String categoryId) ;
+        Call<PlaylistsModel> getPlaylists(@Header("Authorization") String authorization, @Path("categoryId") String categoryId);
+
         @GET("v1/playlists/{playlistId}")
         Call<PlaylistSimplified> getSongs(@Header("Authorization") String authorization, @Path("playlistId") String playlistId);
     }
+
     public static class PlaylistsModel {
         @SerializedName("message")
         private String message;
+
         public String getMessage() {
             return message;
         }
