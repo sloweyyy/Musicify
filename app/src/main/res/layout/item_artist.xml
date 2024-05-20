@@ -31,10 +31,10 @@
             android:id="@+id/artistTitle"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:layout_marginHorizontal="@dimen/_20sdp"
             android:text="Artist Name"
             android:textSize="24sp"
-            android:textStyle="bold"
-            android:layout_marginHorizontal="@dimen/_20sdp"/>
+            android:textStyle="bold" />
 
 
     </LinearLayout>

@@ -1,5 +1,3 @@
-import org.apache.tools.ant.util.JavaEnvUtils.VERSION_1_8
-
 plugins {
     alias(libs.plugins.androidApplication)
     id("com.google.gms.google-services")
@@ -22,7 +20,10 @@ android {
     buildTypes {
         release {
             isMinifyEnabled = false
-            proguardFiles(getDefaultProguardFile("proguard-android-optimize.txt"), "proguard-rules.pro")
+            proguardFiles(
+                getDefaultProguardFile("proguard-android-optimize.txt"),
+                "proguard-rules.pro"
+            )
         }
     }
 
@@ -44,17 +45,17 @@ dependencies {
     implementation(libs.constraintlayout)
     implementation(libs.firebase.auth)
     implementation(libs.firebase.storage)
- 
+
     implementation(libs.navigation.fragment)
     implementation(libs.navigation.ui)
     implementation(libs.androidthings)
 //    implementation(files("../spotify-app-remote-release-0.8.0.aar"))
- 
+
     testImplementation(libs.junit)
     androidTestImplementation(libs.ext.junit)
     androidTestImplementation(libs.espresso.core)
     //gson
-    implementation ("com.google.code.gson:gson:2.10.1")
+    implementation("com.google.code.gson:gson:2.10.1")
     //
     val room_version = "2.6.1"
     //room & RxJava
@@ -64,10 +65,10 @@ dependencies {
     //recycle
     implementation("androidx.recyclerview:recyclerview:1.3.2")
     //retrofit
-    implementation ("com.squareup.retrofit2:retrofit:2.11.0")
-    implementation ("com.squareup.retrofit2:converter-gson:2.11.0")
+    implementation("com.squareup.retrofit2:retrofit:2.11.0")
+    implementation("com.squareup.retrofit2:converter-gson:2.11.0")
     //RxJava
-    implementation ("io.reactivex.rxjava3:rxjava:3.1.8")
+    implementation("io.reactivex.rxjava3:rxjava:3.1.8")
     //LifeCycle & ViewModel & Model & Live Data
     val lifecycle_version = "2.7.0"
     // ViewModel
@@ -81,12 +82,12 @@ dependencies {
     implementation("com.google.firebase:firebase-firestore")
     implementation("com.google.android.gms:play-services-auth:21.1.1")
 
-    implementation ("com.intuit.sdp:sdp-android:1.0.6")
+    implementation("com.intuit.sdp:sdp-android:1.0.6")
 
     //gif
-    implementation ("com.github.bumptech.glide:glide:4.11.0")
-    annotationProcessor ("com.github.bumptech.glide:compiler:4.11.0")
-    implementation ("com.squareup.picasso:picasso:2.8")
-    implementation ("de.hdodenhof:circleimageview:3.1.0")
- 
+    implementation("com.github.bumptech.glide:glide:4.11.0")
+    annotationProcessor("com.github.bumptech.glide:compiler:4.11.0")
+    implementation("com.squareup.picasso:picasso:2.8")
+    implementation("de.hdodenhof:circleimageview:3.1.0")
+
 }

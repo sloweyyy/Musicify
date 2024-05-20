@@ -158,6 +158,7 @@ public class PlaySongFragment extends Fragment implements FetchAccessToken.Acces
     }
 
     private void PlayPreviousSong() {
+        ((BottomAppBarListener) requireActivity()).hideBottomAppBar();
         int currentIndex = getCurrentSongIndex(songId);
         String previousSongId = "";
         if (currentIndex > 0) {

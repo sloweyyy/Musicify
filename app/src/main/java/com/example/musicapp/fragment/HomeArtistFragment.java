@@ -1,23 +1,20 @@
 package com.example.musicapp.fragment;
 
 import android.app.AlertDialog;
-import android.database.Observable;
 import android.os.Bundle;
-
-import androidx.fragment.app.Fragment;
-import androidx.recyclerview.widget.LinearLayoutManager;
-import androidx.recyclerview.widget.RecyclerView;
-
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
+import androidx.fragment.app.Fragment;
+import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
+
 import com.example.musicapp.R;
 import com.example.musicapp.adapter.ArtitstHomeAdapter;
 import com.example.musicapp.adapter.FetchAccessToken;
 import com.example.musicapp.model.Artist;
-import com.example.musicapp.model.PlaylistSimplified;
 import com.google.gson.annotations.SerializedName;
 
 import java.util.ArrayList;
@@ -31,7 +28,6 @@ import retrofit2.converter.gson.GsonConverterFactory;
 import retrofit2.http.GET;
 import retrofit2.http.Header;
 import retrofit2.http.Path;
-import retrofit2.http.Query;
 
 public class HomeArtistFragment extends Fragment implements FetchAccessToken.AccessTokenCallback {
     RecyclerView artist_recyclerView;
@@ -39,11 +35,12 @@ public class HomeArtistFragment extends Fragment implements FetchAccessToken.Acc
     private FetchAccessToken fetchAccessToken;
     private ArtitstHomeAdapter artitstHomeAdapter;
     private String accesstoken;
-    List<String> artistIdArray ;
+    List<String> artistIdArray;
 
     public HomeArtistFragment() {
         // Required empty public constructor
     }
+
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -79,12 +76,12 @@ public class HomeArtistFragment extends Fragment implements FetchAccessToken.Acc
 
     @Override
     public void onTokenReceived(String accessToken) {
-        this.accesstoken=accessToken;
+        this.accesstoken = accessToken;
         Log.d("AccessToken", "Token: " + accessToken);
         getArtist(accesstoken);
     }
-    public void getArtist (String accessToken)
-    {
+
+    public void getArtist(String accessToken) {
         Retrofit retrofit = new Retrofit.Builder()
                 .baseUrl("https://api.spotify.com/")
                 .addConverterFactory(GsonConverterFactory.create())
@@ -93,46 +90,47 @@ public class HomeArtistFragment extends Fragment implements FetchAccessToken.Acc
         String authorization = "Bearer " + accessToken;
         String artistIds = String.join(",", artistIdArray);
         List<Artist> allArtists = new ArrayList<>();
-        final int[] remainingCalls = { artistIdArray.size() };
+        final int[] remainingCalls = {artistIdArray.size()};
 
         for (String artistId : artistIdArray) {
             Call<ArtistsResponse> call = apiService.getRelatedArtists(authorization, artistId);
-             call.enqueue(new Callback<ArtistsResponse>() {
-                 @Override
-                 public void onResponse(Call<ArtistsResponse> call, Response<ArtistsResponse> response) {
-                     if (response.isSuccessful()) {
-                         Log.d("HUHUHUHU", "Token: " + accessToken);
-                         List<Artist> artistList = response.body().getArtists();
-                         if(artistList.isEmpty()){
-                             Log.d("Oh no", "Empty artist list");
-                         }else {
-                             Artist firstArtist = artistList.get(0);
-                             Log.d("First Artist", "Name: "+ firstArtist.getName() + ", ID: "  );
-                         }
-                         allArtists.addAll(artistList);
-                         if (--remainingCalls[0] == 0) {
-                             artitstHomeAdapter  = new ArtitstHomeAdapter(getContext(), allArtists);
-                             artist_recyclerView.setAdapter(artitstHomeAdapter);
-                         }
+            call.enqueue(new Callback<ArtistsResponse>() {
+                @Override
+                public void onResponse(Call<ArtistsResponse> call, Response<ArtistsResponse> response) {
+                    if (response.isSuccessful()) {
+                        Log.d("HUHUHUHU", "Token: " + accessToken);
+                        List<Artist> artistList = response.body().getArtists();
+                        if (artistList.isEmpty()) {
+                            Log.d("Oh no", "Empty artist list");
+                        } else {
+                            Artist firstArtist = artistList.get(0);
+                            Log.d("First Artist", "Name: " + firstArtist.getName() + ", ID: ");
+                        }
+                        allArtists.addAll(artistList);
+                        if (--remainingCalls[0] == 0) {
+                            artitstHomeAdapter = new ArtitstHomeAdapter(getContext(), allArtists);
+                            artist_recyclerView.setAdapter(artitstHomeAdapter);
+                        }
 
-                     }
-                 }
+                    }
+                }
 
-                 @Override
-                 public void onFailure(Call<ArtistsResponse> call, Throwable throwable) {
-                     Log.d("HEHEHHEHEE", "Token: " + accessToken);
-                     AlertDialog.Builder alertDialog = new AlertDialog.Builder(requireContext());
+                @Override
+                public void onFailure(Call<ArtistsResponse> call, Throwable throwable) {
+                    Log.d("HEHEHHEHEE", "Token: " + accessToken);
+                    AlertDialog.Builder alertDialog = new AlertDialog.Builder(requireContext());
                     alertDialog.setTitle("Error");
                     alertDialog.setMessage(throwable.getMessage());
                     alertDialog.setPositiveButton("OK", null);
                     AlertDialog dialog = alertDialog.create();
                     dialog.show();
-                 }
-             });
+                }
+            });
         }
 //        ArtitstHomeAdapter adapter = new ArtitstHomeAdapter(getContext(), allArtists);
 //        artist_recyclerView.setAdapter(adapter);
     }
+
     public interface SpotifyApiService {
 
         @GET("v1/artists/{id}/related-artists")
@@ -141,6 +139,7 @@ public class HomeArtistFragment extends Fragment implements FetchAccessToken.Acc
                 @Path("id") String artistId
         );
     }
+
     public class ArtistsResponse {
         @SerializedName("artists")
         private List<Artist> artists;
