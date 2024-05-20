@@ -2,8 +2,6 @@ package com.example.musicapp.fragment;
 
 import android.annotation.SuppressLint;
 import android.app.AlertDialog;
-import android.media.AudioAttributes;
-import android.media.MediaPlayer;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Looper;
@@ -28,10 +26,12 @@ import androidx.fragment.app.FragmentManager;
 import com.bumptech.glide.Glide;
 import com.example.musicapp.R;
 import com.example.musicapp.adapter.FetchAccessToken;
+import com.example.musicapp.adapter.SongAdapter;
 import com.example.musicapp.manager.MediaPlayerManager;
 import com.example.musicapp.manager.OnSongSelectedListener;
 import com.example.musicapp.model.BottomAppBarListener;
-import com.example.musicapp.adapter.SongAdapter;
+import com.example.musicapp.model.Song;
+import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FieldValue;
 import com.google.firebase.firestore.FirebaseFirestore;
@@ -48,9 +48,8 @@ import retrofit2.converter.gson.GsonConverterFactory;
 import retrofit2.http.GET;
 import retrofit2.http.Header;
 import retrofit2.http.Path;
-import com.example.musicapp.model.Song;
 
-public class PlaySongFragment extends Fragment implements FetchAccessToken.AccessTokenCallback , OnSongSelectedListener {
+public class PlaySongFragment extends Fragment implements FetchAccessToken.AccessTokenCallback, OnSongSelectedListener {
 
     private View view;
     private Handler handler = new Handler(Looper.getMainLooper());
@@ -76,6 +75,8 @@ public class PlaySongFragment extends Fragment implements FetchAccessToken.Acces
 
     private ImageView heartBtn;
     private String songId, previousSongId, nextSongId;
+
+    private SongAdapter songAdapter; // Add SongAdapter here
 
     @Override
     public void onTokenReceived(String accessToken) {
@@ -146,6 +147,7 @@ public class PlaySongFragment extends Fragment implements FetchAccessToken.Acces
         this.songList = songList;
         this.songId = currentSongId;
     }
+
     private int getCurrentSongIndex(String songId) {
         for (int i = 0; i < songList.size(); i++) {
             if (songList.get(i).getId().equals(songId)) {
@@ -154,14 +156,14 @@ public class PlaySongFragment extends Fragment implements FetchAccessToken.Acces
         }
         return -1;
     }
-    private void PlayPreviousSong(){
+
+    private void PlayPreviousSong() {
         int currentIndex = getCurrentSongIndex(songId);
         String previousSongId = "";
         if (currentIndex > 0) {
             previousSongId = songList.get(currentIndex - 1).getId();
-        }
-        else {
-            previousSongId = songList.get(songList.size()-1).getId();
+        } else {
+            previousSongId = songList.get(songList.size() - 1).getId();
         }
         Song previousSong = getSongById(previousSongId);
         if (playSongFragment == null) {
@@ -190,6 +192,7 @@ public class PlaySongFragment extends Fragment implements FetchAccessToken.Acces
         }
         throw new IllegalArgumentException("Song with ID " + songId + " not found.");
     }
+
     private void ShowLyric() {
         LyricFragment lyricFragment = new LyricFragment();
         lyricFragment.setSongId(songId);
@@ -209,20 +212,23 @@ public class PlaySongFragment extends Fragment implements FetchAccessToken.Acces
         args.putString("totalDuration", total_value);
 
         lyricFragment.setArguments(args);
-        ((AppCompatActivity)requireContext()).getSupportFragmentManager()
+        ((AppCompatActivity) requireContext()).getSupportFragmentManager()
                 .beginTransaction()
                 .replace(R.id.frame_layout, lyricFragment, "LyricFragment")
                 .addToBackStack("LyricFragment")
                 .commit();
     }
+
     @Override
     public void onDestroyView() {
         super.onDestroyView();
         ((BottomAppBarListener) requireActivity()).showBottomAppBar();
     }
+
     public void setSongId(String songId) {
         this.songId = songId;
     }
+
     private void initializeViews() {
         songname = view.findViewById(R.id.songNamePlay);
         artistname = view.findViewById(R.id.artistNamePlay);
@@ -272,8 +278,10 @@ public class PlaySongFragment extends Fragment implements FetchAccessToken.Acces
         });
 
     }
+
     private void checkIsLiked(String id, OnIsLikedCallback callback) {
-        String userId = "4k4kPnoXFCTgzBAvaDNw25XVFpy1";
+        FirebaseAuth mAuth = FirebaseAuth.getInstance();
+        String userId = mAuth.getCurrentUser().getUid();
         FirebaseFirestore db = FirebaseFirestore.getInstance();
 
         db.collection("users")
@@ -291,8 +299,10 @@ public class PlaySongFragment extends Fragment implements FetchAccessToken.Acces
                     callback.onResult(false);
                 });
     }
+
     private void removeSongFromLikedSongs(String songId) {
-        String userId = "4k4kPnoXFCTgzBAvaDNw25XVFpy1";
+        FirebaseAuth mAuth = FirebaseAuth.getInstance();
+        String userId = mAuth.getCurrentUser().getUid();
         FirebaseFirestore db = FirebaseFirestore.getInstance();
 
         db.collection("users")
@@ -316,8 +326,10 @@ public class PlaySongFragment extends Fragment implements FetchAccessToken.Acces
                     Log.e("SongAdapter", "Failed to retrieve user document: " + e.getMessage());
                 });
     }
+
     public void addSongToLikedSongs(String songId) {
-        String userId = "4k4kPnoXFCTgzBAvaDNw25XVFpy1";
+        FirebaseAuth mAuth = FirebaseAuth.getInstance();
+        String userId = mAuth.getCurrentUser().getUid();
         FirebaseFirestore db = FirebaseFirestore.getInstance();
         db.collection("users")
                 .whereEqualTo("id", userId)
@@ -342,6 +354,7 @@ public class PlaySongFragment extends Fragment implements FetchAccessToken.Acces
                     Log.e("SongAdapter", "Failed to retrieve user document: " + e.getMessage());
                 });
     }
+
     private void getTrack(String accessToken) {
         Retrofit retrofit = new Retrofit.Builder()
                 .baseUrl("https://api.spotify.com/")
@@ -370,6 +383,7 @@ public class PlaySongFragment extends Fragment implements FetchAccessToken.Acces
             }
         });
     }
+
     public void setupTrack(TrackModel track) {
         String songName = track.getName();
         String artistName = track.artists.get(0).getName();
@@ -389,16 +403,19 @@ public class PlaySongFragment extends Fragment implements FetchAccessToken.Acces
         setupSeekBar();
         setupPauseButton();
     }
+
     @Override
     public void onPause() {
         super.onPause();
         if (mediaPlayerManager.getMediaPlayer() != null) {
         }
     }
+
     @Override
     public void onResume() {
         super.onResume();
     }
+
     public void setupMediaPlayer(String playUrl) {
         if (playUrl != null && !playUrl.isEmpty()) {
             mediaPlayerManager.setMediaSource(playUrl);
@@ -423,12 +440,13 @@ public class PlaySongFragment extends Fragment implements FetchAccessToken.Acces
             handler.postDelayed(updateSeekBarRunnable, 0);
         }
     }
+
     public void setupSeekBar() {
         seekBar.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
             @Override
             public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
                 if (fromUser) {
-                    if ( mediaPlayerManager.getMediaPlayer() != null) { // Check if mediaPlayer is initialized
+                    if (mediaPlayerManager.getMediaPlayer() != null) { // Check if mediaPlayer is initialized
                         mediaPlayerManager.getMediaPlayer().seekTo(progress * 1000);
                     }
                 }
@@ -445,16 +463,17 @@ public class PlaySongFragment extends Fragment implements FetchAccessToken.Acces
         });
 
     }
+
     public void setupPauseButton() {
         pauseBtn.setOnClickListener(v -> {
             if (mediaPlayerManager.getIsPlaying() == true) {
-                if ( mediaPlayerManager.getMediaPlayer() != null) { // Check if mediaPlayer is initialized
+                if (mediaPlayerManager.getMediaPlayer() != null) { // Check if mediaPlayer is initialized
                     mediaPlayerManager.getMediaPlayer().pause();
                 }
                 mediaPlayerManager.setIsPlaying(true);
                 pauseBtn.setBackgroundResource(R.drawable.play);
             } else {
-                if ( mediaPlayerManager.getMediaPlayer() != null) { // Check if mediaPlayer is initialized
+                if (mediaPlayerManager.getMediaPlayer() != null) { // Check if mediaPlayer is initialized
                     mediaPlayerManager.getMediaPlayer().start();
                 }
                 pauseBtn.setBackgroundResource(R.drawable.pause);
@@ -462,6 +481,7 @@ public class PlaySongFragment extends Fragment implements FetchAccessToken.Acces
             }
         });
     }
+
     public void showError(Response<TrackModel> response) {
         try {
             assert response.errorBody() != null;
@@ -475,28 +495,61 @@ public class PlaySongFragment extends Fragment implements FetchAccessToken.Acces
             Log.e("Error handling response", e.getMessage());
         }
     }
+
     @SuppressLint("DefaultLocale")
     private String formattedTime(int currentPosition) {
         int minutes = currentPosition / 60;
         int seconds = currentPosition % 60;
         return String.format("%02d:%02d", minutes, seconds);
     }
+
     @Override
     public void onDestroy() {
         super.onDestroy();
-        if ( mediaPlayerManager.getMediaPlayer() != null) {
+        if (mediaPlayerManager.getMediaPlayer() != null) {
 //                 mediaPlayerManager.getMediaPlayer().release();
 //                 mediaPlayerManager.setMediaSource(null);
         }
         handler.removeCallbacks(updateSeekBarRunnable);
     }
+
     @Override
     public void onSongSelected(String songId, String previousSongId, String nextSongId) {
         this.songId = songId;
         this.previousSongId = previousSongId;
         this.nextSongId = nextSongId;
-        playPreviousSong(previousSongId);
+        // Instead of calling playPreviousSong here, update the current song data in PlaySongFragment
+        updateCurrentSong(songId);
     }
+
+    private void updateCurrentSong(String newSongId) {
+        if (newSongId != null && !newSongId.isEmpty() && !newSongId.equals(songId)) {
+            this.songId = newSongId;
+            this.previousSongId = getPreviousSongId(newSongId); // Implement getPreviousSongId()
+            this.nextSongId = getNextSongId(newSongId); // Implement getNextSongId()
+
+            getTrack(accessToken);
+        }
+    }
+
+    private String getPreviousSongId(String currentSongId) {
+        int currentIndex = getCurrentSongIndex(currentSongId);
+        if (currentIndex > 0) {
+            return songList.get(currentIndex - 1).getId();
+        } else {
+            return songList.get(songList.size() - 1).getId();
+        }
+    }
+
+    private String getNextSongId(String currentSongId) {
+        int currentIndex = getCurrentSongIndex(currentSongId);
+        if (currentIndex < songList.size() - 1) {
+            return songList.get(currentIndex + 1).getId();
+        } else {
+            return songList.get(0).getId();
+        }
+    }
+
     private void playPreviousSong(String previousSongId) {
         setSongId(previousSongId);
         if (playSongFragment == null) {
@@ -516,6 +569,7 @@ public class PlaySongFragment extends Fragment implements FetchAccessToken.Acces
                 .addToBackStack(null)
                 .commit();
     }
+
     public void onPreviousClicked(View view) {
         if (this instanceof OnSongSelectedListener) {
             ((OnSongSelectedListener) this).onSongSelected(songId, previousSongId, nextSongId);
@@ -582,6 +636,7 @@ public class PlaySongFragment extends Fragment implements FetchAccessToken.Acces
             }
         }
     }
+
     public interface OnPreviousSongClickListener {
         void onPreviousSongClick(String previousSongId);
     }
