@@ -15,12 +15,14 @@ public class Artist {
 
     @SerializedName("images")
     private List<Image> images;
+  
     public String getName() {
         return name;
     }
     public String getId() {
         return id;
     }
+
     public Followers getFollowers() {
         return followers;
     }
