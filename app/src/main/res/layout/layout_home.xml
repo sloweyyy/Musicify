@@ -41,16 +41,15 @@
     </LinearLayout>
 
 
-    <!-- CardView for the Artist -->
     <androidx.cardview.widget.CardView
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_marginTop="40dp"
         android:layout_marginLeft="20dp"
         android:layout_marginRight="20dp"
-        app:cardBackgroundColor="#49A078"
         android:id="@+id/cardView"
-        app:cardCornerRadius="18dp"
+        app:cardCornerRadius="23dp"
+        app:cardBackgroundColor="@android:color/transparent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/backButtonLayout"
@@ -61,6 +60,7 @@
             <LinearLayout
                 android:id="@+id/linearLayout1"
                 android:layout_width="0dp"
+                android:layout_marginLeft="10dp"
                 android:layout_height="wrap_content"
                 android:orientation="vertical"
                 app:layout_constraintStart_toStartOf="parent"
@@ -68,33 +68,41 @@
 
         <EditText
             android:layout_width="wrap_content"
-            android:text="Recently listening song"
+            android:textSize="24dp"
+            android:layout_marginBottom="20dp"
+            android:background="@null"
+            android:text="Recently listening"
             android:layout_height="wrap_content"/>
         <EditText
             android:layout_width="wrap_content"
-            android:textSize="25dp"
+            android:textSize="20dp"
             android:textColor="@color/textColor"
+            android:background="@null"
+            android:layout_marginBottom="5dp"
             android:id="@+id/recentSongName"
             android:text="Bad Guy"
             android:layout_height="wrap_content"/>
         <EditText
             android:layout_width="wrap_content"
-            android:textSize="25dp"
+            android:textSize="15dp"
+            android:background="@null"
+            android:layout_marginBottom="10dp"
             android:textColor="@color/textColor"
             android:id="@+id/recentSongArtist"
             android:text="Billie Eilish"
             android:layout_height="wrap_content"/>
         </LinearLayout>
             <ImageView
+                android:src="@drawable/images"
                 android:id="@+id/artistImage"
-                android:layout_width="0dp"
+                android:layout_width="100dp"
                 android:layout_height="0dp"
-                android:src="@drawable/artist_image_demo"
+                android:background="@drawable/image_view_rounded_bg"
+                android:layout_marginLeft="10dp"
                 app:layout_constraintBottom_toBottomOf="@id/linearLayout1"
-                app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintStart_toEndOf="@id/linearLayout1"
                 app:layout_constraintTop_toTopOf="@id/linearLayout1"
-                android:elevation="8dp" />
+                 />
         </androidx.constraintlayout.widget.ConstraintLayout>
 
     </androidx.cardview.widget.CardView>
@@ -107,7 +115,6 @@
             app:layout_constraintTop_toBottomOf="@+id/cardView"
             app:tabMode="fixed">
 
-            <!-- Define your tabs here -->
             <com.google.android.material.tabs.TabItem
                 android:layout_height="wrap_content"
                 android:layout_width="wrap_content"

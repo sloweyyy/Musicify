@@ -41,9 +41,11 @@ public class PlaylistSimplified {
     @SerializedName("tracks")
     public TracksModel tracksContainer;
 
+
     public static class TracksModel {
         @SerializedName("items")
         public List<ItemModel> tracks;
+
 
         public static class ItemModel{
             @SerializedName("track")

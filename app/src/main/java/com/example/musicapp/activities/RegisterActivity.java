@@ -159,7 +159,6 @@ public class RegisterActivity extends AppCompatActivity {
                                 user.put("likedAlbums", likedAlbums);
                                 user.put("likedArtists", likedArtists);
                                 user.put("notificationCount",0);
-                              
 
                                 DocumentReference userDocRef = db.collection("users").document(currentUser.getUid());
                                 userDocRef.set(user).addOnSuccessListener(new OnSuccessListener<Void>() {
