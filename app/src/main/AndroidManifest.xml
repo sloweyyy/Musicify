@@ -20,6 +20,18 @@
             android:name=".activities.NotificationActivity"
             android:exported="false" />
         <activity
+<<<<<<< Updated upstream
+=======
+            android:name=".MainActivity"
+            android:exported="true" >
+            <intent-filter>
+                            <action android:name="android.intent.action.MAIN" />
+
+                            <category android:name="android.intent.category.LAUNCHER" />
+                        </intent-filter>
+        </activity>
+        <activity
+>>>>>>> Stashed changes
             android:name=".activities.RegisterOrSignUp"
             android:exported="false" />
         <activity
