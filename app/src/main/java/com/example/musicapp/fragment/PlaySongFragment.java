@@ -21,12 +21,15 @@ import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.appcompat.app.AppCompatActivity;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentManager;
 
 import com.bumptech.glide.Glide;
 import com.example.musicapp.R;
 import com.example.musicapp.adapter.FetchAccessToken;
+import com.example.musicapp.manager.MediaPlayerManager;
+import com.example.musicapp.manager.OnSongSelectedListener;
 import com.example.musicapp.model.BottomAppBarListener;
 import com.example.musicapp.adapter.SongAdapter;
 import com.google.firebase.firestore.DocumentSnapshot;
@@ -45,29 +48,34 @@ import retrofit2.converter.gson.GsonConverterFactory;
 import retrofit2.http.GET;
 import retrofit2.http.Header;
 import retrofit2.http.Path;
+import com.example.musicapp.model.Song;
 
-public class PlaySongFragment extends Fragment implements FetchAccessToken.AccessTokenCallback {
+public class PlaySongFragment extends Fragment implements FetchAccessToken.AccessTokenCallback , OnSongSelectedListener {
 
     private View view;
     private Handler handler = new Handler(Looper.getMainLooper());
     private Runnable updateSeekBarRunnable;
-    private TextView songname, artistname, duration_played, duration_total;
+    private int currentPosition;
+    private List<Song> songList;
+    private PlaySongFragment playSongFragment;
+    private MediaPlayerManager mediaPlayerManager;
+    private String songnameValue, artistnameValue, avataValue, played_value, total_value, urlAudioValue;
+    private TextView songname, artistname, duration_played, duration_total, lyric;
     private ImageView cover_art;
-    private ImageButton repeateBtn, previousBtn, pauseBtn, nextBtn, shuffleBtn;
+    private ImageButton repeateBtn, previousBtn, pauseBtn, nextBtn, shuffleBtn, show_lyricBtn;
 
-    private LinearLayout backButtonLayout;
+    private LinearLayout backButtonLayout, lyricLayout;
 
     private Button iconBackPlaying;
 
     private SeekBar seekBar;
-    private MediaPlayer mediaPlayer;
     private boolean isPlaying = false;
     private int position = -1;
     private FetchAccessToken fetchAccessToken;
     private String accessToken;
 
     private ImageView heartBtn;
-    private String songId;
+    private String songId, previousSongId, nextSongId;
 
     @Override
     public void onTokenReceived(String accessToken) {
@@ -81,11 +89,14 @@ public class PlaySongFragment extends Fragment implements FetchAccessToken.Acces
         view = inflater.inflate(R.layout.play_song, container, false);
         // hide bottom navigation bar
         ((BottomAppBarListener) requireActivity()).hideBottomAppBar();
+        mediaPlayerManager = MediaPlayerManager.getInstance();
         fetchAccessToken = new FetchAccessToken();
         fetchAccessToken.getTokenFromSpotify(this);
         initializeViews();
         if (getArguments() != null) {
             songId = getArguments().getString("songId");
+            previousSongId = getArguments().getString("previousSongId");
+            nextSongId = getArguments().getString("nextSongId");
         }
         backButtonLayout.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -103,19 +114,114 @@ public class PlaySongFragment extends Fragment implements FetchAccessToken.Acces
             }
         });
 
+        lyricLayout.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                ShowLyric();
+            }
+        });
+        show_lyricBtn.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                ShowLyric();
+            }
+        });
+
+        lyric.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                ShowLyric();
+            }
+        });
+
+        previousBtn.setOnClickListener(v -> {
+            PlayPreviousSong();
+        });
+
         return view;
     }
 
+    public void setCurrentSongList(List<Song> songList, String currentSongId) {
+        this.songList = songList;
+        this.songId = currentSongId;
+    }
+    private int getCurrentSongIndex(String songId) {
+        for (int i = 0; i < songList.size(); i++) {
+            if (songList.get(i).getId().equals(songId)) {
+                return i;
+            }
+        }
+        return -1;
+    }
+    private void PlayPreviousSong(){
+        int currentIndex = getCurrentSongIndex(songId);
+        String previousSongId = "";
+        if (currentIndex > 0) {
+            previousSongId = songList.get(currentIndex - 1).getId();
+        }
+        else {
+            previousSongId = songList.get(songList.size()-1).getId();
+        }
+        Song previousSong = getSongById(previousSongId);
+        if (playSongFragment == null) {
+            playSongFragment = new PlaySongFragment();
+            playSongFragment.setCurrentSongList(songList, previousSongId);
+            Bundle args = new Bundle();
+            args.putString("songId", previousSongId);
+            playSongFragment.setArguments(args);
+        } else {
+            playSongFragment.setCurrentSongList(songList, previousSongId);
+        }
+
+        ((AppCompatActivity) requireContext())
+                .getSupportFragmentManager()
+                .beginTransaction()
+                .replace(R.id.frame_layout, playSongFragment)
+                .addToBackStack(null)
+                .commit();
+    }
+
+    private Song getSongById(String songId) {
+        for (Song song : songList) {
+            if (song.getId().equals(songId)) {
+                return song;
+            }
+        }
+        throw new IllegalArgumentException("Song with ID " + songId + " not found.");
+    }
+    private void ShowLyric() {
+        LyricFragment lyricFragment = new LyricFragment();
+        lyricFragment.setSongId(songId);
+        lyricFragment.setSongName(songnameValue);
+        lyricFragment.setArtistName(artistnameValue);
+        lyricFragment.setAvata(avataValue);
+        lyricFragment.setPlayedDuration(played_value);
+        lyricFragment.setTotalDuration(total_value);
+
+        Bundle args = new Bundle();
+        args.putString("songId", songId);
+        args.putString("songName", songnameValue);
+        args.putString("artistName", artistnameValue);
+        args.putString("avata", avataValue);
+
+        args.putString("playedDuration", played_value);
+        args.putString("totalDuration", total_value);
+
+        lyricFragment.setArguments(args);
+        ((AppCompatActivity)requireContext()).getSupportFragmentManager()
+                .beginTransaction()
+                .replace(R.id.frame_layout, lyricFragment, "LyricFragment")
+                .addToBackStack("LyricFragment")
+                .commit();
+    }
     @Override
     public void onDestroyView() {
         super.onDestroyView();
         ((BottomAppBarListener) requireActivity()).showBottomAppBar();
     }
-
     public void setSongId(String songId) {
         this.songId = songId;
     }
-
     private void initializeViews() {
         songname = view.findViewById(R.id.songNamePlay);
         artistname = view.findViewById(R.id.artistNamePlay);
@@ -131,6 +237,9 @@ public class PlaySongFragment extends Fragment implements FetchAccessToken.Acces
         backButtonLayout = view.findViewById(R.id.backButtonLayout);
         iconBackPlaying = view.findViewById(R.id.iconBackPlaying);
         heartBtn = view.findViewById(R.id.heartBtn);
+        show_lyricBtn = view.findViewById(R.id.show_lyricBtn);
+        lyricLayout = view.findViewById(R.id.lyricLayout);
+        lyric = view.findViewById(R.id.lyric);
 
         checkIsLiked(songId, new OnIsLikedCallback() {
             @Override
@@ -162,7 +271,6 @@ public class PlaySongFragment extends Fragment implements FetchAccessToken.Acces
         });
 
     }
-
     private void checkIsLiked(String id, OnIsLikedCallback callback) {
         String userId = "4k4kPnoXFCTgzBAvaDNw25XVFpy1";
         FirebaseFirestore db = FirebaseFirestore.getInstance();
@@ -182,7 +290,6 @@ public class PlaySongFragment extends Fragment implements FetchAccessToken.Acces
                     callback.onResult(false);
                 });
     }
-
     private void removeSongFromLikedSongs(String songId) {
         String userId = "4k4kPnoXFCTgzBAvaDNw25XVFpy1";
         FirebaseFirestore db = FirebaseFirestore.getInstance();
@@ -234,7 +341,6 @@ public class PlaySongFragment extends Fragment implements FetchAccessToken.Acces
                     Log.e("SongAdapter", "Failed to retrieve user document: " + e.getMessage());
                 });
     }
-
     private void getTrack(String accessToken) {
         Retrofit retrofit = new Retrofit.Builder()
                 .baseUrl("https://api.spotify.com/")
@@ -263,7 +369,6 @@ public class PlaySongFragment extends Fragment implements FetchAccessToken.Acces
             }
         });
     }
-
     public void setupTrack(TrackModel track) {
         String songName = track.getName();
         String artistName = track.artists.get(0).getName();
@@ -274,40 +379,58 @@ public class PlaySongFragment extends Fragment implements FetchAccessToken.Acces
         artistname.setText(artistName);
         Glide.with(getActivity()).load(imageUrl).into(cover_art);
 
-        setupMediaPlayer(playUrl); // Play using the preview_url from the API
+        songnameValue = songName;
+        artistnameValue = artistName;
+        avataValue = imageUrl;
+        urlAudioValue = playUrl;
 
+        setupMediaPlayer(playUrl);
         setupSeekBar();
         setupPauseButton();
     }
-
-    public void setupMediaPlayer(String playUrl) {
-        try {
-            mediaPlayer = new MediaPlayer();
-            mediaPlayer.setAudioAttributes(new AudioAttributes.Builder()
-                    .setContentType(AudioAttributes.CONTENT_TYPE_MUSIC)
-                    .setUsage(AudioAttributes.USAGE_MEDIA)
-                    .build());
-            mediaPlayer.setDataSource(playUrl);
-            mediaPlayer.prepareAsync();
-            mediaPlayer.setOnPreparedListener(mp -> {
-                seekBar.setMax(mediaPlayer.getDuration() / 1000);
-                duration_total.setText(formattedTime(mediaPlayer.getDuration() / 1000));
-                mediaPlayer.start();
-                isPlaying = true;
-                handler.postDelayed(updateSeekBarRunnable, 0);
-            });
-        } catch (IOException e) {
-            Log.e("Error setting up player", e.getMessage());
+    @Override
+    public void onPause() {
+        super.onPause();
+        if (mediaPlayerManager.getMediaPlayer() != null) {
+            mediaPlayerManager.getMediaPlayer().seekTo(0);
         }
     }
+    @Override
+    public void onResume() {
+        super.onResume();
 
+    }
+    public void setupMediaPlayer(String playUrl) {
+        mediaPlayerManager.setMediaSource(playUrl);
+        mediaPlayerManager.getMediaPlayer().seekTo(currentPosition);
+        mediaPlayerManager.setIsPlaying(true);
+        if (mediaPlayerManager.getMediaPlayer()!=null){
+            mediaPlayerManager.getMediaPlayer().start();
+        }
+        seekBar.setMax((int) (mediaPlayerManager.getMediaPlayer().getDuration() / 1000));
+        duration_total.setText(formattedTime(mediaPlayerManager.getMediaPlayer().getDuration() / 1000));
+        mediaPlayerManager.setIsPlaying(true);
+        updateSeekBarRunnable = new Runnable() {
+            @Override
+            public void run() {
+                if ( mediaPlayerManager.getMediaPlayer()!= null && mediaPlayerManager.getIsPlaying())
+                { // Check if mediaPlayer is playing
+                    int CurrentPosition = ( mediaPlayerManager.getMediaPlayer().getCurrentPosition() / 1000);
+                    seekBar.setProgress(CurrentPosition);
+                    duration_played.setText(formattedTime(CurrentPosition));
+                    handler.postDelayed(this, 500); // Update every 500 milliseconds
+                }
+            }
+        };
+        handler.postDelayed(updateSeekBarRunnable, 0);
+    }
     public void setupSeekBar() {
         seekBar.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
             @Override
             public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
                 if (fromUser) {
-                    if (mediaPlayer != null) { // Check if mediaPlayer is initialized
-                        mediaPlayer.seekTo(progress * 1000);
+                    if ( mediaPlayerManager.getMediaPlayer() != null) { // Check if mediaPlayer is initialized
+                        mediaPlayerManager.getMediaPlayer().seekTo(progress * 1000);
                     }
                 }
                 duration_played.setText(formattedTime(progress));
@@ -322,37 +445,24 @@ public class PlaySongFragment extends Fragment implements FetchAccessToken.Acces
             }
         });
 
-        updateSeekBarRunnable = new Runnable() {
-            @Override
-            public void run() {
-                if (mediaPlayer != null && mediaPlayer.isPlaying()) { // Check if mediaPlayer is playing
-                    int currentPosition = mediaPlayer.getCurrentPosition() / 1000;
-                    seekBar.setProgress(currentPosition);
-                    duration_played.setText(formattedTime(currentPosition));
-                    handler.postDelayed(this, 500); // Update every 500 milliseconds
-                }
-            }
-        };
     }
-
     public void setupPauseButton() {
         pauseBtn.setOnClickListener(v -> {
-            if (isPlaying) {
-                if (mediaPlayer != null) { // Check if mediaPlayer is initialized
-                    mediaPlayer.pause();
+            if (mediaPlayerManager.getIsPlaying() == true) {
+                if ( mediaPlayerManager.getMediaPlayer() != null) { // Check if mediaPlayer is initialized
+                    mediaPlayerManager.getMediaPlayer().pause();
                 }
-                isPlaying = false;
+                mediaPlayerManager.setIsPlaying(true);
                 pauseBtn.setBackgroundResource(R.drawable.play);
             } else {
-                if (mediaPlayer != null) { // Check if mediaPlayer is initialized
-                    mediaPlayer.start();
+                if ( mediaPlayerManager.getMediaPlayer() != null) { // Check if mediaPlayer is initialized
+                    mediaPlayerManager.getMediaPlayer().start();
                 }
                 pauseBtn.setBackgroundResource(R.drawable.pause);
-                isPlaying = true;
+                mediaPlayerManager.setIsPlaying(true);
             }
         });
     }
-
     public void showError(Response<TrackModel> response) {
         try {
             assert response.errorBody() != null;
@@ -366,22 +476,51 @@ public class PlaySongFragment extends Fragment implements FetchAccessToken.Acces
             Log.e("Error handling response", e.getMessage());
         }
     }
-
     @SuppressLint("DefaultLocale")
     private String formattedTime(int currentPosition) {
         int minutes = currentPosition / 60;
         int seconds = currentPosition % 60;
         return String.format("%02d:%02d", minutes, seconds);
     }
-
     @Override
     public void onDestroy() {
         super.onDestroy();
-        if (mediaPlayer != null) {
-            mediaPlayer.release();
-            mediaPlayer = null;
+        if ( mediaPlayerManager.getMediaPlayer() != null) {
+//                 mediaPlayerManager.getMediaPlayer().release();
+//                 mediaPlayerManager.setMediaSource(null);
         }
         handler.removeCallbacks(updateSeekBarRunnable);
+    }
+    @Override
+    public void onSongSelected(String songId, String previousSongId, String nextSongId) {
+        this.songId = songId;
+        this.previousSongId = previousSongId;
+        this.nextSongId = nextSongId;
+        playPreviousSong(previousSongId);
+    }
+    private void playPreviousSong(String previousSongId) {
+        setSongId(previousSongId);
+        if (playSongFragment == null) {
+            playSongFragment = new PlaySongFragment();
+            playSongFragment.setSongId(previousSongId);
+            Bundle args = new Bundle();
+            args.putString("songId", previousSongId);
+            playSongFragment.setArguments(args);
+        } else {
+            playSongFragment.setSongId(previousSongId);
+        }
+
+        ((AppCompatActivity) requireContext())
+                .getSupportFragmentManager()
+                .beginTransaction()
+                .replace(R.id.frame_layout, playSongFragment)
+                .addToBackStack(null)
+                .commit();
+    }
+    public void onPreviousClicked(View view) {
+        if (this instanceof OnSongSelectedListener) {
+            ((OnSongSelectedListener) this).onSongSelected(songId, previousSongId, nextSongId);
+        }
     }
 
     private interface OnIsLikedCallback {
@@ -444,4 +583,8 @@ public class PlaySongFragment extends Fragment implements FetchAccessToken.Acces
             }
         }
     }
+    public interface OnPreviousSongClickListener {
+        void onPreviousSongClick(String previousSongId);
+    }
+
 }

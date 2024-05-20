@@ -18,6 +18,7 @@ import com.bumptech.glide.Glide;
 import com.example.musicapp.R;
 import com.example.musicapp.fragment.PlaySongFragment;
 import com.example.musicapp.fragment.PlaylistDetailAPI;
+import com.example.musicapp.manager.OnSongSelectedListener;
 import com.example.musicapp.model.PlaylistAPI;
 import com.example.musicapp.model.Song;
 import com.google.firebase.firestore.DocumentSnapshot;
@@ -31,16 +32,13 @@ public class SongAdapter extends RecyclerView.Adapter<SongAdapter.ViewHolder> {
 
     private Context context;
     private List<Song> songList;
-
     public SongAdapter(Context context, List<Song> songList) {
         this.context = context;
         this.songList = songList;
     }
-
     public interface OnItemClickListener {
         void onItemClick(PlaylistAPI playlist);
     }
-
     @NonNull
     @Override
     public ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
@@ -98,7 +96,11 @@ public class SongAdapter extends RecyclerView.Adapter<SongAdapter.ViewHolder> {
     }
     @Override
     public int getItemCount() {
-        return songList.size();
+        if (songList != null) {
+            return songList.size();
+        } else {
+            return 0;
+        }
     }
 
     public class ViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener{
@@ -147,10 +149,35 @@ public class SongAdapter extends RecyclerView.Adapter<SongAdapter.ViewHolder> {
             int position = getAbsoluteAdapterPosition();
             if (position != RecyclerView.NO_POSITION) {
                 Song selected = songList.get(position);
+                String preId = "";
+                String nextId = "";
+                if (position == 0){
+                    Song previous = songList.get(songList.size() - 1);
+                    preId = previous.getId();
+                }
+                else
+                {
+                    Song previous = songList.get(position - 1);
+                    preId = previous.getId();
+                }
+
+                if (position == songList.size() - 1){
+                    Song nextSong = songList.get(0);
+                    nextId = nextSong.getId();
+                }
+                else
+                {
+                    Song nextSong = songList.get(position + 1);
+                    nextId = nextSong.getId();
+                }
+
                 PlaySongFragment fragment = new PlaySongFragment();
                 fragment.setSongId(selected.getId());
+                fragment.setCurrentSongList(songList, selected.getId());
                 Bundle args = new Bundle();
                 args.putString("songId", selected.getId());
+                args.putString("previousSongId", preId);
+                args.putString("nextSongId", nextId);
                 fragment.setArguments(args);
                 // Add the Fragment to the Activity
                 ((AppCompatActivity)v.getContext()).getSupportFragmentManager()
@@ -161,9 +188,6 @@ public class SongAdapter extends RecyclerView.Adapter<SongAdapter.ViewHolder> {
             }
         }
 
-        public void setOnItemClickListener(SongAdapter.OnItemClickListener listenerInput) {
-            listener = listenerInput;
-        }
     }
 
 

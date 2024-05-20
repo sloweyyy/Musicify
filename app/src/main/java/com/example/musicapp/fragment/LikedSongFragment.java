@@ -1,6 +1,7 @@
 package com.example.musicapp.fragment;
 
 import android.app.AlertDialog;
+import android.content.Context;
 import android.net.Uri;
 import android.os.Bundle;
 import android.security.keystore.StrongBoxUnavailableException;
@@ -15,6 +16,8 @@ import android.widget.EditText;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentManager;
@@ -49,15 +52,12 @@ public class LikedSongFragment extends Fragment implements FetchAccessToken.Acce
     private FetchAccessToken fetchAccessToken;
     private String accessToken;
     private LinearLayout backButtonLayout;
-    List<Song> songs = new ArrayList<>();
+    List<Song> songs= new ArrayList<>(); ;
     private RecyclerView recyclerView;
-
     private RecyclerView recyclerViewSearch;
     private EditText search;
-
     private Button backBtn;
     private SongAdapter songAdapter;
-
     @Override
     public void onTokenReceived(String accessToken) {
         this.accessToken = accessToken;
@@ -65,19 +65,19 @@ public class LikedSongFragment extends Fragment implements FetchAccessToken.Acce
         String userId = "4k4kPnoXFCTgzBAvaDNw25XVFpy1";
         FirebaseFirestore db = FirebaseFirestore.getInstance();
         db.collection("users").whereEqualTo("id", userId).get().addOnSuccessListener(queryDocumentSnapshots ->
-        {
-            if (!queryDocumentSnapshots.isEmpty()) {
-                DocumentSnapshot documentSnapshot = queryDocumentSnapshots.getDocuments().get(0);
-                ArrayList<String> songIds = (ArrayList<String>) documentSnapshot.get("likedsong");
-                for (String id : songIds){
-                    getTrack(accessToken,id);
+            {
+                if (!queryDocumentSnapshots.isEmpty()) {
+                    DocumentSnapshot documentSnapshot = queryDocumentSnapshots.getDocuments().get(0);
+                    ArrayList<String> songIds = (ArrayList<String>) documentSnapshot.get("likedsong");
+                    for (String id : songIds) {
+                        getTrack(accessToken, id);
+                    }
+                    songAdapter = new SongAdapter(getContext(), songs);
+                    songCount.setText(songAdapter.getItemCount() + " songs");
+                    recyclerView.setAdapter(songAdapter);
                 }
-                songAdapter = new SongAdapter(getContext(), songs);
-                songCount.setText(songAdapter.getItemCount() + " songs");
-                recyclerView.setAdapter(songAdapter);
-            }
-        }).addOnFailureListener(e -> {
-        });
+            }).addOnFailureListener(e -> {
+            });
     }
 
     private enum SortState {
@@ -87,7 +87,6 @@ public class LikedSongFragment extends Fragment implements FetchAccessToken.Acce
     private FirebaseStorage storage;
     private static final int PICK_IMAGE_REQUEST = 1;
     private Uri selectedImageUri;
-
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         view = inflater.inflate(R.layout.likedsong_fragment, container, false);
@@ -200,14 +199,10 @@ public class LikedSongFragment extends Fragment implements FetchAccessToken.Acce
         });
     }
 
-
-
-
     public interface SpotifyApi {
         @GET("v1/tracks/{songId}")
         Call<SimplifiedTrack> getTrack(@Header("Authorization") String authorization, @Path("songId") String songId);
     }
-
     public static class TrackModel {
         @SerializedName("id")
         private String id;

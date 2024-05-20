@@ -1,6 +1,13 @@
 package com.example.musicapp.adapter;
 
+import android.os.Bundle;
+import android.view.LayoutInflater;
+import android.view.View;
+import android.view.ViewGroup;
 import android.widget.Toast;
+
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 
 import com.example.musicapp.fragment.ExploreFragment;
 import com.example.musicapp.model.TokenResponse;
@@ -21,6 +28,9 @@ public class FetchAccessToken
     private long tokenExpirationTime;
     public interface AccessTokenCallback {
         void onTokenReceived(String accessToken);
+
+        @Nullable
+        View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState);
     }
     public static class AccessTokenWrapper
     {
