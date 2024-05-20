@@ -242,5 +242,5 @@ public class SongAdapter extends RecyclerView.Adapter<SongAdapter.ViewHolder> {
                     .addOnFailureListener(e -> {
                         Log.e("SongAdapter", "Failed to retrieve user document: " + e.getMessage());
                     });
-}
+    }
 }

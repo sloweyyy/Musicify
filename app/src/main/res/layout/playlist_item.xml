@@ -3,12 +3,16 @@
     android:layout_width="match_parent"
     android:orientation="horizontal"
     android:gravity="center"
-    android:layout_height="155dp">
+    android:layout_margin="10dp"
+    android:padding="10dp"
+    android:background="@drawable/image_view_rounded_bg"
+    android:layout_height="105dp">
+
     <ImageButton
         android:id="@+id/playButton"
-        android:layout_width="64dp"
+        android:layout_width="60dp"
         android:layout_marginLeft="19dp"
-        android:layout_marginTop="19dp"
+        android:layout_gravity="center_vertical"
         android:layout_height="64dp"
         android:background="@drawable/image_button_round_bg"
         android:src="@drawable/play_arrow_24dp_fill0_wght400_grad0_opsz24"
@@ -23,15 +27,16 @@
         android:id="@+id/playlistName"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:layout_gravity="center_vertical"
         android:text="Bad Guy"
-        android:textSize="30dp"
+        android:textSize="24dp"
         android:textStyle="bold" />
 
     <TextView
-        android:id="@+id/artistName"
+        android:id="@+id/totalTracks"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="Billie Eilish"
+        android:layout_gravity="center_vertical"
         android:textSize="16dp"  />
 
 </LinearLayout>
@@ -40,19 +45,11 @@
         android:orientation="horizontal"
         android:layout_width="match_parent"
         android:layout_height="match_parent">
-<TextView
-    android:layout_width="wrap_content"
-    android:id="@+id/duration"
-    android:textSize="20dp"
-    android:text="5:33"
-    android:layout_height="wrap_content"/>
         <ImageButton
             android:layout_width="wrap_content"
             android:id="@+id/likedButton"
             android:background="@drawable/play_arrow_24dp_fill0_wght400_grad0_opsz24"
             android:layout_marginLeft="10dp"
-            android:text="5:33"
             android:layout_height="wrap_content"/>
     </LinearLayout>
-
 </LinearLayout>

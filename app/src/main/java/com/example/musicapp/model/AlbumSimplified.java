@@ -1,5 +1,6 @@
 package com.example.musicapp.model;
 
+import com.example.musicapp.fragment.PlaylistDetailAPI;
 import com.example.musicapp.model.Image;
 
 import com.google.gson.annotations.SerializedName;
@@ -18,6 +19,19 @@ public class AlbumSimplified {
     @SerializedName("artists")
     private List<Artist> artists;
 
+    @SerializedName("tracks")
+    private Tracks tracksContainer;
+
+    public class Tracks {
+        @SerializedName("items")
+        public List<SimplifiedTrack> tracks;
+        public List<SimplifiedTrack> getTrack() {return tracks;}
+    }
+//    public class Item {
+//        @SerializedName("track")
+//        public SimplifiedTrack track;
+//    }
+
     public String getName() {
         return name;
     }
@@ -33,4 +47,7 @@ public class AlbumSimplified {
     public List<Image> getImages() {
         return images;
     }
+    public Tracks getTracksContainer(){return tracksContainer;}
+
+
 }

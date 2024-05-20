@@ -75,7 +75,6 @@ public class List_Playlist extends Fragment implements FetchAccessToken.AccessTo
         String authorization = "Bearer " + accessToken;
         Call<List_Playlist.PlaylistsModel> call = apiService.getPlaylists(authorization, categoryId);
         call.enqueue(new Callback<List_Playlist.PlaylistsModel>() {
-
             @Override
             public void onResponse(Call<PlaylistsModel> call, Response<PlaylistsModel> response) {
                 AlertDialog.Builder builder = new AlertDialog.Builder(requireContext());
@@ -92,7 +91,6 @@ public class List_Playlist extends Fragment implements FetchAccessToken.AccessTo
                     builder.show();
                 }
             }
-
             @Override
             public void onFailure(Call<PlaylistsModel> call, Throwable throwable) {
 
@@ -114,11 +112,9 @@ public class List_Playlist extends Fragment implements FetchAccessToken.AccessTo
         @GET("v1/browse/categories/{categoryId}/playlists")
         Call<List_Playlist.PlaylistsModel> getPlaylists(@Header("Authorization") String authorization, @Path("categoryId") String categoryId);
     }
-
     public static class PlaylistsModel {
         @SerializedName("message")
         private String message;
-
         public String getMessage() {
             return message;
         }
@@ -132,11 +128,7 @@ public class List_Playlist extends Fragment implements FetchAccessToken.AccessTo
             public List<PlaylistAPI> PlaylistsArray;
 
         }
-
-
-
     }
     public void getPlaylist(String accessToken){
-
     }
 }

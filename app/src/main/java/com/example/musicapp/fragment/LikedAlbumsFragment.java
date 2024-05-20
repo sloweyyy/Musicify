@@ -76,27 +76,27 @@ public class LikedAlbumsFragment extends Fragment implements FetchAccessToken.Ac
 //        String userId = FirebaseAuth.getInstance().getCurrentUser().getUid();
 
 
-        //ImageView recentlyAddedIcon = view.findViewById(R.id.iconRecentlyAdded);
-//        TextView recentlyAddedText = view.findViewById(R.id.textRecentlyAdded);
-//        final boolean[] isRecentlyAdded = {false};
-//
-//        View.OnClickListener recentlyAddedClickListener = new View.OnClickListener() {
-//            @Override
-//            public void onClick(View v) {
-//                isRecentlyAdded[0] = !isRecentlyAdded[0];
-//                if (isRecentlyAdded[0]) {
-//                    //recentlyAddedIcon.setImageResource(R.drawable.down_arrow);
-//                    recentlyAddedText.setText("Hide Recently Added");
-//                    adapter.sortAlbumByName();
-//                } else {
-//                    //recentlyAddedIcon.setImageResource(R.drawable.up_arrow);
-//                    recentlyAddedText.setText("Recently Added");
-//                    adapter.sortAlbumByName();
-//                }
-//            }
-//        };
-//        //recentlyAddedIcon.setOnClickListener(recentlyAddedClickListener);
-//        recentlyAddedText.setOnClickListener(recentlyAddedClickListener);
+        ImageView recentlyAddedIcon = view.findViewById(R.id.iconRecentlyAdded);
+        TextView recentlyAddedText = view.findViewById(R.id.textRecentlyAdded);
+        final boolean[] isRecentlyAdded = {false};
+
+        View.OnClickListener recentlyAddedClickListener = new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                isRecentlyAdded[0] = !isRecentlyAdded[0];
+                if (isRecentlyAdded[0]) {
+                    //recentlyAddedIcon.setImageResource(R.drawable.down_arrow);
+                    recentlyAddedText.setText("Name A-Z");
+                    adapter.sortAlbumByName();
+                } else {
+                    //recentlyAddedIcon.setImageResource(R.drawable.up_arrow);
+                    recentlyAddedText.setText("Recently Added");
+                    adapter.sortAlbumByRecentlyAdded();
+                }
+            }
+        };
+        recentlyAddedIcon.setOnClickListener(recentlyAddedClickListener);
+        recentlyAddedText.setOnClickListener(recentlyAddedClickListener);
 
         return view;
     }
