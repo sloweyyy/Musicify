@@ -25,7 +25,6 @@ import androidx.recyclerview.widget.RecyclerView;
 import com.bumptech.glide.Glide;
 import com.example.musicapp.R;
 import com.example.musicapp.adapter.SongAdapter;
-import com.example.musicapp.model.BottomAppBarListener;
 import com.example.musicapp.model.Playlist;
 import com.example.musicapp.model.Song;
 import com.google.android.gms.tasks.OnCompleteListener;
@@ -95,7 +94,6 @@ public class PlaylistDetailFragment extends Fragment {
         thumbnailImageView = view.findViewById(R.id.playlistBanner);
         nameTextView = view.findViewById(R.id.playlistName);
         descriptionTextView = view.findViewById(R.id.playlistDescription);
-        recyclerView = view.findViewById(R.id.recyclerView);
 
         setupBackButton();
         threeDotsButton = view.findViewById(R.id.threeDots);
@@ -114,8 +112,14 @@ public class PlaylistDetailFragment extends Fragment {
         nameTextView.setText(mPlaylistName);
         descriptionTextView.setText(mPlaylistDescription);
 
-        setupRecyclerView();
-        loadSongsFromSpotify();
+        recyclerView = view.findViewById(R.id.recyclerView);
+        recyclerView = view.findViewById(R.id.recyclerView); // Find RecyclerView
+        if (recyclerView != null) {
+            setupRecyclerView(); // Call setupRecyclerView after finding the RecyclerView
+        } else {
+            // Handle the case where the RecyclerView isn't found (log an error, show a message, etc.)
+        }
+
 
         threeDotsButton.setOnClickListener(v -> {
             getPlaylistById(mPlaylistId, task -> {
@@ -151,7 +155,7 @@ public class PlaylistDetailFragment extends Fragment {
     private void setupRecyclerView() {
         songList = new ArrayList<>();
         adapter = new SongAdapter(getContext(), songList);
-        recyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
+        recyclerView.setLayoutManager(new LinearLayoutManager(getContext())); // Set layout manager here
         recyclerView.setAdapter(adapter);
     }
 

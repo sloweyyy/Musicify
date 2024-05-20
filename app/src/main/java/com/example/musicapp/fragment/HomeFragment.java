@@ -12,19 +12,18 @@ import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 import androidx.viewpager2.widget.ViewPager2;
 
-import com.example.musicapp.R;
-import com.example.musicapp.adapter.HomeFragmentAdapter;
-import com.example.musicapp.adapter.TabFavoriteAdapter;
-import com.google.android.material.tabs.TabLayout;
-
 import com.bumptech.glide.Glide;
 import com.bumptech.glide.request.RequestOptions;
+import com.example.musicapp.R;
+import com.example.musicapp.adapter.HomeFragmentAdapter;
+import com.google.android.material.tabs.TabLayout;
+
 public class HomeFragment extends Fragment {
     private View view;
     private TabLayout tabLayout;
     private ViewPager2 viewPager2;
     ImageView artistImage;
-    TextView recentSongArtist,recentSongName;
+    TextView recentSongArtist, recentSongName;
 
     private HomeFragmentAdapter homeFragmentAdapter;
 
@@ -39,15 +38,10 @@ public class HomeFragment extends Fragment {
         artistImage = view.findViewById(R.id.artistImage);
         recentSongArtist = view.findViewById(R.id.recentSongArtist);
         recentSongName = view.findViewById(R.id.recentSongName);
-        if(artistImage==null)
-        {
-            Glide.with(this)
-                    .load(R.drawable.images)
-                    .apply(RequestOptions.circleCropTransform())
-                    .into(artistImage);
+        if (artistImage == null) {
+            Glide.with(this).load(R.drawable.images).apply(RequestOptions.circleCropTransform()).into(artistImage);
             artistImage.setImageResource(R.drawable.images);
-        }
-        else {
+        } else {
 
         }
 
