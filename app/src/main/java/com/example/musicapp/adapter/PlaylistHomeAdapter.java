@@ -6,7 +6,6 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.Button;
 import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.TextView;
@@ -17,10 +16,7 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.musicapp.R;
 import com.example.musicapp.fragment.PlaylistDetailAPI;
-import com.example.musicapp.model.AlbumSimplified;
-import com.example.musicapp.model.Artist;
 import com.example.musicapp.model.PlaylistAPI;
-import com.example.musicapp.model.PlaylistSimplified;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.firestore.FieldValue;
@@ -37,8 +33,9 @@ public class PlaylistHomeAdapter extends RecyclerView.Adapter<PlaylistHomeAdapte
 
     public PlaylistHomeAdapter(Context context, List<PlaylistAPI> playlistList) {
         this.context = context;
-       this.playlistList = playlistList;
+        this.playlistList = playlistList;
     }
+
     @NonNull
     @Override
     public ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
@@ -53,6 +50,7 @@ public class PlaylistHomeAdapter extends RecyclerView.Adapter<PlaylistHomeAdapte
         return new PlaylistHomeAdapter.ViewHolder(view);
 
     }
+
     private void checkIsLiked(String playlistId, OnIsLikedCallback callback) {
         FirebaseFirestore db = FirebaseFirestore.getInstance();
         if (userId == null) {
@@ -79,37 +77,42 @@ public class PlaylistHomeAdapter extends RecyclerView.Adapter<PlaylistHomeAdapte
                     callback.onResult(false);
                 });
     }
- @Override
+
+    @Override
     public void onBindViewHolder(@NonNull ViewHolder holder, int position) {
-     PlaylistAPI playlist = playlistList.get(position);
-     if(playlist != null) {
-         if(playlist.getName() != null && holder.playlistName != null) {
-             holder.playlistName.setText(playlist.getName());
-         }
-         if(playlist.tracks != null && holder.totalTracks != null) {
-             holder.totalTracks.setText(String.valueOf(playlist.tracks.getTotal()));
-         } else if (holder.totalTracks != null){
-             holder.totalTracks.setText("N/A");
-         }
-     }
-     checkIsLiked(playlist.getId(), isLiked -> {
-         if (isLiked) {
-             holder.heartBtn.setImageResource(R.drawable.favourite_filled);
-         } else {
-             holder.heartBtn.setImageResource(R.drawable.favourite_outline);
-         }
-     });
+        PlaylistAPI playlist = playlistList.get(position);
+        if (playlist != null) {
+            if (playlist.getName() != null && holder.playlistName != null) {
+                holder.playlistName.setText(playlist.getName());
+            }
+            if (playlist.tracks != null && holder.totalTracks != null) {
+                holder.totalTracks.setText(String.valueOf(playlist.tracks.getTotal()));
+            } else if (holder.totalTracks != null) {
+                holder.totalTracks.setText("N/A");
+            }
+        }
+        checkIsLiked(playlist.getId(), isLiked -> {
+            if (isLiked) {
+                holder.heartBtn.setImageResource(R.drawable.favourite_filled);
+            } else {
+                holder.heartBtn.setImageResource(R.drawable.favourite_outline);
+            }
+        });
     }
+
     private interface OnIsLikedCallback {
         void onResult(boolean isLiked);
     }
+
     @Override
     public int getItemCount() {
         return playlistList.size();
     }
+
     public interface OnItemClickListener {
         void onItemClick(PlaylistAPI playlist);
     }
+
     public class ViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener {
         TextView playlistName;
         TextView totalTracks;
@@ -121,7 +124,7 @@ public class PlaylistHomeAdapter extends RecyclerView.Adapter<PlaylistHomeAdapte
             playlistName = itemView.findViewById(R.id.playlistName);
             totalTracks = itemView.findViewById(R.id.totalTracks);
             heartBtn = itemView.findViewById(R.id.heartBtn);
-            playButton=itemView.findViewById(R.id.playButton);
+            playButton = itemView.findViewById(R.id.playButton);
             heartBtn.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
@@ -154,7 +157,7 @@ public class PlaylistHomeAdapter extends RecyclerView.Adapter<PlaylistHomeAdapte
                 Bundle args = new Bundle();
                 args.putString("playlistId", selected.getId());
                 fragment.setArguments(args);
-                ((AppCompatActivity)v.getContext()).getSupportFragmentManager()
+                ((AppCompatActivity) v.getContext()).getSupportFragmentManager()
                         .beginTransaction()
                         .replace(R.id.frame_layout, fragment)
                         .addToBackStack(null)
@@ -162,6 +165,7 @@ public class PlaylistHomeAdapter extends RecyclerView.Adapter<PlaylistHomeAdapte
             }
 
         }
+
         public void addPlaylistToLikedPlaylists(String playlistId) {
             FirebaseFirestore db = FirebaseFirestore.getInstance();
             db.collection("users").document(userId)

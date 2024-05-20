@@ -1,6 +1,5 @@
 package com.example.musicapp.adapter;
 
-
 import android.content.Context;
 import android.os.Bundle;
 import android.util.Log;
@@ -17,34 +16,28 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.bumptech.glide.Glide;
 import com.example.musicapp.R;
-import com.example.musicapp.fragment.AlbumDetailFragment;
 import com.example.musicapp.fragment.ArtistDetailFragment;
-import com.example.musicapp.model.AlbumSimplified;
 import com.example.musicapp.model.Artist;
-import com.example.musicapp.model.Playlist;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FieldValue;
 import com.google.firebase.firestore.FirebaseFirestore;
-import com.google.firebase.firestore.QueryDocumentSnapshot;
 
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
-import java.time.LocalDateTime;
-import java.util.HashMap;
-import java.util.LinkedHashMap;
-import java.util.Map;
 
 public class FollowedArtistAdapter extends RecyclerView.Adapter<FollowedArtistAdapter.ViewHolder> {
     private Context context;
-    private Map<Artist, LocalDateTime> followedArtist ;
+    private List<Artist> followedArtists = new ArrayList<>();
+    private boolean isAscending = false;
 
-    public FollowedArtistAdapter(Context context, Map<Artist, LocalDateTime> followedArtist ) {
+    public FollowedArtistAdapter(Context context, List<Artist> followedArtists) {
         this.context = context;
-        this.followedArtist  = followedArtist ;
+        this.followedArtists = followedArtists;
     }
+
     @NonNull
     @Override
     public ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
@@ -54,48 +47,45 @@ public class FollowedArtistAdapter extends RecyclerView.Adapter<FollowedArtistAd
 
     @Override
     public void onBindViewHolder(@NonNull ViewHolder holder, int position) {
-        Artist artist = (Artist) followedArtist.keySet().toArray()[position];
+        Artist artist = followedArtists.get(position);
         String artistName = artist.getName();
-        String imageUrl = artist.getImages().get(0).getUrl();
+        String imageUrl = artist.getImages().isEmpty() ? null : artist.getImages().get(0).getUrl();
+
         holder.artistName.setText(artistName);
-        Glide.with(context).load(imageUrl).into(holder.artistImage);
+        if (imageUrl != null) {
+            Glide.with(context).load(imageUrl).into(holder.artistImage);
+        } else {
+            holder.artistImage.setImageResource(R.drawable.artist_image_demo); // A default image in case there's no image URL
+        }
     }
 
     @Override
     public int getItemCount() {
-        return 0;
+        return followedArtists.size();
     }
 
-    public class ViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener{
+    public class ViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener {
         private ImageView artistImage;
         private TextView artistName;
 
         public ViewHolder(@NonNull View itemView) {
             super(itemView);
             artistImage = itemView.findViewById(R.id.artisthumbnail);
-            artistName = itemView.findViewById(R.id.artistName);
+            artistName = itemView.findViewById(R.id.artistTitle);
+            itemView.setOnClickListener(this);
         }
 
-        public void bind(Artist artist) {
-            String artistname = artist.getName();
-            String imageUrl = artist.getImages().get(0).getUrl();
-
-            artistName.setText(artistname);
-            Glide.with(context).load(imageUrl).into(artistImage);
-        }
         @Override
         public void onClick(View v) {
-            Log.e("Clicked On item", "hehe");
             int position = getAbsoluteAdapterPosition();
             if (position != RecyclerView.NO_POSITION) {
-//                AlbumSimplified selected = likedAlbums.get(position);
-                Artist selected = (Artist) followedArtist.keySet().toArray()[position];
+                Artist selected = followedArtists.get(position);
                 ArtistDetailFragment artistDetailFragment = new ArtistDetailFragment();
                 artistDetailFragment.setArtistId(selected.getId());
                 Bundle args = new Bundle();
-                args.putString("albumId", selected.getId());
+                args.putString("artistId", selected.getId());
                 artistDetailFragment.setArguments(args);
-                ((AppCompatActivity)v.getContext()).getSupportFragmentManager()
+                ((AppCompatActivity) v.getContext()).getSupportFragmentManager()
                         .beginTransaction()
                         .replace(R.id.frame_layout, artistDetailFragment)
                         .addToBackStack(null)
@@ -103,31 +93,35 @@ public class FollowedArtistAdapter extends RecyclerView.Adapter<FollowedArtistAd
             }
         }
     }
-    public void sortArtistByRecentlyPlayed() {
-//        List<Map.Entry<Artist, LocalDateTime>> sortedEntries = new ArrayList<>(followedArtist.entrySet());
-//        Collections.sort(sortedEntries, new Comparator<Map.Entry<Artist, LocalDateTime>>() {
-//            @Override
-//            public int compare(Map.Entry<Artist, LocalDateTime> entry1, Map.Entry<Artist, LocalDateTime> entry2) {
-//                return entry2.getValue().compareTo(entry1.getValue());
-//            }
-//        });
-//
-//        followedArtist.clear();
-//        for (Map.Entry<Artist, LocalDateTime> entry : sortedEntries) {
-//            followedArtist.put(entry.getKey(), entry.getValue());
-//        }
-        notifyDataSetChanged();
-    }
-    // Method to update the playlist list
-    public void updateFollowedArtists(Map<Artist, LocalDateTime> artists) {
-        followedArtist.clear();
-        followedArtist.putAll(artists);
-        notifyDataSetChanged();
-    }
-    // Method to delete a liked album from Firestore
-    public void unfollowedArtist(String albumId) {
-        String userId = FirebaseAuth.getInstance().getCurrentUser().getUid();
 
+    public void sortArtistByRecentlyPlayed() {
+        // Sort and notify adapter about changes
+        notifyDataSetChanged();
+    }
+
+    public void sortArtistByName() {
+        Collections.sort(followedArtists, new Comparator<Artist>() {
+            @Override
+            public int compare(Artist artist1, Artist artist2) {
+                if (isAscending) {
+                    return artist1.getName().compareToIgnoreCase(artist2.getName());
+                } else {
+                    return artist2.getName().compareToIgnoreCase(artist1.getName());
+                }
+            }
+        });
+        isAscending = !isAscending;
+        notifyDataSetChanged();
+    }
+
+    public void updateFollowedArtists(List<Artist> artists) {
+        followedArtists.clear();
+        followedArtists.addAll(artists);
+        notifyDataSetChanged();
+    }
+
+    public void unfollowArtist(String artistId) {
+        String userId = FirebaseAuth.getInstance().getCurrentUser().getUid();
         FirebaseFirestore db = FirebaseFirestore.getInstance();
 
         db.collection("users")
@@ -136,49 +130,36 @@ public class FollowedArtistAdapter extends RecyclerView.Adapter<FollowedArtistAd
                 .addOnSuccessListener(queryDocumentSnapshots -> {
                     if (!queryDocumentSnapshots.isEmpty()) {
                         DocumentSnapshot userDoc = queryDocumentSnapshots.getDocuments().get(0);
-                        userDoc.getReference().update("followedartists", FieldValue.arrayRemove(albumId))
+                        userDoc.getReference().update("likedArtist", FieldValue.arrayRemove(artistId))
                                 .addOnSuccessListener(aVoid -> {
                                     Toast.makeText(context, "Removed from followed artists successfully", Toast.LENGTH_SHORT).show();
-
+                                    followedArtists.removeIf(artist -> artist.getId().equals(artistId));
                                 })
-                                .addOnFailureListener(e -> {
-                                    Log.e("FollowedArtistAdapter", "Failed to remove album from followed artists: " + e.getMessage());
-                                });
+                                .addOnFailureListener(e -> Log.e("FollowedArtistAdapter", "Failed to remove artist from followed artists: " + e.getMessage()));
                     } else {
                         Log.e("FollowedArtistAdapter", "No user document found with userId: " + userId);
                     }
                 })
-                .addOnFailureListener(e -> {
-                    Log.e("FollowedArtistAdapter", "Failed to retrieve user document: " + e.getMessage());
-                });
+                .addOnFailureListener(e -> Log.e("FollowedArtistAdapter", "Failed to retrieve user document: " + e.getMessage()));
     }
-    public void addFollowedArtist(String albumId) {
-        String userId = FirebaseAuth.getInstance().getCurrentUser().getUid();
 
+    public void addFollowedArtist(String artistId) {
+        String userId = FirebaseAuth.getInstance().getCurrentUser().getUid();
         FirebaseFirestore db = FirebaseFirestore.getInstance();
+
         db.collection("users")
                 .whereEqualTo("id", userId)
                 .get()
                 .addOnSuccessListener(queryDocumentSnapshots -> {
                     if (!queryDocumentSnapshots.isEmpty()) {
                         DocumentSnapshot userDoc = queryDocumentSnapshots.getDocuments().get(0);
-                        userDoc.getReference().update("followedartists", FieldValue.arrayUnion(albumId))
-                                .addOnSuccessListener(aVoid -> {
-                                    Toast.makeText(context, "Add to followed artists successfully", Toast.LENGTH_SHORT).show();
-                                    notifyDataSetChanged();
-                                })
-                                .addOnFailureListener(e -> {
-                                    // Handle the error
-                                    Log.e("FollowedArtistAdapter", "Failed to add album to followed artists: " + e.getMessage());
-                                });
+                        userDoc.getReference().update("likedArtist", FieldValue.arrayUnion(artistId))
+                                .addOnSuccessListener(aVoid -> Toast.makeText(context, "Added to followed artists successfully", Toast.LENGTH_SHORT).show())
+                                .addOnFailureListener(e -> Log.e("FollowedArtistAdapter", "Failed to add artist to followed artists: " + e.getMessage()));
                     } else {
                         Log.e("FollowedArtistAdapter", "No user document found with userId: " + userId);
                     }
                 })
-                .addOnFailureListener(e -> {
-                    Log.e("FollowedArtistAdapter", "Failed to retrieve user document: " + e.getMessage());
-                });
+                .addOnFailureListener(e -> Log.e("FollowedArtistAdapter", "Failed to retrieve user document: " + e.getMessage()));
     }
-
-
 }
