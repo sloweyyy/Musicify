@@ -13,12 +13,15 @@
         android:layout_marginTop="20dp"
         android:background="@drawable/back_btn_custom"
         app:layout_constraintStart_toStartOf="parent"
+        android:visibility="invisible"
         app:layout_constraintTop_toTopOf="parent">
 
         <ImageView
             android:id="@+id/iconBack"
+
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:layout_gravity="center"
             android:src="@drawable/arrow_back" />
     </LinearLayout>
 
@@ -35,8 +38,9 @@
 
         <ImageView
             android:id="@+id/threeDots"
-            android:layout_width="wrap_content"
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:layout_gravity="center"
             android:src="@drawable/notifications_24dp_fill0_wght400_grad0_opsz24" />
     </LinearLayout>
 
@@ -66,14 +70,14 @@
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toTopOf="parent">
 
-        <EditText
+        <TextView
             android:layout_width="wrap_content"
             android:textSize="24dp"
             android:layout_marginBottom="20dp"
             android:background="@null"
             android:text="Recently listening"
             android:layout_height="wrap_content"/>
-        <EditText
+        <TextView
             android:layout_width="wrap_content"
             android:textSize="20dp"
             android:textColor="@color/textColor"
@@ -82,7 +86,7 @@
             android:id="@+id/recentSongName"
             android:text="Bad Guy"
             android:layout_height="wrap_content"/>
-        <EditText
+        <TextView
             android:layout_width="wrap_content"
             android:textSize="15dp"
             android:background="@null"
