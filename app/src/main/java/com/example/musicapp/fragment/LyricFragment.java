@@ -99,7 +99,8 @@ public class LyricFragment extends Fragment implements FetchAccessToken.AccessTo
     @Override
     public void onPause() {
         super.onPause();
-        currentPosition = mediaPlayerManager.getMediaPlayer().getCurrentPosition();
+        mediaPlayerManager.setCurrentPosition(mediaPlayerManager.getMediaPlayer().getCurrentPosition());
+        mediaPlayerManager.getMediaPlayer().seekTo(mediaPlayerManager.getMediaPlayer().getCurrentPosition());
     }
 
     private void initializeViews() {

@@ -9,6 +9,15 @@ public class MediaPlayerManager {
 
     private static boolean isPlaying;
     private MediaPlayer mediaPlayer;
+    private int currentPosition;
+
+    public int getCurrentPosition() {
+        return currentPosition;
+    }
+
+    public void setCurrentPosition(int position) {
+        this.currentPosition = position;
+    }
 
     private MediaPlayerManager() {
         mediaPlayer = new MediaPlayer();

@@ -85,13 +85,12 @@ public class PlaySongFragment extends Fragment implements FetchAccessToken.Acces
 
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
-
         view = inflater.inflate(R.layout.play_song, container, false);
         // hide bottom navigation bar
         ((BottomAppBarListener) requireActivity()).hideBottomAppBar();
-        mediaPlayerManager = MediaPlayerManager.getInstance();
         fetchAccessToken = new FetchAccessToken();
         fetchAccessToken.getTokenFromSpotify(this);
+        mediaPlayerManager = MediaPlayerManager.getInstance();
         initializeViews();
         if (getArguments() != null) {
             songId = getArguments().getString("songId");
@@ -392,37 +391,36 @@ public class PlaySongFragment extends Fragment implements FetchAccessToken.Acces
     public void onPause() {
         super.onPause();
         if (mediaPlayerManager.getMediaPlayer() != null) {
-            mediaPlayerManager.getMediaPlayer().seekTo(0);
+            mediaPlayerManager.getMediaPlayer().seekTo(mediaPlayerManager.getMediaPlayer().getCurrentPosition());
         }
     }
     @Override
     public void onResume() {
         super.onResume();
-
     }
     public void setupMediaPlayer(String playUrl) {
-        mediaPlayerManager.setMediaSource(playUrl);
-        mediaPlayerManager.getMediaPlayer().seekTo(currentPosition);
-        mediaPlayerManager.setIsPlaying(true);
-        if (mediaPlayerManager.getMediaPlayer()!=null){
-            mediaPlayerManager.getMediaPlayer().start();
-        }
-        seekBar.setMax((int) (mediaPlayerManager.getMediaPlayer().getDuration() / 1000));
-        duration_total.setText(formattedTime(mediaPlayerManager.getMediaPlayer().getDuration() / 1000));
-        mediaPlayerManager.setIsPlaying(true);
-        updateSeekBarRunnable = new Runnable() {
-            @Override
-            public void run() {
-                if ( mediaPlayerManager.getMediaPlayer()!= null && mediaPlayerManager.getIsPlaying())
-                { // Check if mediaPlayer is playing
-                    int CurrentPosition = ( mediaPlayerManager.getMediaPlayer().getCurrentPosition() / 1000);
-                    seekBar.setProgress(CurrentPosition);
-                    duration_played.setText(formattedTime(CurrentPosition));
-                    handler.postDelayed(this, 500); // Update every 500 milliseconds
-                }
+        if (playUrl != null && !playUrl.isEmpty()) {
+            mediaPlayerManager.setMediaSource(playUrl);
+            mediaPlayerManager.setIsPlaying(true);
+            if (mediaPlayerManager.getIsPlaying()) {
+                mediaPlayerManager.getMediaPlayer().seekTo(mediaPlayerManager.getCurrentPosition());
+                mediaPlayerManager.getMediaPlayer().start();
             }
-        };
-        handler.postDelayed(updateSeekBarRunnable, 0);
+            seekBar.setMax((int) (mediaPlayerManager.getMediaPlayer().getDuration() / 1000));
+            duration_total.setText(formattedTime(mediaPlayerManager.getMediaPlayer().getDuration() / 1000));
+            updateSeekBarRunnable = new Runnable() {
+                @Override
+                public void run() {
+                    if (mediaPlayerManager.getMediaPlayer() != null && mediaPlayerManager.getIsPlaying()) { // Check if mediaPlayer is playing
+                        int CurrentPosition = (mediaPlayerManager.getMediaPlayer().getCurrentPosition() / 1000);
+                        seekBar.setProgress(CurrentPosition);
+                        duration_played.setText(formattedTime(CurrentPosition));
+                        handler.postDelayed(this, 500); // Update every 500 milliseconds
+                    }
+                }
+            };
+            handler.postDelayed(updateSeekBarRunnable, 0);
+        }
     }
     public void setupSeekBar() {
         seekBar.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
