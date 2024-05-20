@@ -22,44 +22,39 @@ import com.bumptech.glide.Glide;
 import com.example.musicapp.R;
 import com.example.musicapp.fragment.AlbumDetailFragment;
 import com.example.musicapp.model.AlbumSimplified;
-import com.example.musicapp.fragment.LikedAlbumDetailFragment;
+import com.example.musicapp.fragment.AlbumDetailFragment;
 import com.example.musicapp.model.Song;
 import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FieldValue;
 import com.google.firebase.firestore.FirebaseFirestore;
-import com.google.firebase.firestore.QueryDocumentSnapshot;
 
-
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.Date;
-import java.util.HashMap;
+import java.util.Comparator;
 import java.util.List;
+import java.time.LocalDateTime;
+import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.Map;
+import java.util.stream.Collectors;
 
-import com.example.musicapp.adapter.FetchAccessToken;
-import com.google.gson.annotations.SerializedName;
-
-import retrofit2.Call;
-import retrofit2.Callback;
-import retrofit2.Response;
-import retrofit2.Retrofit;
-import retrofit2.converter.gson.GsonConverterFactory;
-import retrofit2.http.GET;
-import retrofit2.http.Header;
-import retrofit2.http.Path;
 
 public class LikedAlbumAdapter extends RecyclerView.Adapter<LikedAlbumAdapter.ViewHolder>{
     private Context context;
-    private List<AlbumSimplified> likedAlbumsList;
+//    private List<AlbumSimplified> likedAlbumsList;
+    private Map<AlbumSimplified, LocalDateTime> likedAlbums ;
+//
+//    public LikedAlbumAdapter(Context context, List<AlbumSimplified> likedAlbumsList) {
+//        this.context = context;
+//        this.likedAlbumsList = likedAlbumsList;
+//    }
 
-    public LikedAlbumAdapter(Context context, List<AlbumSimplified> likedAlbumsList) {
+
+    public LikedAlbumAdapter(Context context, Map<AlbumSimplified, LocalDateTime> likedAlbums ) {
         this.context = context;
-        this.likedAlbumsList = likedAlbumsList;
+        this.likedAlbums  = likedAlbums ;
     }
-
 
     @NonNull
     @Override
@@ -70,7 +65,7 @@ public class LikedAlbumAdapter extends RecyclerView.Adapter<LikedAlbumAdapter.Vi
 
     @Override
     public void onBindViewHolder(@NonNull ViewHolder holder, int position) {
-        AlbumSimplified album = likedAlbumsList.get(position);
+        AlbumSimplified album = (AlbumSimplified) likedAlbums.keySet().toArray()[position];
         String songName = album.getName();
         String artistName = album.getArtists().get(0).getName();
         String imageUrl = album.getImages().get(0).getUrl();
@@ -120,7 +115,7 @@ public class LikedAlbumAdapter extends RecyclerView.Adapter<LikedAlbumAdapter.Vi
 
     @Override
     public int getItemCount() {
-        return likedAlbumsList.size();
+        return likedAlbums .size();
     }
 
     public class ViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener{
@@ -145,7 +140,7 @@ public class LikedAlbumAdapter extends RecyclerView.Adapter<LikedAlbumAdapter.Vi
                 public void onClick(View v) {
                     int position = getAbsoluteAdapterPosition();
                     if (position != RecyclerView.NO_POSITION) {
-                        AlbumSimplified albumSimplified = likedAlbumsList.get(position);
+                        AlbumSimplified albumSimplified = (AlbumSimplified) likedAlbums.keySet().toArray()[position];
                         checkIsLiked(albumSimplified.getId(), new OnIsLikedCallback() {
                             @Override
                             public void onResult(boolean isLiked) {
@@ -178,8 +173,9 @@ public class LikedAlbumAdapter extends RecyclerView.Adapter<LikedAlbumAdapter.Vi
             Log.e("Clicked On item", "hehe");
             int position = getAbsoluteAdapterPosition();
             if (position != RecyclerView.NO_POSITION) {
-                AlbumSimplified selected = likedAlbumsList.get(position);
-                LikedAlbumDetailFragment likedAlbumDetailFragment= new LikedAlbumDetailFragment();
+//                AlbumSimplified selected = likedAlbums.get(position);
+                AlbumSimplified selected = (AlbumSimplified) likedAlbums.keySet().toArray()[position];
+                AlbumDetailFragment likedAlbumDetailFragment= new AlbumDetailFragment();
                 likedAlbumDetailFragment.setAlbumId(selected.getId());
                 Bundle args = new Bundle();
                 args.putString("albumId", selected.getId());
@@ -198,17 +194,19 @@ public class LikedAlbumAdapter extends RecyclerView.Adapter<LikedAlbumAdapter.Vi
     }
 
     // Method to update the likedAlbum list
-    public void updateLikedAlbumList(List<AlbumSimplified> albums) {
-        likedAlbumsList.clear();
-        likedAlbumsList.addAll(albums);
+    public void updateLikedAlbumList(Map<AlbumSimplified, LocalDateTime> albums) {
+        likedAlbums.clear();
+        likedAlbums.putAll(albums);
         notifyDataSetChanged();
     }
 
     // Method to sort the album list by name
     public void sortAlbumByName() {
-        likedAlbumsList.sort((album1, album2) -> {
-            String name1 = album1.getName();
-            String name2 = album2.getName();
+        List<Map.Entry<AlbumSimplified, LocalDateTime>> entryList = new ArrayList<>(likedAlbums.entrySet());
+
+        entryList.sort((entry1, entry2) -> {
+            String name1 = entry1.getKey().getName();
+            String name2 = entry2.getKey().getName();
 
             // Check for null before comparing
             if (name1 == null && name2 == null) {
@@ -222,39 +220,31 @@ public class LikedAlbumAdapter extends RecyclerView.Adapter<LikedAlbumAdapter.Vi
                 return name1.compareTo(name2);
             }
         });
+        likedAlbums.clear();
+        for (Map.Entry<AlbumSimplified, LocalDateTime> entry : entryList) {
+            likedAlbums.put(entry.getKey(), entry.getValue());
+        }
+
         notifyDataSetChanged();
     }
+
     public void sortAlbumByRecentlyAdded() {
-        Collections.reverse(likedAlbumsList);
-        // Giả sử bạn có một map chứa thời gian thêm của mỗi album
-//        Map<String, Date> addedTimeMap = getAddedTimeMapForLikedAlbums();
-//
-//        // Sắp xếp likedAlbumsList dựa trên thời gian thêm
-//        likedAlbumsList.sort((album1, album2) -> {
-//            Date date1 = addedTimeMap.get(album1.getId());
-//            Date date2 = addedTimeMap.get(album2.getId());
-//            return date2.compareTo(date1);
-//        });
+        List<Map.Entry<AlbumSimplified, LocalDateTime>> sortedEntries = new ArrayList<>(likedAlbums.entrySet());
+        Collections.sort(sortedEntries, new Comparator<Map.Entry<AlbumSimplified, LocalDateTime>>() {
+            @Override
+            public int compare(Map.Entry<AlbumSimplified, LocalDateTime> entry1, Map.Entry<AlbumSimplified, LocalDateTime> entry2) {
+                return entry2.getValue().compareTo(entry1.getValue());
+            }
+        });
+
+        likedAlbums.clear();
+        for (Map.Entry<AlbumSimplified, LocalDateTime> entry : sortedEntries) {
+            likedAlbums.put(entry.getKey(), entry.getValue());
+        }
 
         notifyDataSetChanged();
     }
 
-//    private Map<String, Date> getAddedTimeMapForLikedAlbums() {
-//        Map<String, Date> addedTimeMap = new HashMap<>();
-//        for (String albumId : likedAlbums) {
-//            // Lấy thời gian thêm album từ Firebase và lưu vào map
-//            Date addedTime = getAddedTimeFromFirebase(albumId);
-//            addedTimeMap.put(albumId, addedTime);
-//        }
-//        return addedTimeMap;
-//    }
-//
-//    private Date getAddedTimeFromFirebase(String albumId) {
-//        // Viết logic để lấy thời gian thêm album từ Firebase dựa trên albumId
-//        // Ví dụ:
-//        DocumentReference userDoc = firestore.collection("users").document(userId);
-//        return userDoc.get("likedAlbums." + albumId + ".addedTime");
-//    }
 
     // Method to delete a liked album from Firestore
     public void unlikeAlbum(String albumId) {
