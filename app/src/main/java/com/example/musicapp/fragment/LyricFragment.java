@@ -4,6 +4,7 @@ import android.annotation.SuppressLint;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Looper;
+import android.security.keystore.StrongBoxUnavailableException;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -13,21 +14,29 @@ import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.SeekBar;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentManager;
-import androidx.recyclerview.widget.LinearLayoutManager;
 
 import com.bumptech.glide.Glide;
 import com.example.musicapp.R;
 import com.example.musicapp.adapter.FetchAccessToken;
 import com.example.musicapp.manager.MediaPlayerManager;
 import com.example.musicapp.model.BottomAppBarListener;
-import com.example.musicapp.model.Image;
+import com.google.gson.annotations.SerializedName;
 
-import java.util.ResourceBundle;
+import java.util.List;
+
+import retrofit2.Call;
+import retrofit2.Callback;
+import retrofit2.Response;
+import retrofit2.Retrofit;
+import retrofit2.converter.gson.GsonConverterFactory;
+import retrofit2.http.GET;
+import retrofit2.http.Query;
 
 public class LyricFragment extends Fragment implements FetchAccessToken.AccessTokenCallback{
     private FetchAccessToken fetchAccessToken;
@@ -35,17 +44,26 @@ public class LyricFragment extends Fragment implements FetchAccessToken.AccessTo
     private Handler handler = new Handler(Looper.getMainLooper());
     private Runnable updateSeekBarRunnable;
 
+    private static final String API_KEY = "63a9e2c4de53b2981cc9b3a8df6b9f32";
+    private static final String API_BASE_URL = "https://api.musixmatch.com/ws/1.1/";
+
     private boolean isPlaying;
-    private String songId;
+    private String songIdhMusixmatc;
     private int currentPosition;
+
+    private boolean isNullLyric;
     private MediaPlayerManager mediaPlayerManager;
     private ImageView background, threeDots, artistAvata, heartBtn;
     private String songNameValue, artistNameValue, avataValue, played_value, total_value, urlAudio;
     private LinearLayout backButtonLayout;
     private Button iconBack;
-    private TextView header, artistName, songName, playedDuration, totalDuration;
+    private TextView header, artistName, songName, playedDuration, totalDuration, lyric;
     private ImageButton repeateBtn, previousBtn, pauseBtn, nextBtn, shuffleBtn;
     private SeekBar seekBar;
+    private MusixmatchApi musixmatchApi;
+    private String commondId;
+
+
     @Override
     public void onTokenReceived(String accessToken) {
 
@@ -60,7 +78,6 @@ public class LyricFragment extends Fragment implements FetchAccessToken.AccessTo
             mediaPlayerManager.getMediaPlayer().start();
         }
         if (getArguments() != null) {
-            songId = getArguments().getString("songId");
             songNameValue = getArguments().getString("songName");
             artistNameValue = getArguments().getString("artistName");
             avataValue = getArguments().getString("avata");
@@ -69,6 +86,7 @@ public class LyricFragment extends Fragment implements FetchAccessToken.AccessTo
 
         }
         initializeViews();
+        searchTrack();
         fetchAccessToken = new FetchAccessToken();
         fetchAccessToken.getTokenFromSpotify(this);
         backButtonLayout.setOnClickListener(new View.OnClickListener() {
@@ -105,7 +123,7 @@ public class LyricFragment extends Fragment implements FetchAccessToken.AccessTo
 
     private void initializeViews() {
 
-
+        lyric = view.findViewById(R.id.lyric);
         songName = view.findViewById(R.id.songName);
         songName.setText(songNameValue);
 
@@ -140,7 +158,7 @@ public class LyricFragment extends Fragment implements FetchAccessToken.AccessTo
 
     }
     public void setSongId(String songId){
-        this.songId = songId;
+
     }
     public void setSongName(String songName){
         this.songNameValue = songName;
@@ -240,5 +258,180 @@ public class LyricFragment extends Fragment implements FetchAccessToken.AccessTo
         int seconds = currentPosition % 60;
         return String.format("%02d:%02d", minutes, seconds);
     }
+    public void searchTrack() {
+        Retrofit retrofit = new Retrofit.Builder()
+                .baseUrl(API_BASE_URL)
+                .addConverterFactory(GsonConverterFactory.create())
+                .build();
 
+        musixmatchApi = retrofit.create(MusixmatchApi.class);
+        Call<MusixmatchSearchResponse> call = musixmatchApi.searchTrack(songNameValue, artistNameValue, API_KEY);
+        call.enqueue(new Callback<MusixmatchSearchResponse>() {
+            @Override
+            public void onResponse(@NonNull Call<MusixmatchSearchResponse> call,@NonNull Response<MusixmatchSearchResponse> response) {
+                if (response.isSuccessful()) {
+                    MusixmatchSearchResponse searchResponse = response.body();
+                    if (searchResponse != null) {
+                        if (searchResponse.getMessageBody().getBody().getTrackList() != null){
+                            songIdhMusixmatc = searchResponse.getMessageBody().getBody().getTrackList().getTrackInfo().getId();
+                            commondId = searchResponse.getMessageBody().getBody().getTrackList().getTrackInfo().getIdCommon();
+                            getLyric(songIdhMusixmatc);
+                            if (isNullLyric == true)
+                                getLyric(commondId);
+                        }
+                        else {
+                            lyric.setText("Don't have lyrics");
+                        }
+
+                    } else {
+                        Toast.makeText(requireContext(), response.message(), Toast.LENGTH_SHORT).show();
+                    }
+                }
+            }
+
+            @Override
+            public void onFailure(Call<MusixmatchSearchResponse> call, Throwable t) {
+            }
+        });
+    }
+
+    public void getLyric(String songId){
+        Retrofit retrofit = new Retrofit.Builder()
+                .baseUrl(API_BASE_URL)
+                .addConverterFactory(GsonConverterFactory.create())
+                .build();
+
+        musixmatchApi = retrofit.create(MusixmatchApi.class);
+        Call<LyricsResponse> call = musixmatchApi.getLyrics(songId, API_KEY);
+        call.enqueue(new Callback<LyricsResponse>() {
+            @Override
+            public void onResponse(@NonNull Call<LyricsResponse> call,@NonNull Response<LyricsResponse> response) {
+                if (response.isSuccessful()) {
+                    LyricsResponse lyricResponse = response.body();
+                    if (lyricResponse != null)
+                    {
+                        String lyricText = lyricResponse.getMessageBody().getBody().getLyric_container().getLyric();
+                        if (lyricText != null){
+                            isNullLyric = false;
+                            lyric.setText(lyricText);
+                        }
+                        else {
+                            isNullLyric = true;
+                        }
+                    } else {
+                        Toast.makeText(requireContext(), response.message(), Toast.LENGTH_SHORT).show();
+                    }
+                }
+            }
+
+            @Override
+            public void onFailure(Call<LyricsResponse> call, Throwable t) {
+            }
+        });
+    }
+    public interface MusixmatchApi {
+        @GET("track.search")
+        Call<MusixmatchSearchResponse> searchTrack(
+                @Query("q_track") String trackTitle,
+                @Query("q_artist") String trackArtist,
+                @Query("apikey") String apiKey
+        );
+        @GET("track.lyrics.get")
+        Call<LyricsResponse> getLyrics(
+                @Query("track_id") String trackId,
+                @Query("apikey") String apiKey
+        );
+    }
+    public static class MusixmatchSearchResponse {
+        @SerializedName("message")
+        private MessageContainer messageBody;
+
+        public MessageContainer getMessageBody() {
+            return messageBody;
+        }
+
+        public static class MessageContainer{
+            @SerializedName("body")
+            private MessageBody body;
+
+            public MessageBody getBody() {
+                return body;
+            }
+
+            public static class MessageBody {
+                @SerializedName("track_list")
+                public List<TrackWrapper> trackList;
+
+                public TrackWrapper getTrackList() {
+                    if (trackList != null && !trackList.isEmpty()) {
+                        return trackList.get(0);
+                    } else {
+                        return null;
+                    }
+                }
+
+                public static class TrackWrapper{
+                    @SerializedName("track")
+                    private trackInfo track_Info;
+
+                    public trackInfo getTrackInfo(){
+                        return track_Info;
+                    }
+                    public static class trackInfo{
+                        @SerializedName("track_id")
+                        public String id;
+                        @SerializedName("commontrack_id")
+                        public String idCommon;
+
+                        public String getId() {
+                            return id;
+                        }
+
+                        public String getIdCommon() {
+                            return idCommon;
+                        }
+                    }
+                }
+            }
+        }
+
+
+
+    }
+    public static class LyricsResponse
+    {
+        @SerializedName("message")
+        private MessageContainer messageBody;
+
+        public MessageContainer getMessageBody() {
+            return messageBody;
+        }
+
+        public static class MessageContainer {
+            @SerializedName("body")
+            private MessageBody body;
+
+            public MessageBody getBody() {
+                return body;
+            }
+
+            public static class MessageBody{
+                @SerializedName("lyrics")
+                private lyricContainer lyric_container;
+
+                public lyricContainer getLyric_container() {
+                    return lyric_container;
+                }
+
+                public static class lyricContainer{
+                    @SerializedName("lyrics_body")
+                    private String lyric;
+
+                    public String getLyric() {
+                        return lyric;
+                    }
+                }
+            }
+        }
+    }
 }
