@@ -1,5 +1,6 @@
 package com.example.musicapp.adapter;
 
+import android.util.Log;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageButton;
@@ -30,9 +31,14 @@ import java.util.List;
 public class SongHomeAdapter extends RecyclerView.Adapter<SongHomeAdapter.ViewHolder> {
     private Context context;
     private List<Song> songList;
-    public SongHomeAdapter(Context context, List<Song> songList) {
+    public interface OnSongSelectedListener {
+        void onSongSelected(Song song);
+    }
+    private OnSongSelectedListener listener;
+    public SongHomeAdapter(Context context, List<Song> songList,OnSongSelectedListener listener) {
         this.context = context;
         this.songList = songList;
+        this.listener = listener;
     }
     @NonNull
     @Override
@@ -71,6 +77,16 @@ public class SongHomeAdapter extends RecyclerView.Adapter<SongHomeAdapter.ViewHo
             artistName = itemView.findViewById(R.id.artistName);
             artistPic = itemView.findViewById(R.id.artistPic);
             playButton=itemView.findViewById(R.id.playButton);
+
+            playButton.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    int position = getAdapterPosition();
+                    if (position != RecyclerView.NO_POSITION) {
+                        listener.onSongSelected(songList.get(position));
+                    }
+                }
+            });
         }
     }
 }

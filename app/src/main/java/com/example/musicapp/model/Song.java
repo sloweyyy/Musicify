@@ -60,6 +60,7 @@ public class Song {
         this.artist = artist;
     }
 
+
     public static Song fromSimplifiedTrack(SimplifiedTrack track) {
         String artistName = "";
         String imageUrl = "";
