@@ -36,6 +36,24 @@ public class SongAdapter extends RecyclerView.Adapter<SongAdapter.ViewHolder> {
         this.songList = songList;
     }
 
+    public void sortSongByName() {
+        songList.sort((song1, song2) -> {
+            String name1 = song1.getTitle();
+            String name2 = song2.getTitle();
+
+            if (name1 == null && name2 == null) {
+                return 0;
+            } else if (name1 == null) {
+                return -1;
+            } else if (name2 == null) {
+                return 1;
+            } else {
+
+                return name1.compareTo(name2);
+            }
+        });
+        notifyDataSetChanged();
+    }
     public interface OnItemClickListener {
         void onItemClick(PlaylistAPI playlist);
     }
@@ -120,7 +138,6 @@ public class SongAdapter extends RecyclerView.Adapter<SongAdapter.ViewHolder> {
     public int getItemCount() {
         return (songList != null) ? songList.size() : 0;
     }
-
     public class ViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener {
 
         TextView songTitle;
@@ -175,7 +192,29 @@ public class SongAdapter extends RecyclerView.Adapter<SongAdapter.ViewHolder> {
             }
         }
     }
-
+    public void PlayFirstSong()
+    {
+        int position = 0;
+        if (position != RecyclerView.NO_POSITION) {
+            Song selected = songList.get(position);
+            String preId = songList.get(songList.size() - 1).getId();
+            String nextId = songList.get(position + 1).getId();
+            // Open PlaySongFragment as a BottomSheet
+            PlaySongFragment fragment = new PlaySongFragment();
+            fragment.setSongId(selected.getId());
+            fragment.setCurrentSongList(songList, selected.getId());
+            Bundle args = new Bundle();
+            args.putString("songId", selected.getId());
+            args.putString("previousSongId", preId);
+            args.putString("nextSongId", nextId);
+            fragment.setArguments(args);
+            ((AppCompatActivity)context).getSupportFragmentManager()
+                    .beginTransaction()
+                    .replace(R.id.frame_layout, fragment)
+                    .addToBackStack(null)
+                    .commit();
+        }
+    }
     private void removeSongFromLikedSongs(String songId) {
         FirebaseAuth mAuth = FirebaseAuth.getInstance();
         String userId = mAuth.getCurrentUser().getUid();
