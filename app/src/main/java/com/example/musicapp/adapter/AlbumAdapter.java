@@ -48,18 +48,16 @@ public class AlbumAdapter extends RecyclerView.Adapter<AlbumAdapter.ViewHolder>{
     @NonNull
     @Override
     public ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
-        View view = LayoutInflater.from(context).inflate(R.layout.item_album, parent, false);
+        View view = LayoutInflater.from(context).inflate(R.layout.artist_item_album, parent, false);
         return new ViewHolder(view);
     }
 
     @Override
     public void onBindViewHolder(@NonNull ViewHolder holder, int position) {
         AlbumSimplified album = likedAlbumsList.get(position);
-        String songName = album.getName();
-        String artistName = album.getArtists().get(0).getName();
+        String albumname = album.getName();
         String imageUrl = album.getImages().get(0).getUrl();
-        holder.albumName.setText(songName);
-        holder.albumArtist.setText(artistName);
+        holder.albumName.setText(albumname);
         Glide.with(context).load(imageUrl).into(holder.albumImage);
 
         checkIsLiked(album.getId(), new OnIsLikedCallback() {
@@ -110,7 +108,6 @@ public class AlbumAdapter extends RecyclerView.Adapter<AlbumAdapter.ViewHolder>{
     public class ViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener{
         private ImageView albumImage;
         private TextView albumName;
-        private TextView albumArtist;
 
         private ImageView heartBtn;
         private AlbumAdapter.OnItemClickListener listener;
@@ -119,8 +116,7 @@ public class AlbumAdapter extends RecyclerView.Adapter<AlbumAdapter.ViewHolder>{
             super(itemView);
             itemView.setOnClickListener(this);
             albumImage = itemView.findViewById(R.id.albumThumbnail);
-            albumName = itemView.findViewById(R.id.albumTitle);
-            albumArtist = itemView.findViewById(R.id.artistName);
+            albumName = itemView.findViewById(R.id.albumName);
             heartBtn = itemView.findViewById(R.id.heartBtn);
             this.listener = listener;
 
@@ -148,12 +144,10 @@ public class AlbumAdapter extends RecyclerView.Adapter<AlbumAdapter.ViewHolder>{
         }
 
         public void bind(AlbumSimplified album) {
-            String songName = album.getName();
-            String artistName = album.getArtists().get(0).getName();
+            String albumname = album.getName();
             String imageUrl = album.getImages().get(0).getUrl();
 
-            albumName.setText(songName);
-            albumArtist.setText(artistName);
+            albumName.setText(albumname);
             Glide.with(context).load(imageUrl).into(albumImage);
         }
 

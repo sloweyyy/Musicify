@@ -108,7 +108,7 @@ public class LikedAlbumsFragment extends Fragment implements FetchAccessToken.Ac
     @Override
     public void onTokenReceived(String accessToken) {
         this.accessToken = accessToken;
-        String userId = "KRmDxRGH0sez8q3XRknqmmZq97S2";
+        String userId = FirebaseAuth.getInstance().getCurrentUser().getUid();
         FirebaseFirestore db = FirebaseFirestore.getInstance();
         db.collection("users").whereEqualTo("id", userId).get().addOnSuccessListener(queryDocumentSnapshots ->
         {

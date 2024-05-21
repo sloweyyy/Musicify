@@ -19,6 +19,7 @@ import com.bumptech.glide.Glide;
 import com.example.musicapp.R;
 import com.example.musicapp.fragment.AlbumDetailFragment;
 import com.example.musicapp.model.AlbumSimplified;
+import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FieldValue;
 import com.google.firebase.firestore.FirebaseFirestore;
@@ -80,7 +81,7 @@ public class LikedAlbumAdapter extends RecyclerView.Adapter<LikedAlbumAdapter.Vi
     }
 
     private void checkIsLiked(String id, OnIsLikedCallback onIsLikedCallback) {
-        String userId = "KRmDxRGH0sez8q3XRknqmmZq97S2";
+        String userId = FirebaseAuth.getInstance().getCurrentUser().getUid();
         FirebaseFirestore db = FirebaseFirestore.getInstance();
 
         db.collection("users")
@@ -242,7 +243,7 @@ public class LikedAlbumAdapter extends RecyclerView.Adapter<LikedAlbumAdapter.Vi
 
     // Method to delete a liked album from Firestore
     public void unlikeAlbum(String albumId) {
-        String userId = "KRmDxRGH0sez8q3XRknqmmZq97S2";
+        String userId = FirebaseAuth.getInstance().getCurrentUser().getUid();
         FirebaseFirestore db = FirebaseFirestore.getInstance();
 
         db.collection("users")
@@ -268,7 +269,7 @@ public class LikedAlbumAdapter extends RecyclerView.Adapter<LikedAlbumAdapter.Vi
                 });
     }
     public void addAlbumToLikedAlbums(String albumId) {
-        String userId = "KRmDxRGH0sez8q3XRknqmmZq97S2";
+        String userId = FirebaseAuth.getInstance().getCurrentUser().getUid();
         FirebaseFirestore db = FirebaseFirestore.getInstance();
         db.collection("users")
                 .whereEqualTo("id", userId)

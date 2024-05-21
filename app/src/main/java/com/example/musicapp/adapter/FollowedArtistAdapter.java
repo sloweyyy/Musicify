@@ -18,10 +18,6 @@ import com.bumptech.glide.Glide;
 import com.example.musicapp.R;
 import com.example.musicapp.fragment.ArtistDetailFragment;
 import com.example.musicapp.model.Artist;
-import com.google.firebase.auth.FirebaseAuth;
-import com.google.firebase.firestore.DocumentSnapshot;
-import com.google.firebase.firestore.FieldValue;
-import com.google.firebase.firestore.FirebaseFirestore;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -61,7 +57,9 @@ public class FollowedArtistAdapter extends RecyclerView.Adapter<FollowedArtistAd
 
     @Override
     public int getItemCount() {
+        if (followedArtists!=null)
         return followedArtists.size();
+        else return 0;
     }
 
     public class ViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener {
@@ -94,11 +92,6 @@ public class FollowedArtistAdapter extends RecyclerView.Adapter<FollowedArtistAd
         }
     }
 
-    public void sortArtistByRecentlyPlayed() {
-        // Sort and notify adapter about changes
-        notifyDataSetChanged();
-    }
-
     public void sortArtistByName() {
         Collections.sort(followedArtists, new Comparator<Artist>() {
             @Override
@@ -112,54 +105,5 @@ public class FollowedArtistAdapter extends RecyclerView.Adapter<FollowedArtistAd
         });
         isAscending = !isAscending;
         notifyDataSetChanged();
-    }
-
-    public void updateFollowedArtists(List<Artist> artists) {
-        followedArtists.clear();
-        followedArtists.addAll(artists);
-        notifyDataSetChanged();
-    }
-
-    public void unfollowArtist(String artistId) {
-        String userId = FirebaseAuth.getInstance().getCurrentUser().getUid();
-        FirebaseFirestore db = FirebaseFirestore.getInstance();
-
-        db.collection("users")
-                .whereEqualTo("id", userId)
-                .get()
-                .addOnSuccessListener(queryDocumentSnapshots -> {
-                    if (!queryDocumentSnapshots.isEmpty()) {
-                        DocumentSnapshot userDoc = queryDocumentSnapshots.getDocuments().get(0);
-                        userDoc.getReference().update("likedArtist", FieldValue.arrayRemove(artistId))
-                                .addOnSuccessListener(aVoid -> {
-                                    Toast.makeText(context, "Removed from followed artists successfully", Toast.LENGTH_SHORT).show();
-                                    followedArtists.removeIf(artist -> artist.getId().equals(artistId));
-                                })
-                                .addOnFailureListener(e -> Log.e("FollowedArtistAdapter", "Failed to remove artist from followed artists: " + e.getMessage()));
-                    } else {
-                        Log.e("FollowedArtistAdapter", "No user document found with userId: " + userId);
-                    }
-                })
-                .addOnFailureListener(e -> Log.e("FollowedArtistAdapter", "Failed to retrieve user document: " + e.getMessage()));
-    }
-
-    public void addFollowedArtist(String artistId) {
-        String userId = FirebaseAuth.getInstance().getCurrentUser().getUid();
-        FirebaseFirestore db = FirebaseFirestore.getInstance();
-
-        db.collection("users")
-                .whereEqualTo("id", userId)
-                .get()
-                .addOnSuccessListener(queryDocumentSnapshots -> {
-                    if (!queryDocumentSnapshots.isEmpty()) {
-                        DocumentSnapshot userDoc = queryDocumentSnapshots.getDocuments().get(0);
-                        userDoc.getReference().update("likedArtist", FieldValue.arrayUnion(artistId))
-                                .addOnSuccessListener(aVoid -> Toast.makeText(context, "Added to followed artists successfully", Toast.LENGTH_SHORT).show())
-                                .addOnFailureListener(e -> Log.e("FollowedArtistAdapter", "Failed to add artist to followed artists: " + e.getMessage()));
-                    } else {
-                        Log.e("FollowedArtistAdapter", "No user document found with userId: " + userId);
-                    }
-                })
-                .addOnFailureListener(e -> Log.e("FollowedArtistAdapter", "Failed to retrieve user document: " + e.getMessage()));
     }
 }

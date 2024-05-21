@@ -4,7 +4,8 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:orientation="vertical">
+    android:orientation="vertical"
+    tools:context=".fragment.ArtistDetailFragment">
 
 
     <RelativeLayout
@@ -38,7 +39,7 @@
                 android:orientation="horizontal">
 
                 <Button
-                    android:id="@+id/iconBack"
+                    android:id="@+id/backBtn"
                     android:layout_width="25dp"
                     android:layout_height="25dp"
                     android:layout_marginLeft="10dp"
@@ -59,7 +60,7 @@
                 android:gravity="center">
 
                 <Button
-                    android:id="@+id/iconMore"
+                    android:id="@+id/moreBtn"
                     android:layout_width="25sp"
                     android:layout_height="25sp"
                     android:background="@drawable/more_vert_btn"
@@ -84,7 +85,7 @@
             android:textColor="@color/white"
             android:layout_marginBottom="10sp"/>
         <TextView
-            android:id="@+id/albums_track_count"
+            android:id="@+id/followers"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="3 Album, 67 Track"
