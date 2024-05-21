@@ -98,6 +98,7 @@ public class LyricFragment extends Fragment implements FetchAccessToken.AccessTo
         backButtonLayout.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                mediaPlayerManager.setCurrentPosition(0);
                 FragmentManager fragmentManager = getParentFragmentManager();
                 fragmentManager.popBackStack();
             }
@@ -106,6 +107,7 @@ public class LyricFragment extends Fragment implements FetchAccessToken.AccessTo
         iconBack.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                mediaPlayerManager.setCurrentPosition(0);
                 FragmentManager fragmentManager = getParentFragmentManager();
                 fragmentManager.popBackStack();
             }
