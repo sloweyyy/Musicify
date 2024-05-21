@@ -36,6 +36,31 @@ public class SongAdapter extends RecyclerView.Adapter<SongAdapter.ViewHolder> {
         this.context = context;
         this.songList = songList;
     }
+
+    public void sortSongByName() {
+        songList.sort((song1, song2) -> {
+            String name1 = song1.getTitle();
+            String name2 = song2.getTitle();
+
+            if (name1 == null && name2 == null) {
+                return 0;
+            } else if (name1 == null) {
+                return -1;
+            } else if (name2 == null) {
+                return 1;
+            } else {
+
+                return name1.compareTo(name2);
+            }
+        });
+        notifyDataSetChanged();
+    }
+
+    public void clearSongs() {
+        songList.clear();
+        notifyDataSetChanged();
+    }
+
     public interface OnItemClickListener {
         void onItemClick(PlaylistAPI playlist);
     }
@@ -102,29 +127,7 @@ public class SongAdapter extends RecyclerView.Adapter<SongAdapter.ViewHolder> {
             return 0;
         }
     }
-    public void sortSongByName() {
-        songList.sort((song1, song2) -> {
-            String name1 = song1.getTitle();
-            String name2 = song2.getTitle();
-
-<<<<<<< Updated upstream
-    public class ViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener{
-=======
-            if (name1 == null && name2 == null) {
-                return 0;
-            } else if (name1 == null) {
-                return -1;
-            } else if (name2 == null) {
-                return 1;
-            } else {
-
-                return name1.compareTo(name2);
-            }
-        });
-        notifyDataSetChanged();
-    }
     public class ViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener {
->>>>>>> Stashed changes
 
         TextView songTitle;
         TextView artistName;
@@ -208,12 +211,8 @@ public class SongAdapter extends RecyclerView.Adapter<SongAdapter.ViewHolder> {
                         .commit();
             }
         }
-
     }
 
-<<<<<<< Updated upstream
-
-=======
     public void PlayFirstSong()
     {
         int position = 0;
@@ -221,7 +220,6 @@ public class SongAdapter extends RecyclerView.Adapter<SongAdapter.ViewHolder> {
             Song selected = songList.get(position);
             String preId = songList.get(songList.size() - 1).getId();
             String nextId = songList.get(position + 1).getId();
-
             // Open PlaySongFragment as a BottomSheet
             PlaySongFragment fragment = new PlaySongFragment();
             fragment.setSongId(selected.getId());
@@ -231,11 +229,13 @@ public class SongAdapter extends RecyclerView.Adapter<SongAdapter.ViewHolder> {
             args.putString("previousSongId", preId);
             args.putString("nextSongId", nextId);
             fragment.setArguments(args);
-
-            fragment.show(((AppCompatActivity) context).getSupportFragmentManager(), "PlaySongFragment");
+            ((AppCompatActivity)context).getSupportFragmentManager()
+                    .beginTransaction()
+                    .replace(R.id.frame_layout, fragment)
+                    .addToBackStack(null)
+                    .commit();
         }
     }
->>>>>>> Stashed changes
 
     private void removeSongFromLikedSongs(String songId) {
         String userId = "4k4kPnoXFCTgzBAvaDNw25XVFpy1";

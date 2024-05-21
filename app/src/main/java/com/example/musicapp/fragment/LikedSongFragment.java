@@ -18,12 +18,8 @@ import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 
-<<<<<<< Updated upstream
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
-=======
->>>>>>> Stashed changes
-import androidx.appcompat.app.AppCompatActivity;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentManager;
 import androidx.recyclerview.widget.LinearLayoutManager;
@@ -112,13 +108,11 @@ public class LikedSongFragment extends Fragment implements FetchAccessToken.Acce
         storage = FirebaseStorage.getInstance();
         fetchAccessToken = new FetchAccessToken();
         fetchAccessToken.getTokenFromSpotify(this);
-<<<<<<< Updated upstream
-=======
         songAdapter = new SongAdapter(requireContext(), new ArrayList<>());
         recyclerView.setAdapter(songAdapter);
         pauseContainer = view.findViewById(R.id.pauseContainer);
         pauseBtn = view.findViewById(R.id.pauseBtn);
->>>>>>> Stashed changes
+
         backButtonLayout.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
