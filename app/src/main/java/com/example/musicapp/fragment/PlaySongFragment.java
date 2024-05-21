@@ -186,7 +186,7 @@ public class PlaySongFragment extends BottomSheetDialogFragment implements Fetch
         return -1;
     }
 
-    private void PlayPreviousSong() {
+    public void PlayPreviousSong() {
         ((BottomAppBarListener) requireActivity()).hideBottomAppBar();
         int currentIndex = getCurrentSongIndex(songId);
         String previousSongId = "";
@@ -228,13 +228,12 @@ public class PlaySongFragment extends BottomSheetDialogFragment implements Fetch
 
     private void ShowLyric() {
         LyricFragment lyricFragment = new LyricFragment();
-        lyricFragment.setSongId(songId);
         lyricFragment.setSongName(songnameValue);
         lyricFragment.setArtistName(artistnameValue);
         lyricFragment.setAvata(avataValue);
         lyricFragment.setPlayedDuration(played_value);
         lyricFragment.setTotalDuration(total_value);
-
+        lyricFragment.setCurrentSongList(songList,songId);
         Bundle args = new Bundle();
         args.putString("songId", songId);
         args.putString("songName", songnameValue);
