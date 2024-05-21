@@ -69,7 +69,7 @@ public class ArtistDetailFragment extends Fragment implements FetchAccessToken.A
         LinearLayoutManager layoutManager = new LinearLayoutManager(getActivity());
         recyclerView.setLayoutManager(layoutManager);
         if (getArguments() != null) {
-            artistId = getArguments().getString("albumId");
+            artistId = getArguments().getString("artistId");
         }
 //        setupBackButton();
         fetchAccessToken = new FetchAccessToken();

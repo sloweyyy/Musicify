@@ -2,6 +2,7 @@ package com.example.musicapp.adapter;
 //ArtistHomeAdapter
 
 import android.content.Context;
+import android.os.Bundle;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -10,10 +11,12 @@ import android.widget.ImageView;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
+import androidx.appcompat.app.AppCompatActivity;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.bumptech.glide.Glide;
 import com.example.musicapp.R;
+import com.example.musicapp.fragment.ArtistDetailFragment;
 import com.example.musicapp.model.Artist;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
@@ -66,7 +69,6 @@ public class ArtitstHomeAdapter extends RecyclerView.Adapter<ArtitstHomeAdapter.
     @NonNull
     @Override
     public ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
-        Log.d("ViewHolder", "onCreateViewHolder was called");
         View view = LayoutInflater.from(context).inflate(R.layout.artist_item, parent, false);
         mAuth = FirebaseAuth.getInstance();
         user = mAuth.getCurrentUser();
@@ -102,13 +104,11 @@ public class ArtitstHomeAdapter extends RecyclerView.Adapter<ArtitstHomeAdapter.
     public int getItemCount() {
         return artistList.size();
     }
-
     private interface OnIsLikedCallback {
         void onResult(boolean isLiked);
     }
 
-    //thieu implement onclick
-    public class ViewHolder extends RecyclerView.ViewHolder {
+    public class ViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener {
 
         TextView artistName, totalFollowers;
         ImageView heartBtn;
@@ -119,9 +119,9 @@ public class ArtitstHomeAdapter extends RecyclerView.Adapter<ArtitstHomeAdapter.
             Log.d("BLULUBLUBLU", "Token: ");
             heartBtn = itemView.findViewById(R.id.heartBtn);
             artistName = itemView.findViewById(R.id.artistName);
-
             totalFollowers = itemView.findViewById(R.id.totalFollowers);
             cicleArtistImg = itemView.findViewById(R.id.cicleArtistImg);
+
 
             heartBtn.setOnClickListener(new View.OnClickListener() {
                 @Override
@@ -159,6 +159,24 @@ public class ArtitstHomeAdapter extends RecyclerView.Adapter<ArtitstHomeAdapter.
                     .update("likedArtist", FieldValue.arrayRemove(artistId))
                     .addOnSuccessListener(aVoid -> Log.d("ArtitstHomeAdapter", "Artist removed from liked artists"))
                     .addOnFailureListener(e -> Log.e("ArtitstHomeAdapter", "Error removing artist from liked artists", e));
+        }
+
+        @Override
+        public void onClick(View v) {
+            int position = getAbsoluteAdapterPosition();
+            if (position != RecyclerView.NO_POSITION) {
+                Artist selected = artistList.get(position);
+                ArtistDetailFragment fragment = new ArtistDetailFragment();
+                fragment.setArtistId(selected.getId());
+                Bundle args = new Bundle();
+                args.putString("artistId", selected.getId());
+                fragment.setArguments(args);
+                ((AppCompatActivity) v.getContext()).getSupportFragmentManager()
+                        .beginTransaction()
+                        .replace(R.id.frame_layout, fragment)
+                        .addToBackStack(null)
+                        .commit();
+            }
         }
     }
 

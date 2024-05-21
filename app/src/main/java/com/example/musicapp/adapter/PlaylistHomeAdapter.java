@@ -109,10 +109,6 @@ public class PlaylistHomeAdapter extends RecyclerView.Adapter<PlaylistHomeAdapte
         return playlistList.size();
     }
 
-    public interface OnItemClickListener {
-        void onItemClick(PlaylistAPI playlist);
-    }
-
     public class ViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener {
         TextView playlistName;
         TextView totalTracks;
@@ -125,6 +121,26 @@ public class PlaylistHomeAdapter extends RecyclerView.Adapter<PlaylistHomeAdapte
             totalTracks = itemView.findViewById(R.id.totalTracks);
             heartBtn = itemView.findViewById(R.id.heartBtn);
             playButton = itemView.findViewById(R.id.playButton);
+            itemView.setOnClickListener(this);
+            playButton.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    int position = getAbsoluteAdapterPosition();
+                    if (position != RecyclerView.NO_POSITION) {
+                        PlaylistAPI selected = playlistList.get(position);
+                        PlaylistDetailAPI fragment = new PlaylistDetailAPI();
+                        fragment.setPlaylistId(selected.getId());
+                        Bundle args = new Bundle();
+                        args.putString("playlistId", selected.getId());
+                        fragment.setArguments(args);
+                        ((AppCompatActivity) v.getContext()).getSupportFragmentManager()
+                                .beginTransaction()
+                                .replace(R.id.frame_layout, fragment)
+                                .addToBackStack(null)
+                                .commit();
+                    }
+                }
+            });
             heartBtn.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
@@ -146,6 +162,21 @@ public class PlaylistHomeAdapter extends RecyclerView.Adapter<PlaylistHomeAdapte
             });
         }
 
+        public void addPlaylistToLikedPlaylists(String playlistId) {
+            FirebaseFirestore db = FirebaseFirestore.getInstance();
+            db.collection("users").document(userId)
+                    .update("likedPlaylist", FieldValue.arrayUnion(playlistId))
+                    .addOnSuccessListener(aVoid -> Log.d("PlaylistHomeAdapter", "Playlist added to liked playlist"))
+                    .addOnFailureListener(e -> Log.e("PlaylistHomeAdapter", "Error adding playlist to liked playlist", e));
+        }
+
+        public void removePlaylistFromLikedPlaylists(String playlistId) {
+            FirebaseFirestore db = FirebaseFirestore.getInstance();
+            db.collection("users").document(userId)
+                    .update("likedPlaylist", FieldValue.arrayRemove(playlistId))
+                    .addOnSuccessListener(aVoid -> Log.d("PlaylistHomeAdapter", "Playlist remove to liked playlist"))
+                    .addOnFailureListener(e -> Log.e("PlaylistHomeAdapter", "Error remove playlist to liked playlist", e));
+        }
 
         @Override
         public void onClick(View v) {
@@ -163,24 +194,6 @@ public class PlaylistHomeAdapter extends RecyclerView.Adapter<PlaylistHomeAdapte
                         .addToBackStack(null)
                         .commit();
             }
-
         }
-
-        public void addPlaylistToLikedPlaylists(String playlistId) {
-            FirebaseFirestore db = FirebaseFirestore.getInstance();
-            db.collection("users").document(userId)
-                    .update("likedPlaylist", FieldValue.arrayUnion(playlistId))
-                    .addOnSuccessListener(aVoid -> Log.d("PlaylistHomeAdapter", "Playlist added to liked playlist"))
-                    .addOnFailureListener(e -> Log.e("PlaylistHomeAdapter", "Error adding playlist to liked playlist", e));
-        }
-
-        public void removePlaylistFromLikedPlaylists(String playlistId) {
-            FirebaseFirestore db = FirebaseFirestore.getInstance();
-            db.collection("users").document(userId)
-                    .update("likedPlaylist", FieldValue.arrayRemove(playlistId))
-                    .addOnSuccessListener(aVoid -> Log.d("PlaylistHomeAdapter", "Playlist remove to liked playlist"))
-                    .addOnFailureListener(e -> Log.e("PlaylistHomeAdapter", "Error remove playlist to liked playlist", e));
-        }
-
     }
 }

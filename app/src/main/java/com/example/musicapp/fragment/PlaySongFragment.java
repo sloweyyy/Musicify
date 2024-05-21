@@ -317,7 +317,11 @@ public class PlaySongFragment extends BottomSheetDialogFragment implements Fetch
             if (!queryDocumentSnapshots.isEmpty()) {
                 DocumentSnapshot userDoc = queryDocumentSnapshots.getDocuments().get(0);
                 List<String> likedSongs = (List<String>) userDoc.get("likedsong");
-                callback.onResult(likedSongs.contains(id));
+                if (likedSongs != null && likedSongs.contains(id)) {
+                    callback.onResult(true);
+                } else {
+                    callback.onResult(false);
+                }
             }
         }).addOnFailureListener(e -> {
             Log.e("SongAdapter", "Failed to retrieve user document: " + e.getMessage());
