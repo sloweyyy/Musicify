@@ -1,6 +1,7 @@
 package com.example.musicapp.fragment;
 
 import android.app.AlertDialog;
+import android.content.Context;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -8,13 +9,13 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Toast;
 
+import androidx.annotation.NonNull;
 import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.musicapp.R;
 import com.example.musicapp.adapter.FetchAccessToken;
-import com.example.musicapp.adapter.PlaylistAdapterAPI;
 import com.example.musicapp.adapter.PlaylistHomeAdapter;
 import com.example.musicapp.adapter.SongHomeAdapter;
 import com.example.musicapp.model.PlaylistAPI;
@@ -35,7 +36,7 @@ import retrofit2.http.GET;
 import retrofit2.http.Header;
 import retrofit2.http.Path;
 
-public class NewsFragment extends Fragment implements FetchAccessToken.AccessTokenCallback {
+public class NewsFragment extends Fragment implements FetchAccessToken.AccessTokenCallback  {
 
     private View view;
     private RecyclerView trackRecyclerView, playlistRecyclerView;
@@ -43,8 +44,10 @@ public class NewsFragment extends Fragment implements FetchAccessToken.AccessTok
     private SongHomeAdapter songHomeAdapter;
     private PlaylistHomeAdapter playlistHomeAdapter;
     private String accesstoken;
+    HomeFragment homeFragment;
     private final String playlistId = "37i9dQZF1DX5G3iiHaIzdf";
     private final String categoryId = "party";
+
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
@@ -56,6 +59,7 @@ public class NewsFragment extends Fragment implements FetchAccessToken.AccessTok
         trackRecyclerView.setLayoutManager(horizontalLayoutManager);
         playlistRecyclerView.setLayoutManager(verticalLayoutManager);
         fetchAccessToken = new FetchAccessToken();
+        homeFragment= new HomeFragment();
         fetchAccessToken.getTokenFromSpotify(this);
         return view;
     }
@@ -63,7 +67,7 @@ public class NewsFragment extends Fragment implements FetchAccessToken.AccessTok
     @Override
     public void onTokenReceived(String accessToken) {
 
-        this.accesstoken=accessToken;
+        this.accesstoken = accessToken;
         Log.d("AccessToken", "Token: " + accessToken);
         getSongs(accesstoken);
     }
@@ -77,11 +81,7 @@ public class NewsFragment extends Fragment implements FetchAccessToken.AccessTok
         String authorization = "Bearer " + accessToken;
         Call<PlaylistSimplified> call1 = apiService.getSongs(authorization, playlistId);
         Call <PlaylistsModel> call2 = apiService.getPlaylists(authorization, categoryId);
-//        AlertDialog.Builder alertDialog = new AlertDialog.Builder(requireContext());
-//        alertDialog.setTitle("Error");
-//        alertDialog.setPositiveButton("OK", null);
-//        AlertDialog dialog = alertDialog.create();
-//        dialog.show();
+
         //hỏrizontal reviewcleview
         Log.d("HEHEHEHE", "Token: " + accessToken);
         call1.enqueue(new Callback<PlaylistSimplified>() {
@@ -90,11 +90,11 @@ public class NewsFragment extends Fragment implements FetchAccessToken.AccessTok
                 if (response.isSuccessful()) {
                     PlaylistSimplified playlistSimplified = response.body();
                     List<Song> songs = new ArrayList<>();
-                    for ( PlaylistSimplified.TracksModel.ItemModel item : playlistSimplified.tracksContainer.tracks) {
+                    for (PlaylistSimplified.TracksModel.ItemModel item : playlistSimplified.tracksContainer.tracks) {
                         SimplifiedTrack track = item.track;
                         songs.add(Song.fromSimplifiedTrack(track));
                     }
-                    songHomeAdapter = new SongHomeAdapter(getContext(), songs);
+                    songHomeAdapter = new SongHomeAdapter(getContext(), songs, homeFragment);
                     trackRecyclerView.setAdapter(songHomeAdapter);
 
                 }
@@ -117,7 +117,7 @@ public class NewsFragment extends Fragment implements FetchAccessToken.AccessTok
                 if (response.isSuccessful()) {
                     PlaylistsModel playlistsContainer = response.body();
                     if (playlistsContainer != null) {
-                         ShowPlaylist(playlistsContainer.Playlists.PlaylistsArray);
+                        ShowPlaylist(playlistsContainer.Playlists.PlaylistsArray);
                     }
                     Log.d("HUHUHUHU", "Token: " + accessToken);
                 }
@@ -127,7 +127,7 @@ public class NewsFragment extends Fragment implements FetchAccessToken.AccessTok
             public void onFailure(Call<PlaylistsModel> call, Throwable throwable) {
                 AlertDialog.Builder alertDialog = new AlertDialog.Builder(requireContext());
                 alertDialog.setTitle("Error");
-                alertDialog.setMessage(throwable.getMessage()); // Showing the error message from the exception
+                alertDialog.setMessage(throwable.getMessage());
                 alertDialog.setPositiveButton("OK", null);
                 AlertDialog dialog = alertDialog.create();
                 dialog.show();
@@ -136,9 +136,9 @@ public class NewsFragment extends Fragment implements FetchAccessToken.AccessTok
         });
         Log.d("HIHIHIHI", "Token: " + accessToken);
     }
-    public void ShowPlaylist(List<PlaylistAPI> playlists){
+
+    public void ShowPlaylist(List<PlaylistAPI> playlists) {
         if (playlists != null) {
-//            PlaylistAdapterAPI adapter = new PlaylistAdapterAPI(playlists);
             playlistHomeAdapter = new PlaylistHomeAdapter(getContext(), playlists);
             playlistRecyclerView.setAdapter(playlistHomeAdapter);
         } else {
@@ -146,15 +146,19 @@ public class NewsFragment extends Fragment implements FetchAccessToken.AccessTok
         }
 
     }
+
     public interface SpotifyApiService {
         @GET("v1/browse/categories/{categoryId}/playlists")
-        Call<PlaylistsModel> getPlaylists(@Header("Authorization") String authorization, @Path("categoryId") String categoryId) ;
+        Call<PlaylistsModel> getPlaylists(@Header("Authorization") String authorization, @Path("categoryId") String categoryId);
+
         @GET("v1/playlists/{playlistId}")
         Call<PlaylistSimplified> getSongs(@Header("Authorization") String authorization, @Path("playlistId") String playlistId);
     }
+
     public static class PlaylistsModel {
         @SerializedName("message")
         private String message;
+
         public String getMessage() {
             return message;
         }

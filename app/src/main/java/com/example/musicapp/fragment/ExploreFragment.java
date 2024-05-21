@@ -15,7 +15,6 @@ import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.GridLayoutManager;
 import androidx.recyclerview.widget.LinearLayoutManager;
-
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.musicapp.R;
@@ -52,6 +51,7 @@ public class ExploreFragment extends Fragment implements FetchAccessToken.Access
     private SongAdapter songAdapter; // Adapter for search results
     private exploreAdapter exploreAdapter; // Adapter for categories
     private RecyclerView recyclerViewSongs;
+
     @Override
     public void onTokenReceived(String accessToken) {
         this.accessToken = accessToken;

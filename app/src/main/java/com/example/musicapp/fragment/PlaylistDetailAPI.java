@@ -7,7 +7,6 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -19,9 +18,6 @@ import com.bumptech.glide.Glide;
 import com.example.musicapp.R;
 import com.example.musicapp.adapter.FetchAccessToken;
 import com.example.musicapp.adapter.SongAdapter;
-import com.example.musicapp.model.PlaylistAPI;
-import com.example.musicapp.model.PlaylistSimplified;
-import com.example.musicapp.model.SearchResult;
 import com.example.musicapp.model.SimplifiedTrack;
 import com.example.musicapp.model.Song;
 import com.google.gson.annotations.SerializedName;
@@ -37,9 +33,8 @@ import retrofit2.converter.gson.GsonConverterFactory;
 import retrofit2.http.GET;
 import retrofit2.http.Header;
 import retrofit2.http.Path;
-import retrofit2.http.Query;
 
-public class PlaylistDetailAPI extends Fragment implements FetchAccessToken.AccessTokenCallback{
+public class PlaylistDetailAPI extends Fragment implements FetchAccessToken.AccessTokenCallback {
     View view;
     RecyclerView recyclerView;
     private FetchAccessToken fetchAccessToken;
@@ -56,6 +51,7 @@ public class PlaylistDetailAPI extends Fragment implements FetchAccessToken.Acce
     public void onTokenReceived(String accessToken) {
         getSongs(accessToken);
     }
+
     @Nullable
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
@@ -73,10 +69,12 @@ public class PlaylistDetailAPI extends Fragment implements FetchAccessToken.Acce
         fetchAccessToken.getTokenFromSpotify(this);
         return view;
     }
+
     public void setPlaylistId(String playlistId) {
         this.playlistId = playlistId;
     }
-    public void getSongs (String accessToken){
+
+    public void getSongs(String accessToken) {
         Retrofit retrofit = new Retrofit.Builder()
                 .baseUrl("https://api.spotify.com/")
                 .addConverterFactory(GsonConverterFactory.create())
@@ -94,10 +92,10 @@ public class PlaylistDetailAPI extends Fragment implements FetchAccessToken.Acce
                     playlistDescription.setText(playlist.getDescription());
                     Glide.with(requireContext()).load(playlist.images.get(0).getUrl()).into(imageView);
                     List<Song> songs = new ArrayList<>();
-                   for (ItemModel item : playlist.tracksContainer.tracks) {
-                       SimplifiedTrack track = item.track;
-                       songs.add(Song.fromSimplifiedTrack(track));
-                  }
+                    for (ItemModel item : playlist.tracksContainer.tracks) {
+                        SimplifiedTrack track = item.track;
+                        songs.add(Song.fromSimplifiedTrack(track));
+                    }
                     songAdapter = new SongAdapter(getContext(), songs);
                     recyclerView.setAdapter(songAdapter);
                     recyclerView.setVisibility(View.VISIBLE);
@@ -117,6 +115,7 @@ public class PlaylistDetailAPI extends Fragment implements FetchAccessToken.Acce
         });
 
     }
+
     public interface SpotifyApiService {
         @GET("v1/playlists/{playlistId}")
         Call<PlaylistSimplified> getSongs(@Header("Authorization") String authorization, @Path("playlistId") String playlistId);
@@ -148,7 +147,7 @@ public class PlaylistDetailAPI extends Fragment implements FetchAccessToken.Acce
         @SerializedName("images")
         public List<imageModel> images;
 
-        public class imageModel{
+        public class imageModel {
             @SerializedName("url")
             public String url;
 
@@ -166,7 +165,8 @@ public class PlaylistDetailAPI extends Fragment implements FetchAccessToken.Acce
         @SerializedName("items")
         public List<ItemModel> tracks;
     }
-    public class ItemModel{
+
+    public class ItemModel {
         @SerializedName("track")
         public SimplifiedTrack track;
     }

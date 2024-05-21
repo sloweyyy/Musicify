@@ -62,7 +62,8 @@ public class PlaylistsFragment extends Fragment {
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         view = inflater.inflate(R.layout.fragment_playlists, container, false);
-        recyclerView = view.findViewById(R.id.recyclerView);
+        recyclerView = view.findViewById(R.id.recyclerView); // Find RecyclerView after the view is inflated
+        recyclerView.setLayoutManager(new LinearLayoutManager(getActivity())); // Set layout manager
         storage = FirebaseStorage.getInstance();
 
         LinearLayout liked = view.findViewById(R.id.liked);
@@ -140,7 +141,7 @@ public class PlaylistsFragment extends Fragment {
             @Override
             public void onClick(View v) {
                 LikedSongFragment fragment = new LikedSongFragment();
-                ((AppCompatActivity)v.getContext()).getSupportFragmentManager()
+                ((AppCompatActivity) v.getContext()).getSupportFragmentManager()
                         .beginTransaction()
                         .replace(R.id.frame_layout, fragment)
                         .addToBackStack(null)
