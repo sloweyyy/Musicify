@@ -8,10 +8,13 @@ import android.view.ViewGroup;
 import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.appcompat.app.AppCompatActivity;
 import androidx.fragment.app.Fragment;
+import androidx.recyclerview.widget.RecyclerView;
 import androidx.viewpager2.widget.ViewPager2;
 
 import com.bumptech.glide.Glide;
@@ -20,6 +23,7 @@ import com.example.musicapp.R;
 import com.example.musicapp.adapter.HomeFragmentAdapter;
 import com.example.musicapp.adapter.PlaylistHomeAdapter;
 import com.example.musicapp.adapter.SongHomeAdapter;
+import com.example.musicapp.model.PlaylistAPI;
 import com.example.musicapp.model.Song;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.OnFailureListener;
@@ -40,6 +44,7 @@ public class HomeFragment extends Fragment  implements SongHomeAdapter.OnSongSel
     private TabLayout tabLayout;
     private ViewPager2 viewPager2;
     ImageView artistImage;
+   String songId;
     TextView recentSongArtist, recentSongName;
     String userId;
     FirebaseUser user;
@@ -60,8 +65,8 @@ public class HomeFragment extends Fragment  implements SongHomeAdapter.OnSongSel
         resumeBtn = view.findViewById(R.id.resumeBtn);
         homeFragmentAdapter = new HomeFragmentAdapter(getActivity());
         viewPager2.setAdapter(homeFragmentAdapter);
-        FirebaseAuth mAuth = FirebaseAuth.getInstance();
-        FirebaseUser user = mAuth.getCurrentUser();
+         mAuth = FirebaseAuth.getInstance();
+         user = mAuth.getCurrentUser();
         userId = user.getUid();
         artistImage = view.findViewById(R.id.artistImage);
         recentSongArtist = view.findViewById(R.id.recentSongArtist);
@@ -91,6 +96,25 @@ public class HomeFragment extends Fragment  implements SongHomeAdapter.OnSongSel
                 }
             });
         }
+        resumeBtn.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                if(songId != null) {
+                    PlaySongFragment fragment = new PlaySongFragment();
+                    fragment.setSongId(songId);
+                    Bundle args = new Bundle();
+                    args.putString("songId", songId);
+                    fragment.setArguments(args);
+                    ((AppCompatActivity) v.getContext()).getSupportFragmentManager()
+                            .beginTransaction()
+                            .replace(R.id.frame_layout, fragment)
+                            .addToBackStack(null)
+                            .commit();
+                } else {
+                    Toast.makeText(getContext(), "No recent song to resume", Toast.LENGTH_SHORT).show();
+                }
+            }
+        });
         FirebaseFirestore db = FirebaseFirestore.getInstance();
         db.collection("users").document(userId).addSnapshotListener(new EventListener<DocumentSnapshot>() {
             @Override
@@ -103,12 +127,14 @@ public class HomeFragment extends Fragment  implements SongHomeAdapter.OnSongSel
                 if (value != null && value.exists()) {
                     Log.d("Firestore", "Current data: " + value.getData());
                     if (value.contains("recentListeningSong")) {
-                        Map<String, Object> recentSong = (Map<String, Object>) value.get("recentListeningSong");
-                        if (recentSong != null) {
-                            recentSongName.setText(recentSong.get("songName").toString());
-                            recentSongArtist.setText(recentSong.get("artistName").toString());
-                            Glide.with(getContext()).load(recentSong.get("imageURL")).apply(RequestOptions.circleCropTransform()).into(artistImage);
+                        Map<String, Object> recentSongData = (Map<String, Object>) value.get("recentListeningSong");
+                        if (recentSongData != null) {
+                            recentSongName.setText(recentSongData.get("songName").toString());
+                            recentSongArtist.setText(recentSongData.get("artistName").toString());
+                            Glide.with(getContext()).load(recentSongData.get("imageURL")).apply(RequestOptions.circleCropTransform()).into(artistImage);
                             resumeBtn.setVisibility(View.VISIBLE);
+                           songId = recentSongData.get("songId").toString();
+//                            songId= (songId != null) ? songId.toString() : null;
                         }
                     } else {
                         recentSongName.setText("Select song to listen");
@@ -139,12 +165,13 @@ public class HomeFragment extends Fragment  implements SongHomeAdapter.OnSongSel
             recentSongArtist.setText(song.getArtist());
             Glide.with(this).load(song.getImageUrl()).apply(RequestOptions.circleCropTransform()).into(artistImage);
         } else {
-            Log.e("HomeFragment", "updateRecentSong: TextViews are not initialized.");
+
         }
         Map<String, Object> recentListeningSong = new HashMap<>();
         recentListeningSong.put("songName", song.getTitle());
         recentListeningSong.put("imageURL", song.getImageUrl());
         recentListeningSong.put("artistName", song.getArtist());
+        recentListeningSong.put("songId", song.getId());
 
         if (userId != null) {
             FirebaseFirestore.getInstance()
