@@ -10,14 +10,16 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.ImageButton;
 import android.widget.LinearLayout;
+import android.widget.RelativeLayout;
 import android.widget.TextView;
-
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentManager;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
-
 import com.example.musicapp.R;
 import com.example.musicapp.adapter.FetchAccessToken;
 import com.example.musicapp.adapter.SongAdapter;
@@ -42,15 +44,17 @@ import retrofit2.http.Path;
 
 public class LikedSongFragment extends Fragment implements FetchAccessToken.AccessTokenCallback {
     private View view;
-    private TextView songCount;
+    private TextView songCount, sortStateText;
     private FetchAccessToken fetchAccessToken;
     private String accessToken;
+    private RelativeLayout pauseContainer;
+    private ImageButton pauseBtn;
     private LinearLayout backButtonLayout;
     //private List<Song> songs= new ArrayList<>(); ; // Remove this line
     private RecyclerView recyclerView;
     private RecyclerView recyclerViewSearch;
     private EditText search;
-    private Button backBtn;
+    private Button backBtn, sortBtn;
     private SongAdapter songAdapter;
 
     @Override
@@ -76,7 +80,7 @@ public class LikedSongFragment extends Fragment implements FetchAccessToken.Acce
     }
 
     private enum SortState {
-        DEFAULT, BY_NAME, BY_PRIVACY
+        DEFAULT, BY_NAME
     }
 
     private SortState currentSortState = SortState.DEFAULT;
@@ -92,6 +96,8 @@ public class LikedSongFragment extends Fragment implements FetchAccessToken.Acce
         recyclerView.setLayoutManager(layoutManager);
         backButtonLayout = view.findViewById(R.id.backButtonLayout);
         backBtn = view.findViewById(R.id.iconBack);
+        sortBtn = view.findViewById(R.id.iconSort);
+        sortStateText = view.findViewById(R.id.sortState);
         recyclerViewSearch = view.findViewById(R.id.recyclerViewSearch);
         recyclerViewSearch.setLayoutManager(new LinearLayoutManager(getActivity()));
         search = view.findViewById(R.id.searchSong);
@@ -101,6 +107,9 @@ public class LikedSongFragment extends Fragment implements FetchAccessToken.Acce
         fetchAccessToken.getTokenFromSpotify(this);
         songAdapter = new SongAdapter(requireContext(), new ArrayList<>());
         recyclerView.setAdapter(songAdapter);
+        pauseContainer = view.findViewById(R.id.pauseContainer);
+        pauseBtn = view.findViewById(R.id.pauseBtn);
+
         backButtonLayout.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -108,7 +117,6 @@ public class LikedSongFragment extends Fragment implements FetchAccessToken.Acce
                 fragmentManager.popBackStack();
             }
         });
-
         backBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -116,7 +124,6 @@ public class LikedSongFragment extends Fragment implements FetchAccessToken.Acce
                 fragmentManager.popBackStack();
             }
         });
-
         search.addTextChangedListener(new TextWatcher() {
             @Override
             public void beforeTextChanged(CharSequence s, int start, int count, int after) {
@@ -134,7 +141,35 @@ public class LikedSongFragment extends Fragment implements FetchAccessToken.Acce
                 // Not used
             }
         });
-
+        sortBtn.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                if (currentSortState == SortState.DEFAULT){
+                    currentSortState = SortState.BY_NAME;
+                    sortStateText.setText("Sort by name");
+                    songAdapter.sortSongByName();
+                }
+                else {
+                    currentSortState = SortState.DEFAULT;
+                    sortStateText.setText("Default");
+                    songAdapter.clearSongs();
+                    onTokenReceived(accessToken);
+                    songAdapter.notifyDataSetChanged();
+                }
+            }
+        });
+        pauseContainer.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+             songAdapter.PlayFirstSong();
+            }
+        });
+        pauseBtn.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                songAdapter.PlayFirstSong();
+            }
+        });
         return view;
     }
 

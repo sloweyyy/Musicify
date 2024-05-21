@@ -4,12 +4,9 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:layout_marginTop="30dp">
-
-
     <androidx.cardview.widget.CardView
         android:id="@+id/cardView"
         android:layout_width="0dp"
-
         android:layout_height="wrap_content"
         android:layout_marginLeft="20dp"
         android:layout_marginRight="20dp"
@@ -36,14 +33,18 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_marginBottom="20dp"
+                    android:textStyle="bold"
                     android:background="@null"
                     android:text="Recently listening"
                     android:textSize="24dp" />
 
                 <TextView
                     android:id="@+id/recentSongName"
-                    android:layout_width="wrap_content"
+                    android:layout_width="match_parent"
                     android:layout_height="wrap_content"
+                    android:maxLines="1"
+                    android:ellipsize="end"
+                    android:scaleType="centerCrop"
                     android:layout_marginBottom="5dp"
                     android:background="@null"
                     android:text="Bad Guy"
@@ -52,6 +53,7 @@
 
                 <TextView
                     android:id="@+id/recentSongArtist"
+                    android:scaleType="centerCrop"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_marginBottom="10dp"
@@ -59,18 +61,33 @@
                     android:text="Billie Eilish"
                     android:textColor="@color/textColor"
                     android:textSize="15dp" />
+
             </LinearLayout>
 
             <ImageView
                 android:id="@+id/artistImage"
                 android:layout_width="100dp"
                 android:layout_height="0dp"
+                android:layout_gravity="center_vertical"
                 android:layout_marginLeft="10dp"
                 android:background="@drawable/image_view_rounded_bg"
                 android:src="@drawable/images"
                 app:layout_constraintBottom_toBottomOf="@id/linearLayout1"
+                app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toEndOf="@id/linearLayout1"
                 app:layout_constraintTop_toTopOf="@id/linearLayout1" />
+
+            <ImageButton
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:translationY="-10dp"
+                android:elevation="10dp"
+                android:id="@+id/resumeBtn"
+                android:background="@drawable/image_button_round_bg"
+                android:visibility="gone"
+                android:src="@drawable/resume_24dp_fill0_wght400_grad0_opsz24"
+                app:layout_constraintBottom_toBottomOf="@+id/artistImage"
+                app:layout_constraintEnd_toEndOf="@+id/artistImage" />
         </androidx.constraintlayout.widget.ConstraintLayout>
 
     </androidx.cardview.widget.CardView>

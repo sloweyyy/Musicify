@@ -31,7 +31,6 @@
                 android:layout_width="40dp"
                 android:layout_height="40dp"
                 android:background="@drawable/back_btn_custom"
-                android:padding="10dp"
                 android:src="@drawable/play_arrow_24dp_fill0_wght400_grad0_opsz24"
                 app:layout_constraintTop_toBottomOf="@+id/artistPic"
                 app:layout_constraintEnd_toEndOf="@+id/artistPic"
@@ -43,7 +42,10 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:text="Bad Guy"
-            android:textSize="30dp"
+            android:textSize="24dp"
+            android:maxLines="1"
+            android:ellipsize="end"
+            android:scaleType="centerCrop"
             android:textStyle="bold"
             android:layout_marginStart="10dp" />
 
@@ -51,6 +53,9 @@
             android:id="@+id/artistName"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:maxLines="1"
+            android:ellipsize="end"
+            android:scaleType="centerCrop"
             android:text="Billie Eilish"
             android:textSize="16dp"
             android:layout_marginStart="10dp" />

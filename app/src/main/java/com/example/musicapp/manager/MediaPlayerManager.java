@@ -23,13 +23,13 @@ public class MediaPlayerManager {
         mediaPlayer = new MediaPlayer();
     }
 
-    public boolean getIsPlaying(){
+    public boolean getIsPlaying() {
         return isPlaying;
     }
-    public void setIsPlaying(boolean sth){
+
+    public void setIsPlaying(boolean sth) {
         isPlaying = sth;
     }
-
 
 
     public static MediaPlayerManager getInstance() {
@@ -46,6 +46,15 @@ public class MediaPlayerManager {
             mediaPlayer.prepare();
         } catch (IOException e) {
             e.printStackTrace();
+        }
+    }
+
+    public void stopAndRelease() {
+        if (mediaPlayer != null) {
+            mediaPlayer.stop();
+            mediaPlayer.release();
+            mediaPlayer = null;
+            isPlaying = false;
         }
     }
 

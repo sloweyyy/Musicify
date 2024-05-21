@@ -126,7 +126,7 @@
                 android:textSize="20sp">
             </TextView>
             <LinearLayout
-                android:layout_marginLeft="@dimen/_10sdp"
+                android:layout_marginHorizontal="@dimen/_10sdp"
                 android:layout_width="@dimen/_30sdp"
                 android:layout_height="@dimen/_30sdp"
                 android:layout_weight="0"
@@ -144,6 +144,14 @@
                     app:backgroundTint="#30AF75"
                     android:contentDescription="Sort"/>
             </LinearLayout>
+            <TextView
+                android:id="@+id/sortState"
+                android:layout_gravity="center"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="266 songs"
+                android:textSize="20sp">
+            </TextView>
 
         </LinearLayout>
         <Space
@@ -152,6 +160,7 @@
             android:layout_weight="1"/>
 
         <RelativeLayout
+            android:id="@+id/pauseContainer"
             android:layout_width="@dimen/_35sdp"
             android:layout_height="@dimen/_35sdp"
             android:gravity="center"
