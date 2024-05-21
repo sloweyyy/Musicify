@@ -4,7 +4,6 @@ import android.annotation.SuppressLint;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Looper;
-import android.security.keystore.StrongBoxUnavailableException;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -38,7 +37,7 @@ import retrofit2.converter.gson.GsonConverterFactory;
 import retrofit2.http.GET;
 import retrofit2.http.Query;
 
-public class LyricFragment extends Fragment implements FetchAccessToken.AccessTokenCallback{
+public class LyricFragment extends Fragment implements FetchAccessToken.AccessTokenCallback {
     private FetchAccessToken fetchAccessToken;
     private View view;
     private Handler handler = new Handler(Looper.getMainLooper());
@@ -68,21 +67,22 @@ public class LyricFragment extends Fragment implements FetchAccessToken.AccessTo
     public void onTokenReceived(String accessToken) {
 
     }
+
     @Nullable
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         view = inflater.inflate(R.layout.lyric, container, false);
         ((BottomAppBarListener) requireActivity()).hideBottomAppBar();
         mediaPlayerManager = MediaPlayerManager.getInstance();
-        if (mediaPlayerManager.getIsPlaying()==true) {
+        if (mediaPlayerManager.getIsPlaying() == true) {
             mediaPlayerManager.getMediaPlayer().start();
         }
         if (getArguments() != null) {
             songNameValue = getArguments().getString("songName");
             artistNameValue = getArguments().getString("artistName");
             avataValue = getArguments().getString("avata");
-           played_value = getArguments().getString("playedDuration");
-           total_value = getArguments().getString("totalDuration");
+            played_value = getArguments().getString("playedDuration");
+            total_value = getArguments().getString("totalDuration");
 
         }
         initializeViews();
@@ -157,23 +157,28 @@ public class LyricFragment extends Fragment implements FetchAccessToken.AccessTo
         setupPauseButton();
 
     }
-    public void setSongId(String songId){
+
+    public void setSongId(String songId) {
 
     }
-    public void setSongName(String songName){
+
+    public void setSongName(String songName) {
         this.songNameValue = songName;
     }
-    public void setArtistName(String artistName){
+
+    public void setArtistName(String artistName) {
         this.artistNameValue = artistName;
     }
-    public void setAvata(String avara_url){
+
+    public void setAvata(String avara_url) {
         this.avataValue = avara_url;
     }
-    public void setPlayedDuration(String duration){
+
+    public void setPlayedDuration(String duration) {
         this.played_value = duration;
     }
 
-    public void setTotalDuration(String duration){
+    public void setTotalDuration(String duration) {
         this.total_value = duration;
     }
 
@@ -183,9 +188,8 @@ public class LyricFragment extends Fragment implements FetchAccessToken.AccessTo
         updateSeekBarRunnable = new Runnable() {
             @Override
             public void run() {
-                if ( mediaPlayerManager.getMediaPlayer()!= null && mediaPlayerManager.getMediaPlayer().isPlaying())
-                { // Check if mediaPlayer is playing
-                    int CurrentPosition = ( mediaPlayerManager.getMediaPlayer().getCurrentPosition() / 1000);
+                if (mediaPlayerManager.getMediaPlayer() != null && mediaPlayerManager.getMediaPlayer().isPlaying()) { // Check if mediaPlayer is playing
+                    int CurrentPosition = (mediaPlayerManager.getMediaPlayer().getCurrentPosition() / 1000);
                     seekBar.setProgress(CurrentPosition);
                     playedDuration.setText(formattedTime(CurrentPosition));
                     handler.postDelayed(this, 500); // Update every 500 milliseconds
@@ -201,7 +205,7 @@ public class LyricFragment extends Fragment implements FetchAccessToken.AccessTo
             @Override
             public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
                 if (fromUser) {
-                    if ( mediaPlayerManager.getMediaPlayer() != null) { // Check if mediaPlayer is initialized
+                    if (mediaPlayerManager.getMediaPlayer() != null) { // Check if mediaPlayer is initialized
                         mediaPlayerManager.getMediaPlayer().seekTo(progress * 1000);
                     }
                 }
@@ -221,14 +225,14 @@ public class LyricFragment extends Fragment implements FetchAccessToken.AccessTo
 
     public void setupPauseButton() {
         backButtonLayout.setOnClickListener(v -> {
-            if (mediaPlayerManager.getIsPlaying()==true) {
-                if ( mediaPlayerManager.getMediaPlayer() != null) { // Check if mediaPlayer is initialized
+            if (mediaPlayerManager.getIsPlaying() == true) {
+                if (mediaPlayerManager.getMediaPlayer() != null) { // Check if mediaPlayer is initialized
                     mediaPlayerManager.getMediaPlayer().pause();
                 }
                 mediaPlayerManager.setIsPlaying(false);
                 pauseBtn.setBackgroundResource(R.drawable.play);
             } else {
-                if ( mediaPlayerManager.getMediaPlayer() != null) { // Check if mediaPlayer is initialized
+                if (mediaPlayerManager.getMediaPlayer() != null) { // Check if mediaPlayer is initialized
                     mediaPlayerManager.getMediaPlayer().start();
                 }
                 pauseBtn.setBackgroundResource(R.drawable.pause);
@@ -237,14 +241,14 @@ public class LyricFragment extends Fragment implements FetchAccessToken.AccessTo
         });
 
         pauseBtn.setOnClickListener(v -> {
-            if (mediaPlayerManager.getIsPlaying()==true) {
-                if ( mediaPlayerManager.getMediaPlayer() != null) { // Check if mediaPlayer is initialized
+            if (mediaPlayerManager.getIsPlaying() == true) {
+                if (mediaPlayerManager.getMediaPlayer() != null) { // Check if mediaPlayer is initialized
                     mediaPlayerManager.getMediaPlayer().pause();
                 }
                 mediaPlayerManager.setIsPlaying(false);
                 pauseBtn.setBackgroundResource(R.drawable.play);
             } else {
-                if ( mediaPlayerManager.getMediaPlayer() != null) { // Check if mediaPlayer is initialized
+                if (mediaPlayerManager.getMediaPlayer() != null) { // Check if mediaPlayer is initialized
                     mediaPlayerManager.getMediaPlayer().start();
                 }
                 pauseBtn.setBackgroundResource(R.drawable.pause);
@@ -252,12 +256,14 @@ public class LyricFragment extends Fragment implements FetchAccessToken.AccessTo
             }
         });
     }
+
     @SuppressLint("DefaultLocale")
     private String formattedTime(int currentPosition) {
         int minutes = currentPosition / 60;
         int seconds = currentPosition % 60;
         return String.format("%02d:%02d", minutes, seconds);
     }
+
     public void searchTrack() {
         Retrofit retrofit = new Retrofit.Builder()
                 .baseUrl(API_BASE_URL)
@@ -268,18 +274,17 @@ public class LyricFragment extends Fragment implements FetchAccessToken.AccessTo
         Call<MusixmatchSearchResponse> call = musixmatchApi.searchTrack(songNameValue, artistNameValue, API_KEY);
         call.enqueue(new Callback<MusixmatchSearchResponse>() {
             @Override
-            public void onResponse(@NonNull Call<MusixmatchSearchResponse> call,@NonNull Response<MusixmatchSearchResponse> response) {
+            public void onResponse(@NonNull Call<MusixmatchSearchResponse> call, @NonNull Response<MusixmatchSearchResponse> response) {
                 if (response.isSuccessful()) {
                     MusixmatchSearchResponse searchResponse = response.body();
                     if (searchResponse != null) {
-                        if (searchResponse.getMessageBody().getBody().getTrackList() != null){
+                        if (searchResponse.getMessageBody().getBody().getTrackList() != null) {
                             songIdhMusixmatc = searchResponse.getMessageBody().getBody().getTrackList().getTrackInfo().getId();
                             commondId = searchResponse.getMessageBody().getBody().getTrackList().getTrackInfo().getIdCommon();
                             getLyric(songIdhMusixmatc);
                             if (isNullLyric == true)
                                 getLyric(commondId);
-                        }
-                        else {
+                        } else {
                             lyric.setText("Don't have lyrics");
                         }
 
@@ -295,7 +300,7 @@ public class LyricFragment extends Fragment implements FetchAccessToken.AccessTo
         });
     }
 
-    public void getLyric(String songId){
+    public void getLyric(String songId) {
         Retrofit retrofit = new Retrofit.Builder()
                 .baseUrl(API_BASE_URL)
                 .addConverterFactory(GsonConverterFactory.create())
@@ -305,17 +310,15 @@ public class LyricFragment extends Fragment implements FetchAccessToken.AccessTo
         Call<LyricsResponse> call = musixmatchApi.getLyrics(songId, API_KEY);
         call.enqueue(new Callback<LyricsResponse>() {
             @Override
-            public void onResponse(@NonNull Call<LyricsResponse> call,@NonNull Response<LyricsResponse> response) {
+            public void onResponse(@NonNull Call<LyricsResponse> call, @NonNull Response<LyricsResponse> response) {
                 if (response.isSuccessful()) {
                     LyricsResponse lyricResponse = response.body();
-                    if (lyricResponse != null)
-                    {
+                    if (lyricResponse != null) {
                         String lyricText = lyricResponse.getMessageBody().getBody().getLyric_container().getLyric();
-                        if (lyricText != null){
+                        if (lyricText != null) {
                             isNullLyric = false;
                             lyric.setText(lyricText);
-                        }
-                        else {
+                        } else {
                             isNullLyric = true;
                         }
                     } else {
@@ -329,6 +332,7 @@ public class LyricFragment extends Fragment implements FetchAccessToken.AccessTo
             }
         });
     }
+
     public interface MusixmatchApi {
         @GET("track.search")
         Call<MusixmatchSearchResponse> searchTrack(
@@ -336,12 +340,14 @@ public class LyricFragment extends Fragment implements FetchAccessToken.AccessTo
                 @Query("q_artist") String trackArtist,
                 @Query("apikey") String apiKey
         );
+
         @GET("track.lyrics.get")
         Call<LyricsResponse> getLyrics(
                 @Query("track_id") String trackId,
                 @Query("apikey") String apiKey
         );
     }
+
     public static class MusixmatchSearchResponse {
         @SerializedName("message")
         private MessageContainer messageBody;
@@ -350,7 +356,7 @@ public class LyricFragment extends Fragment implements FetchAccessToken.AccessTo
             return messageBody;
         }
 
-        public static class MessageContainer{
+        public static class MessageContainer {
             @SerializedName("body")
             private MessageBody body;
 
@@ -370,14 +376,15 @@ public class LyricFragment extends Fragment implements FetchAccessToken.AccessTo
                     }
                 }
 
-                public static class TrackWrapper{
+                public static class TrackWrapper {
                     @SerializedName("track")
                     private trackInfo track_Info;
 
-                    public trackInfo getTrackInfo(){
+                    public trackInfo getTrackInfo() {
                         return track_Info;
                     }
-                    public static class trackInfo{
+
+                    public static class trackInfo {
                         @SerializedName("track_id")
                         public String id;
                         @SerializedName("commontrack_id")
@@ -396,10 +403,9 @@ public class LyricFragment extends Fragment implements FetchAccessToken.AccessTo
         }
 
 
-
     }
-    public static class LyricsResponse
-    {
+
+    public static class LyricsResponse {
         @SerializedName("message")
         private MessageContainer messageBody;
 
@@ -415,7 +421,7 @@ public class LyricFragment extends Fragment implements FetchAccessToken.AccessTo
                 return body;
             }
 
-            public static class MessageBody{
+            public static class MessageBody {
                 @SerializedName("lyrics")
                 private lyricContainer lyric_container;
 
@@ -423,7 +429,7 @@ public class LyricFragment extends Fragment implements FetchAccessToken.AccessTo
                     return lyric_container;
                 }
 
-                public static class lyricContainer{
+                public static class lyricContainer {
                     @SerializedName("lyrics_body")
                     private String lyric;
 

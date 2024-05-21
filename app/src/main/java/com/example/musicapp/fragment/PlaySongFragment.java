@@ -20,8 +20,6 @@ import android.widget.Toast;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
-import androidx.fragment.app.Fragment;
-import androidx.fragment.app.FragmentManager;
 
 import com.bumptech.glide.Glide;
 import com.example.musicapp.R;
@@ -31,6 +29,7 @@ import com.example.musicapp.manager.MediaPlayerManager;
 import com.example.musicapp.manager.OnSongSelectedListener;
 import com.example.musicapp.model.BottomAppBarListener;
 import com.example.musicapp.model.Song;
+import com.google.android.material.bottomsheet.BottomSheetDialogFragment;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FieldValue;
@@ -49,14 +48,13 @@ import retrofit2.http.GET;
 import retrofit2.http.Header;
 import retrofit2.http.Path;
 
-public class PlaySongFragment extends Fragment implements FetchAccessToken.AccessTokenCallback, OnSongSelectedListener {
+public class PlaySongFragment extends BottomSheetDialogFragment implements FetchAccessToken.AccessTokenCallback, OnSongSelectedListener {
 
     private View view;
     private Handler handler = new Handler(Looper.getMainLooper());
     private Runnable updateSeekBarRunnable;
     private int currentPosition;
     private List<Song> songList;
-    private PlaySongFragment playSongFragment;
     private MediaPlayerManager mediaPlayerManager;
     private String songnameValue, artistnameValue, avataValue, played_value, total_value, urlAudioValue;
     private TextView songname, artistname, duration_played, duration_total, lyric;
@@ -84,6 +82,7 @@ public class PlaySongFragment extends Fragment implements FetchAccessToken.Acces
         getTrack(accessToken);
     }
 
+    @Nullable
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         view = inflater.inflate(R.layout.play_song, container, false);
@@ -102,8 +101,7 @@ public class PlaySongFragment extends Fragment implements FetchAccessToken.Acces
             @Override
             public void onClick(View v) {
                 mediaPlayerManager.getMediaPlayer().seekTo(0);
-                FragmentManager fragmentManager = getParentFragmentManager();
-                fragmentManager.popBackStack();
+                dismiss();
             }
         });
 
@@ -111,8 +109,7 @@ public class PlaySongFragment extends Fragment implements FetchAccessToken.Acces
             @Override
             public void onClick(View v) {
                 mediaPlayerManager.setCurrentPosition(0);
-                FragmentManager fragmentManager = getParentFragmentManager();
-                fragmentManager.popBackStack();
+                dismiss();
             }
         });
 
@@ -120,12 +117,14 @@ public class PlaySongFragment extends Fragment implements FetchAccessToken.Acces
             @Override
             public void onClick(View v) {
                 ShowLyric();
+                view.setVisibility(View.GONE);
             }
         });
         show_lyricBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 ShowLyric();
+                view.setVisibility(View.GONE);
             }
         });
 
@@ -133,6 +132,7 @@ public class PlaySongFragment extends Fragment implements FetchAccessToken.Acces
             @Override
             public void onClick(View v) {
                 ShowLyric();
+                view.setVisibility(View.GONE);
             }
         });
 
@@ -195,72 +195,28 @@ public class PlaySongFragment extends Fragment implements FetchAccessToken.Acces
         } else {
             previousSongId = songList.get(songList.size() - 1).getId();
         }
-        Song previousSong = getSongById(previousSongId);
-        if (playSongFragment == null) {
-            playSongFragment = new PlaySongFragment();
-            playSongFragment.setCurrentSongList(songList, previousSongId);
-            Bundle args = new Bundle();
-            args.putString("songId", previousSongId);
-            playSongFragment.setArguments(args);
-        } else {
-            playSongFragment.setCurrentSongList(songList, previousSongId);
-        }
-
-        ((AppCompatActivity) requireContext())
-                .getSupportFragmentManager()
-                .beginTransaction()
-                .replace(R.id.frame_layout, playSongFragment)
-                .addToBackStack(null)
-                .commit();
+        updateCurrentSong(previousSongId);
     }
-    private void PlayNextSong(){
+
+    private void PlayNextSong() {
         ((BottomAppBarListener) requireActivity()).hideBottomAppBar();
         int currentIndex = getCurrentSongIndex(songId);
         String nextSongId = "";
-        if (currentIndex < songList.size()-1) {
+        if (currentIndex < songList.size() - 1) {
             nextSongId = songList.get(currentIndex + 1).getId();
-        }
-        else {
+        } else {
             nextSongId = songList.get(0).getId();
         }
-        if (playSongFragment == null) {
-            playSongFragment = new PlaySongFragment();
-            playSongFragment.setCurrentSongList(songList, nextSongId);
-            Bundle args = new Bundle();
-            args.putString("songId", nextSongId);
-            playSongFragment.setArguments(args);
-        } else {
-            playSongFragment.setCurrentSongList(songList, nextSongId);
-        }
-
-        ((AppCompatActivity) requireContext())
-                .getSupportFragmentManager()
-                .beginTransaction()
-                .replace(R.id.frame_layout, playSongFragment)
-                .addToBackStack(null)
-                .commit();
+        updateCurrentSong(nextSongId);
     }
-    private void PlayRandomSong(){
+
+    private void PlayRandomSong() {
         ((BottomAppBarListener) requireActivity()).hideBottomAppBar();
-        int randomIndex = (int)(Math.random() * songList.size());
+        int randomIndex = (int) (Math.random() * songList.size());
         String nextSongId = songList.get(randomIndex).getId();
-        if (playSongFragment == null) {
-            playSongFragment = new PlaySongFragment();
-            playSongFragment.setCurrentSongList(songList, nextSongId);
-            Bundle args = new Bundle();
-            args.putString("songId", nextSongId);
-            playSongFragment.setArguments(args);
-        } else {
-            playSongFragment.setCurrentSongList(songList, nextSongId);
-        }
-
-        ((AppCompatActivity) requireContext())
-                .getSupportFragmentManager()
-                .beginTransaction()
-                .replace(R.id.frame_layout, playSongFragment)
-                .addToBackStack(null)
-                .commit();
+        updateCurrentSong(nextSongId);
     }
+
     private Song getSongById(String songId) {
         for (Song song : songList) {
             if (song.getId().equals(songId)) {
@@ -289,11 +245,7 @@ public class PlaySongFragment extends Fragment implements FetchAccessToken.Acces
         args.putString("totalDuration", total_value);
 
         lyricFragment.setArguments(args);
-        ((AppCompatActivity) requireContext()).getSupportFragmentManager()
-                .beginTransaction()
-                .replace(R.id.frame_layout, lyricFragment, "LyricFragment")
-                .addToBackStack("LyricFragment")
-                .commit();
+        ((AppCompatActivity) requireContext()).getSupportFragmentManager().beginTransaction().replace(R.id.frame_layout, lyricFragment, "LyricFragment").addToBackStack("LyricFragment").commit();
     }
 
     @Override
@@ -361,20 +313,16 @@ public class PlaySongFragment extends Fragment implements FetchAccessToken.Acces
         String userId = mAuth.getCurrentUser().getUid();
         FirebaseFirestore db = FirebaseFirestore.getInstance();
 
-        db.collection("users")
-                .whereEqualTo("id", userId)
-                .get()
-                .addOnSuccessListener(queryDocumentSnapshots -> {
-                    if (!queryDocumentSnapshots.isEmpty()) {
-                        DocumentSnapshot userDoc = queryDocumentSnapshots.getDocuments().get(0);
-                        List<String> likedSongs = (List<String>) userDoc.get("likedsong");
-                        callback.onResult(likedSongs.contains(id));
-                    }
-                })
-                .addOnFailureListener(e -> {
-                    Log.e("SongAdapter", "Failed to retrieve user document: " + e.getMessage());
-                    callback.onResult(false);
-                });
+        db.collection("users").whereEqualTo("id", userId).get().addOnSuccessListener(queryDocumentSnapshots -> {
+            if (!queryDocumentSnapshots.isEmpty()) {
+                DocumentSnapshot userDoc = queryDocumentSnapshots.getDocuments().get(0);
+                List<String> likedSongs = (List<String>) userDoc.get("likedsong");
+                callback.onResult(likedSongs.contains(id));
+            }
+        }).addOnFailureListener(e -> {
+            Log.e("SongAdapter", "Failed to retrieve user document: " + e.getMessage());
+            callback.onResult(false);
+        });
     }
 
     private void removeSongFromLikedSongs(String songId) {
@@ -382,61 +330,46 @@ public class PlaySongFragment extends Fragment implements FetchAccessToken.Acces
         String userId = mAuth.getCurrentUser().getUid();
         FirebaseFirestore db = FirebaseFirestore.getInstance();
 
-        db.collection("users")
-                .whereEqualTo("id", userId)
-                .get()
-                .addOnSuccessListener(queryDocumentSnapshots -> {
-                    if (!queryDocumentSnapshots.isEmpty()) {
-                        DocumentSnapshot userDoc = queryDocumentSnapshots.getDocuments().get(0);
-                        userDoc.getReference().update("likedsong", FieldValue.arrayRemove(songId))
-                                .addOnSuccessListener(aVoid -> {
-                                    Toast.makeText(requireContext(), "Removed from liked songs successfully", Toast.LENGTH_SHORT).show();
-                                })
-                                .addOnFailureListener(e -> {
-                                    Log.e("SongAdapter", "Failed to remove song from liked songs: " + e.getMessage());
-                                });
-                    } else {
-                        Log.e("SongAdapter", "No user document found with userId: " + userId);
-                    }
-                })
-                .addOnFailureListener(e -> {
-                    Log.e("SongAdapter", "Failed to retrieve user document: " + e.getMessage());
+        db.collection("users").whereEqualTo("id", userId).get().addOnSuccessListener(queryDocumentSnapshots -> {
+            if (!queryDocumentSnapshots.isEmpty()) {
+                DocumentSnapshot userDoc = queryDocumentSnapshots.getDocuments().get(0);
+                userDoc.getReference().update("likedsong", FieldValue.arrayRemove(songId)).addOnSuccessListener(aVoid -> {
+                    Toast.makeText(requireContext(), "Removed from liked songs successfully", Toast.LENGTH_SHORT).show();
+                }).addOnFailureListener(e -> {
+                    Log.e("SongAdapter", "Failed to remove song from liked songs: " + e.getMessage());
                 });
+            } else {
+                Log.e("SongAdapter", "No user document found with userId: " + userId);
+            }
+        }).addOnFailureListener(e -> {
+            Log.e("SongAdapter", "Failed to retrieve user document: " + e.getMessage());
+        });
     }
 
     public void addSongToLikedSongs(String songId) {
         FirebaseAuth mAuth = FirebaseAuth.getInstance();
         String userId = mAuth.getCurrentUser().getUid();
         FirebaseFirestore db = FirebaseFirestore.getInstance();
-        db.collection("users")
-                .whereEqualTo("id", userId)
-                .get()
-                .addOnSuccessListener(queryDocumentSnapshots -> {
-                    if (!queryDocumentSnapshots.isEmpty()) {
-                        DocumentSnapshot userDoc = queryDocumentSnapshots.getDocuments().get(0);
-                        userDoc.getReference().update("likedsong", FieldValue.arrayUnion(songId))
-                                .addOnSuccessListener(aVoid -> {
+        db.collection("users").whereEqualTo("id", userId).get().addOnSuccessListener(queryDocumentSnapshots -> {
+            if (!queryDocumentSnapshots.isEmpty()) {
+                DocumentSnapshot userDoc = queryDocumentSnapshots.getDocuments().get(0);
+                userDoc.getReference().update("likedsong", FieldValue.arrayUnion(songId)).addOnSuccessListener(aVoid -> {
 
-                                    Toast.makeText(requireContext(), "Add to liked songs successfully", Toast.LENGTH_SHORT).show();
-                                })
-                                .addOnFailureListener(e -> {
-                                    // Handle the error
-                                    Log.e("SongAdapter", "Failed to add song to liked songs: " + e.getMessage());
-                                });
-                    } else {
-                        Log.e("SongAdapter", "No user document found with userId: " + userId);
-                    }
-                })
-                .addOnFailureListener(e -> {
-                    Log.e("SongAdapter", "Failed to retrieve user document: " + e.getMessage());
+                    Toast.makeText(requireContext(), "Add to liked songs successfully", Toast.LENGTH_SHORT).show();
+                }).addOnFailureListener(e -> {
+                    // Handle the error
+                    Log.e("SongAdapter", "Failed to add song to liked songs: " + e.getMessage());
                 });
+            } else {
+                Log.e("SongAdapter", "No user document found with userId: " + userId);
+            }
+        }).addOnFailureListener(e -> {
+            Log.e("SongAdapter", "Failed to retrieve user document: " + e.getMessage());
+        });
     }
 
     private void getTrack(String accessToken) {
-        Retrofit retrofit = new Retrofit.Builder()
-                .baseUrl("https://api.spotify.com/")
-                .addConverterFactory(GsonConverterFactory.create())
-                .build();
+        Retrofit retrofit = new Retrofit.Builder().baseUrl("https://api.spotify.com/").addConverterFactory(GsonConverterFactory.create()).build();
 
         SpotifyApi apiService = retrofit.create(SpotifyApi.class);
         String authorization = "Bearer " + accessToken;
@@ -627,25 +560,20 @@ public class PlaySongFragment extends Fragment implements FetchAccessToken.Acces
         }
     }
 
-    private void playPreviousSong(String previousSongId) {
-        setSongId(previousSongId);
-        if (playSongFragment == null) {
-            playSongFragment = new PlaySongFragment();
-            playSongFragment.setSongId(previousSongId);
-            Bundle args = new Bundle();
-            args.putString("songId", previousSongId);
-            playSongFragment.setArguments(args);
-        } else {
-            playSongFragment.setSongId(previousSongId);
-        }
-
-        ((AppCompatActivity) requireContext())
-                .getSupportFragmentManager()
-                .beginTransaction()
-                .replace(R.id.frame_layout, playSongFragment)
-                .addToBackStack(null)
-                .commit();
-    }
+//    private void playPreviousSong(String previousSongId) {
+//        setSongId(previousSongId);
+//        if (playSongFragment == null) {
+//            playSongFragment = new PlaySongFragment();
+//            playSongFragment.setSongId(previousSongId);
+//            Bundle args = new Bundle();
+//            args.putString("songId", previousSongId);
+//            playSongFragment.setArguments(args);
+//        } else {
+//            playSongFragment.setSongId(previousSongId);
+//        }
+//
+//        playSongFragment.show(getParentFragmentManager(), "PlaySongFragment");
+//    }
 
     public void onPreviousClicked(View view) {
         if (this instanceof OnSongSelectedListener) {
