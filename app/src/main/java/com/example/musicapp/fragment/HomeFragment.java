@@ -107,16 +107,12 @@ public class HomeFragment extends Fragment implements SongHomeAdapter.OnSongSele
             @Override
             public void onClick(View v) {
                 if (songId != null) {
-                    PlaySongFragment fragment = new PlaySongFragment();
-                    fragment.setSongId(songId);
+                    // playsongfragment is a bottom sheet
+                    PlaySongFragment playSongFragment = new PlaySongFragment();
                     Bundle args = new Bundle();
                     args.putString("songId", songId);
-                    fragment.setArguments(args);
-                    ((AppCompatActivity) v.getContext()).getSupportFragmentManager()
-                            .beginTransaction()
-                            .replace(R.id.frame_layout, fragment)
-                            .addToBackStack(null)
-                            .commit();
+                    playSongFragment.setArguments(args);
+                    playSongFragment.show(((AppCompatActivity) getContext()).getSupportFragmentManager(), "PlaySongFragment");
                 } else {
                     Toast.makeText(getContext(), "No recent song to resume", Toast.LENGTH_SHORT).show();
                 }
