@@ -1,14 +1,20 @@
 package com.example.musicapp.fragment;
 
+import android.app.Dialog;
 import android.app.NotificationChannel;
 import android.app.NotificationManager;
 import android.app.PendingIntent;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.net.Uri;
+import android.os.AsyncTask;
 import android.os.Bundle;
+import android.os.Handler;
+import android.os.Looper;
+import android.os.StrictMode;
 import android.util.Log;
 import android.view.Gravity;
 import android.view.KeyEvent;
@@ -32,8 +38,10 @@ import static android.app.Activity.RESULT_OK;
 import static android.content.Intent.getIntent;
 
 import androidx.annotation.Nullable;
+import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.app.NotificationCompat;
+import androidx.core.content.ContextCompat;
 import androidx.fragment.app.Fragment;
 
 import com.bumptech.glide.Glide;
@@ -41,9 +49,13 @@ import com.example.musicapp.MainActivity;
 import com.example.musicapp.R;
 import com.example.musicapp.activities.LoginActivity;
 import com.example.musicapp.activities.PrivacyPolicyActivity;
+import com.example.musicapp.activities.TermsConditionActivity;
 import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.OnFailureListener;
+import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
 import com.google.android.material.card.MaterialCardView;
+import com.google.android.material.textfield.TextInputEditText;
 import com.google.firebase.auth.AuthCredential;
 import com.google.firebase.auth.AuthResult;
 import com.google.firebase.auth.FirebaseAuth;
@@ -61,9 +73,22 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Properties;
 import java.util.UUID;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+
+import javax.mail.Authenticator;
+import javax.mail.Message;
+import javax.mail.MessagingException;
+import javax.mail.PasswordAuthentication;
+import javax.mail.Session;
+import javax.mail.Transport;
+import javax.mail.internet.InternetAddress;
+import javax.mail.internet.MimeMessage;
 
 import de.hdodenhof.circleimageview.CircleImageView;
+import jp.wasabeef.blurry.Blurry;
 
 public class ProfileFragment extends Fragment {
     View view;
@@ -93,7 +118,15 @@ public class ProfileFragment extends Fragment {
     TextView privacyPolicy;
     TextView notification;
     TextView modifyPassword;
+    TextView termsAndConditions,update,feedbackError;
     List<String> notifications = new ArrayList<>();
+    Dialog dialog1,dialog2;
+    Button btnLogoutCancel, btnDialogLogout;
+    Button btnReportCancel, btnReportSend;
+    TextInputEditText inputReport;
+    TextView reportSucess;
+    String email;
+
     @Nullable
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
@@ -113,12 +146,74 @@ public class ProfileFragment extends Fragment {
         modifyPassword = view.findViewById(R.id.modifyPassword);
          user = mAuth.getCurrentUser();
         notificationPopup = view.findViewById(R.id.notificationPopup);
+        termsAndConditions = view.findViewById(R.id.termsAndConditions);
+        update = view.findViewById(R.id.update);
+        feedbackError = view.findViewById(R.id.feedbackError);
+        dialog1 = new Dialog(getActivity());
+        dialog2 = new Dialog(getActivity());
+        dialog1.setContentView(R.layout.custom_report_dialog);
+        dialog2.setContentView(R.layout.custom_logout_dialog);
+        if(getActivity() != null) {
+            int width = (int)(getResources().getDisplayMetrics().widthPixels*0.90);
+            dialog1.getWindow().setLayout(width, ViewGroup.LayoutParams.WRAP_CONTENT);
+//            dialog1.getWindow().setBackgroundDrawable(ContextCompat.getDrawable(getActivity(), R.drawable.bg_dialog));
+            dialog2.getWindow().setLayout(width,ViewGroup.LayoutParams.WRAP_CONTENT);
+            dialog2.getWindow().setBackgroundDrawable(ContextCompat.getDrawable(getActivity(), R.drawable.bg_dialog));
+        }
+        dialog1.setCancelable(false);
+        dialog2.setCancelable(false);
+        //dialog
+        btnLogoutCancel = dialog2.findViewById(R.id.btnCancel);
+        btnDialogLogout = dialog2.findViewById(R.id.btnDialogLogout);
+        btnReportCancel = dialog1.findViewById(R.id.btnCancel);
+        btnReportSend = dialog1.findViewById(R.id.btnReportSend);
+        inputReport = dialog1.findViewById(R.id.inputReport);
+        reportSucess = dialog1.findViewById(R.id.reportSucess);
+        inputReport = dialog1.findViewById(R.id.inputReport);
+        btnLogoutCancel.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                dialog2.dismiss();
+            }
+        });
+        btnReportCancel.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                dialog1.dismiss();
+            }
+        });
+        btnReportSend.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                String reportContent = inputReport.getText().toString();
+                saveErrorReport(reportContent,email);
+                reportSucess.setVisibility(View.VISIBLE);
+                reportSucess.setText("Thanks for giving us feedback!");
+                new Handler().postDelayed(new Runnable() {
+                    @Override
+                    public void run() {
+                        reportSucess.setVisibility(View.GONE);
+                    }
+                }, 6000);
+            }
+        });
+        btnDialogLogout.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                FirebaseAuth.getInstance().signOut();
+                Intent intent = new Intent(getActivity(), LoginActivity.class);
+                startActivity(intent);
+                dialog2.dismiss();
+                getActivity().finish();
+
+            }
+        });
+
         if (notificationPopup != null) {
             linearLayout = notificationPopup.findViewById(R.id.linearLayout);
         } else {
             Log.e("ProfileFragment", "notificationPopup is null");
         }
-
 
         if (getArguments() != null) {
              data = getArguments().getString("data", "");
@@ -135,6 +230,7 @@ public class ProfileFragment extends Fragment {
 
                             if(document.contains("Name")){
                                 String name = document.getString("Name");
+                                email = document.getString("email");
                                 Name.setText(name);
                             }
                             if(document.contains("notificationCount"))
@@ -165,9 +261,46 @@ public class ProfileFragment extends Fragment {
                 }
             });
         }
+        feedbackError.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Blurry.with(getContext()).radius(10).sampling(2).onto((ViewGroup)view);
+                dialog1.show();
+                dialog1.setOnDismissListener(new DialogInterface.OnDismissListener() {
+                    @Override
+                    public void onDismiss(DialogInterface dialog) {
+                        Blurry.delete((ViewGroup)view);
+                    }
+                });
+            }
+        });
+        update.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Blurry.with(getContext()).radius(10).sampling(2).onto((ViewGroup)view);
+                AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
+                builder.setTitle("Nothing to Update");
+                builder.setMessage("Your application is already up-to-date.");
+                builder.setPositiveButton("OK", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        dialog.dismiss();
+                    }
+                });
+                AlertDialog dialog = builder.create();
+                dialog.show();
+                dialog.setOnDismissListener(new DialogInterface.OnDismissListener() {
+                    @Override
+                    public void onDismiss(DialogInterface dialog) {
+                        Blurry.delete((ViewGroup)view);
+                    }
+                });
+            }
+        });
         privacyPolicy.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+
                 Intent intent = new Intent();
                 intent.setClass(v.getContext(), PrivacyPolicyActivity.class);
                 startActivity(intent);
@@ -179,6 +312,7 @@ public class ProfileFragment extends Fragment {
             @Override
             public void onClick(View v) {
                 if (notificationPopup.getVisibility() == View.GONE) {
+                    Intent intent = new Intent();
                     notificationPopup.setVisibility(View.VISIBLE);
                 } else {
                     notificationPopup.setVisibility(View.GONE);
@@ -186,9 +320,20 @@ public class ProfileFragment extends Fragment {
             }
         });
 
+        termsAndConditions.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent intent = new Intent();
+                intent.setClass(v.getContext(), TermsConditionActivity.class);
+                startActivity(intent);
+                getActivity().finish();
+            }
+        });
+
         modifyPassword.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+//                toggleTextViewAppearance(modifyPassword, R.drawable.admin_panel_settings_24dp_fill1_wght400_grad0_opsz24, R.drawable.admin_panel_settings_24dp_fill0_wght400_grad0_opsz24);
                 PasswordSettingFragment fragment = new PasswordSettingFragment();
                 ((AppCompatActivity)v.getContext()).getSupportFragmentManager()
                         .beginTransaction()
@@ -211,10 +356,14 @@ public class ProfileFragment extends Fragment {
         logout.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                FirebaseAuth.getInstance().signOut();
-                Intent intent = new Intent(getActivity(), LoginActivity.class);
-                startActivity(intent);
-                getActivity().finish();
+                Blurry.with(getContext()).radius(10).sampling(2).onto((ViewGroup)view);
+                 dialog2.show();
+                dialog2.setOnDismissListener(new DialogInterface.OnDismissListener() {
+                    @Override
+                    public void onDismiss(DialogInterface dialog) {
+                        Blurry.delete((ViewGroup)view);
+                    }
+                });
             }
         });
         modifyName.setOnClickListener(new View.OnClickListener() {
@@ -262,7 +411,25 @@ public class ProfileFragment extends Fragment {
             }
         });
         return view;
+    }
+    private void saveErrorReport(  String reportContent,String email) {
+        Map<String, Object> updates = new HashMap<>();
+        updates.put("Image", email);
+        updates.put("reportContent", reportContent);
+        db.collection("reports")
+                .add(updates)
+                .addOnSuccessListener(new OnSuccessListener<DocumentReference>() {
+                    @Override
+                    public void onSuccess(DocumentReference documentReference) {
+                        Log.d("saveErrorReport", "DocumentSnapshot added with ID: " + documentReference.getId());
+                    }
+                })
+                .addOnFailureListener(new OnFailureListener() {
+                    @Override
+                    public void onFailure(@NonNull Exception e) {
 
+                    }
+                });
 
     }
     private void saveNameChanges() {
@@ -319,7 +486,6 @@ public void onActivityResult(int requestCode, int resultCode, @Nullable Intent d
     super.onActivityResult(requestCode, resultCode, data);
 
     if (resultCode == RESULT_OK && data != null && data.getData() != null) {
-        // Differentiate between the requests
         if (requestCode == PICK_IMAGE_REQUEST) {
             selectedImageUri = data.getData();
             backgroundAvatar.setImageURI(selectedImageUri);

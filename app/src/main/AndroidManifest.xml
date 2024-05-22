@@ -14,20 +14,17 @@
         android:supportsRtl="true"
         android:theme="@style/Theme.Material3.Dark.NoActionBar">
         <activity
+            android:name=".activities.TermsConditionActivity"
+            android:exported="false" />
+        <activity
             android:name=".activities.PrivacyPolicyActivity"
             android:exported="false" />
         <activity
             android:name=".activities.NotificationActivity"
             android:exported="false" />
         <activity
-            android:name=".MainActivity"
-            android:exported="false">
-            <!--            <intent-filter>-->
-            <!--                <action android:name="android.intent.action.MAIN" />-->
-
-            <!--                <category android:name="android.intent.category.LAUNCHER" />-->
-            <!--            </intent-filter>-->
-        </activity>
+            android:name=".activities.GettingStartedActivity"
+            android:exported="false" />
         <activity
             android:name=".activities.RegisterOrSignUp"
             android:exported="false" />
@@ -38,27 +35,27 @@
             android:name=".activities.ForgetPasswordActivity"
             android:exported="false" />
         <activity
-            android:name=".activities.GettingStartedActivity"
-            android:exported="false">
-            <!--            <intent-filter>-->
-            <!--                <action android:name="android.intent.action.MAIN" />-->
-
-            <!--                <category android:name="android.intent.category.LAUNCHER" />-->
-            <!--            </intent-filter>-->
-        </activity>
-        <activity
             android:name=".activities.LoginActivity"
-            android:exported="false" />
-        <activity
-            android:name=".activities.Launching"
             android:exported="true">
-
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
-
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
+        </activity>
+        <activity
+            android:name=".MainActivity"
+            android:exported="false" />
+        <activity
+            android:name=".activities.Launching"
+            android:exported="false">
+
+            <!-- <intent-filter> -->
+            <!-- <action android:name="android.intent.action.MAIN" /> -->
+
+
+            <!-- <category android:name="android.intent.category.LAUNCHER" /> -->
+            <!-- </intent-filter> -->
         </activity>
     </application>
 

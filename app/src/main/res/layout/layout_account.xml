@@ -43,12 +43,14 @@
             <EditText
                 android:id="@+id/Name"
                 android:layout_width="wrap_content"
+
                 android:layout_height="wrap_content"
                 android:textColor="@color/textColor" />
 
             <ImageButton
                 android:id="@+id/modifyName"
                 android:layout_width="wrap_content"
+                android:layout_gravity="center_vertical"
                 android:layout_height="wrap_content"
                 android:background="?android:selectableItemBackgroundBorderless"
                 android:src="@drawable/edit_24dp_fill0_wght400_grad0_opsz24" />
@@ -238,6 +240,7 @@
                     android:layout_height="wrap_content"
                     android:layout_marginLeft="20dp"
                     android:layout_marginTop="5dp"
+                    android:id="@+id/update"
                     android:drawableLeft="@drawable/update_24dp_fill0_wght400_grad0_opsz24"
                     android:drawablePadding="10dp"
                     android:text="Check for updates"
@@ -247,6 +250,7 @@
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:layout_marginLeft="20dp"
+                    android:id="@+id/feedbackError"
                     android:layout_marginTop="5dp"
                     android:drawableLeft="@drawable/flag_24dp_fill0_wght400_grad0_opsz24"
                     android:drawablePadding="10dp"
@@ -278,7 +282,7 @@
                 <Button
                     android:id="@+id/btnLogout"
                     android:layout_width="230dp"
-                    android:layout_height="40dp"
+                    android:layout_height="50dp"
                     android:layout_marginLeft="24dp"
                     android:layout_marginTop="15dp"
                     android:layout_marginRight="24dp"
@@ -286,8 +290,7 @@
                     android:text="Log out"
                     android:textColor="@color/textColor"
                     app:backgroundTint="@color/btnColor" />
-
-            </LinearLayout>
+                </LinearLayout>
         </LinearLayout>
     </ScrollView>
 

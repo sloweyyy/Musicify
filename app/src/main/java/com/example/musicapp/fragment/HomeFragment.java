@@ -1,5 +1,6 @@
 package com.example.musicapp.fragment;
 
+import android.content.Context;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -22,6 +23,7 @@ import com.bumptech.glide.request.RequestOptions;
 import com.example.musicapp.R;
 import com.example.musicapp.adapter.HomeFragmentAdapter;
 import com.example.musicapp.adapter.PlaylistHomeAdapter;
+import com.example.musicapp.adapter.SongAdapter;
 import com.example.musicapp.adapter.SongHomeAdapter;
 import com.example.musicapp.model.PlaylistAPI;
 import com.example.musicapp.model.Song;
@@ -39,7 +41,7 @@ import com.google.firebase.firestore.FirebaseFirestoreException;
 import java.util.HashMap;
 import java.util.Map;
 
-public class HomeFragment extends Fragment  implements SongHomeAdapter.OnSongSelectedListener    {
+public class HomeFragment extends Fragment  implements SongHomeAdapter.OnSongSelectedListener , SongAdapter.OnSongSelectedListener {
     private View view;
     private TabLayout tabLayout;
     private ViewPager2 viewPager2;
@@ -123,7 +125,6 @@ public class HomeFragment extends Fragment  implements SongHomeAdapter.OnSongSel
                     Log.e("Firestore", "Listen failed.", error);
                     return;
                 }
-
                 if (value != null && value.exists()) {
                     Log.d("Firestore", "Current data: " + value.getData());
                     if (value.contains("recentListeningSong")) {
@@ -131,26 +132,35 @@ public class HomeFragment extends Fragment  implements SongHomeAdapter.OnSongSel
                         if (recentSongData != null) {
                             recentSongName.setText(recentSongData.get("songName").toString());
                             recentSongArtist.setText(recentSongData.get("artistName").toString());
-                            Glide.with(getContext()).load(recentSongData.get("imageURL")).apply(RequestOptions.circleCropTransform()).into(artistImage);
+                            if (isAdded() && getActivity() != null) {
+                                if (recentSongData.get("imageURL") != null) {
+                                    Glide.with(requireContext()).load(recentSongData.get("imageURL")).apply(RequestOptions.circleCropTransform()).into(artistImage);
+                                }
+                            }
                             resumeBtn.setVisibility(View.VISIBLE);
                            songId = recentSongData.get("songId").toString();
-//                            songId= (songId != null) ? songId.toString() : null;
                         }
                     } else {
                         recentSongName.setText("Select song to listen");
                         recentSongArtist.setText("");
-                        Glide.with(getContext()).load(R.drawable.playlist_image).apply(RequestOptions.circleCropTransform()).into(artistImage);
+                        if((isAdded() && getActivity() != null))
+                            Glide.with(getContext()).load(R.drawable.playlist_image).apply(RequestOptions.circleCropTransform()).into(artistImage);
                     }
                 } else {
                     recentSongArtist.setText("");
                     recentSongName.setText("Choose song to listen");
-//                    artistImage.setImageResource(R.drawable.playlist_image);
-                    Glide.with(getContext()).load(R.drawable.playlist_image).apply(RequestOptions.circleCropTransform()).into(artistImage);
+                    if (isAdded() && getActivity() != null) {
+                        Glide.with(requireContext()).load(R.drawable.playlist_image).apply(RequestOptions.circleCropTransform()).into(artistImage);
+                    }
                 }
             }
         });
 
         return view;
+    }
+    @Override
+    public void onAttach(@NonNull Context context) {
+        super.onAttach(context);
     }
     private void updateRecentSong(Song song) {
         FirebaseAuth mAuth = FirebaseAuth.getInstance();
