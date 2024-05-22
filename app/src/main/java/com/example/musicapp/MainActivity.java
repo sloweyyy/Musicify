@@ -1,5 +1,7 @@
 package com.example.musicapp;
 
+import android.content.Intent;
+import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.view.View;
 
@@ -8,30 +10,41 @@ import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentManager;
 import androidx.fragment.app.FragmentTransaction;
 
-import com.example.musicapp.adapter.SongAdapter;
+import com.example.musicapp.activities.Launching;
+import com.example.musicapp.activities.LoginActivity;
 import com.example.musicapp.databinding.ActivityMainBinding;
 import com.example.musicapp.fragment.ExploreFragment;
 import com.example.musicapp.fragment.FavouriteFragment;
 import com.example.musicapp.fragment.HomeFragment;
-import com.example.musicapp.fragment.PlaySongFragment;
 import com.example.musicapp.fragment.ProfileFragment;
 import com.example.musicapp.model.BottomAppBarListener;
+import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseUser;
 
 public class MainActivity extends AppCompatActivity implements BottomAppBarListener {
     ActivityMainBinding binding;
+    SharedPreferences sharedPreferences;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         binding = ActivityMainBinding.inflate(getLayoutInflater());
         setContentView(binding.getRoot());
 
-        // test bottom sheet
+        // load login state
+        FirebaseUser currentUser = FirebaseAuth.getInstance().getCurrentUser();
+        if (currentUser == null) {
+            // User not logged in, navigate to login screen
+            Intent intent = new Intent(MainActivity.this, Launching.class);
+            startActivity(intent);
+            finish();
+            return;
+        }
 
         replaceFragment(new HomeFragment());
+
         binding.bottomNavigationView.setBackground(null);
-
         binding.bottomNavigationView.setOnItemSelectedListener(item -> {
-
             if (item.getItemId() == R.id.home) {
                 replaceFragment(new HomeFragment());
             } else if (item.getItemId() == R.id.search) {
@@ -41,7 +54,6 @@ public class MainActivity extends AppCompatActivity implements BottomAppBarListe
             } else if (item.getItemId() == R.id.profile) {
                 replaceFragment(new ProfileFragment());
             }
-
             return true;
         });
     }
@@ -62,6 +74,7 @@ public class MainActivity extends AppCompatActivity implements BottomAppBarListe
     public void showBottomAppBar() {
         binding.bottomAppBar.setVisibility(View.VISIBLE);
     }
+
     @Override
     public boolean onSupportNavigateUp() {
         FragmentManager fragmentManager = getSupportFragmentManager();
@@ -72,5 +85,4 @@ public class MainActivity extends AppCompatActivity implements BottomAppBarListe
             return super.onSupportNavigateUp();
         }
     }
-
 }
