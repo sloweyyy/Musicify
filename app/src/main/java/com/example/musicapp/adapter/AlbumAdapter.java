@@ -108,14 +108,13 @@ public class AlbumAdapter extends RecyclerView.Adapter<AlbumAdapter.ViewHolder>{
     public class ViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener{
         private ImageView albumImage;
         private TextView albumName;
-
         private ImageView heartBtn;
         private AlbumAdapter.OnItemClickListener listener;
 
         public ViewHolder(@NonNull View itemView) {
             super(itemView);
             itemView.setOnClickListener(this);
-            albumImage = itemView.findViewById(R.id.albumThumbnail);
+            albumImage = itemView.findViewById(R.id.imgAlbum);
             albumName = itemView.findViewById(R.id.albumName);
             heartBtn = itemView.findViewById(R.id.heartBtn);
             this.listener = listener;

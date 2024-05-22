@@ -24,9 +24,6 @@ import com.google.firebase.firestore.FieldValue;
 import com.google.firebase.firestore.FirebaseFirestore;
 
 import java.util.List;
-
-import de.hdodenhof.circleimageview.CircleImageView;
-
 public class ArtitstHomeAdapter extends RecyclerView.Adapter<ArtitstHomeAdapter.ViewHolder> {
 
     private Context context;
@@ -112,7 +109,7 @@ public class ArtitstHomeAdapter extends RecyclerView.Adapter<ArtitstHomeAdapter.
 
         TextView artistName, totalFollowers;
         ImageView heartBtn;
-        CircleImageView cicleArtistImg;
+        ImageView cicleArtistImg;
 
         public ViewHolder(@NonNull View itemView) {
             super(itemView);

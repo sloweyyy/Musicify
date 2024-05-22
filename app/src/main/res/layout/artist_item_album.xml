@@ -14,6 +14,7 @@
             android:layout_height="wrap_content"
             app:cardCornerRadius="@dimen/_15sdp">
             <ImageView
+                android:id="@+id/imgAlbum"
                 android:layout_width="@dimen/_140sdp"
                 android:layout_height="@dimen/_135sdp"
                 android:src="@drawable/playlist_image" />
