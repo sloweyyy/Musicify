@@ -16,6 +16,7 @@ import android.widget.EditText;
 import android.widget.ImageButton;
 
 import com.example.musicapp.R;
+import com.example.musicapp.activities.LoginActivity;
 import com.example.musicapp.activities.RegisterOrSignUp;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
@@ -96,6 +97,10 @@ public class PasswordSettingFragment extends Fragment {
                 Map<String, Object> newPass = new HashMap<>();
                 newPass.put("password", newPassword);
                 updateDocument(newPass);
+
+                Intent intent = new Intent(getActivity(), LoginActivity.class);
+                startActivity(intent);
+                getActivity().finish();
 
             }
         });

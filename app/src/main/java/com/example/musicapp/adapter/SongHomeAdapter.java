@@ -86,12 +86,9 @@ public class SongHomeAdapter extends RecyclerView.Adapter<SongHomeAdapter.ViewHo
             playButton.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
-                    int position = getAdapterPosition();
+                    int position = getAbsoluteAdapterPosition();
                     if (position != RecyclerView.NO_POSITION) {
                         listener.onSongSelected(songList.get(position));
-                    }
-                    position = getAbsoluteAdapterPosition();
-                    if (position != RecyclerView.NO_POSITION) {
                         Song selected = songList.get(position);
                         PlaySongFragment fragment = new PlaySongFragment();
                         fragment.setSongId(selected.getId());

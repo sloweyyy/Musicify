@@ -16,7 +16,11 @@ android {
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
     }
-
+    packaging {
+        resources {
+            excludes += listOf("META-INF/NOTICE.md", "META-INF/LICENSE.md")
+        }
+    }
     buildTypes {
         release {
             isMinifyEnabled = false
@@ -89,5 +93,10 @@ dependencies {
     annotationProcessor("com.github.bumptech.glide:compiler:4.11.0")
     implementation("com.squareup.picasso:picasso:2.8")
     implementation("de.hdodenhof:circleimageview:3.1.0")
+    //mail
+    implementation (libs.android.mail)
+    implementation (libs.android.activation)
+    //blur
+    implementation ("jp.wasabeef:blurry:3.0.0")
 
 }
