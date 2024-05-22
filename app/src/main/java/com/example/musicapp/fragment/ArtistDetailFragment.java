@@ -71,13 +71,71 @@ public class ArtistDetailFragment extends Fragment implements FetchAccessToken.A
     private ImageView imageView;
 
     public ArtistDetailFragment() {}
-
     @Override
     public void onTokenReceived(String accessToken) {
         this.accessToken = accessToken;
         getArtist(accessToken);
-        getArtistAlbums(accessToken);
-        getArtistTopTrack(accessToken);
+    }
+
+    private void getArtist(String accessToken) {
+        Retrofit retrofit = new Retrofit.Builder()
+                .baseUrl("https://api.spotify.com/")
+                .addConverterFactory(GsonConverterFactory.create())
+                .build();
+        ArtistDetailFragment.SpotifyApiService apiService = retrofit.create(ArtistDetailFragment.SpotifyApiService.class);
+        String authorization = "Bearer " + accessToken;
+        Call<ArtistAlbums> call1 = apiService.getArtistAlbums(authorization, artistId);
+        Call<Artist> call = apiService.getArtist(authorization, artistId);
+        Call<ArtistTopTrack> call2 = apiService.getArtistTopTrack(authorization, artistId);
+        //Artist
+        call.enqueue(new Callback<Artist>() {
+
+            @Override
+            public void onResponse(Call<Artist> call, Response<Artist> response) {
+                AlertDialog.Builder builder = new AlertDialog.Builder(requireContext());
+                if (response.isSuccessful()) {
+                    Artist artist = response.body();
+                    artistName.setText(artist.getName());
+                    artistFollowers.setText(artist.getFollowers().getTotal() + "followers");
+                    Glide.with(requireContext()).load(artist.getImages().get(0).getUrl()).into(imageView);
+                } else {
+                    builder.setTitle("Cảnh báo");
+                    builder.setMessage(response.message());
+                    builder.setPositiveButton("OK", null);
+                    builder.show();
+                }
+            }
+
+            @Override
+            public void onFailure(Call<Artist> call, Throwable throwable) {
+
+            }
+        });
+        //Artist's albums
+        call1.enqueue(new Callback<ArtistAlbums>() {
+            @Override
+            public void onResponse(Call<ArtistAlbums> call1, Response<ArtistAlbums> response) {
+                AlertDialog.Builder builder = new AlertDialog.Builder(requireContext());
+                if (response.isSuccessful()) {
+                    ArtistAlbums artistAlbums = response.body();
+                    List<AlbumSimplified> albumSimplifiedList = artistAlbums.getListAlbum();
+                    albumAdapter = new AlbumAdapter(getContext(), albumSimplifiedList);
+                    recyclerViewAlbums.setAdapter(albumAdapter);
+                    recyclerViewAlbums.setVisibility(View.VISIBLE);
+
+                } else {
+                    builder.setTitle("Cảnh báo");
+                    builder.setMessage(response.message());
+                    builder.setPositiveButton("OK", null);
+                    builder.show();
+                }
+            }
+
+            @Override
+            public void onFailure(Call<ArtistAlbums> call1, Throwable throwable) {
+
+            }
+        });
     }
 
     @Nullable
@@ -103,73 +161,6 @@ public class ArtistDetailFragment extends Fragment implements FetchAccessToken.A
 
     public void setArtistId(String artistId) {
         this.artistId = artistId;
-    }
-
-    private void getArtistAlbums(String accessToken) {
-        Retrofit retrofit = new Retrofit.Builder()
-                .baseUrl("https://api.spotify.com/")
-                .addConverterFactory(GsonConverterFactory.create())
-                .build();
-        ArtistDetailFragment.SpotifyApiService_ArtistAlbums apiService = retrofit.create(ArtistDetailFragment.SpotifyApiService_ArtistAlbums.class);
-        String authorization = "Bearer " + accessToken;
-        Call<ArtistAlbums> call = apiService.getArtistAlbums(authorization, artistId);
-        call.enqueue(new Callback<ArtistAlbums>() {
-
-            @Override
-            public void onResponse(Call<ArtistAlbums> call, Response<ArtistAlbums> response) {
-                AlertDialog.Builder builder = new AlertDialog.Builder(requireContext());
-                if (response.isSuccessful()) {
-                    ArtistAlbums artistAlbums = response.body();
-                    List<AlbumSimplified> albumSimplifiedList = artistAlbums.getListAlbum();
-                    albumAdapter = new AlbumAdapter(getContext(), albumSimplifiedList);
-                    recyclerViewAlbums.setAdapter(albumAdapter);
-                    recyclerViewAlbums.setVisibility(View.VISIBLE);
-
-                } else {
-                    builder.setTitle("Cảnh báo");
-                    builder.setMessage(response.message());
-                    builder.setPositiveButton("OK", null);
-                    builder.show();
-                }
-            }
-
-            @Override
-            public void onFailure(Call<ArtistAlbums> call, Throwable throwable) {
-
-            }
-        });
-    }
-    private void getArtist(String accessToken) {
-        Retrofit retrofit = new Retrofit.Builder()
-                .baseUrl("https://api.spotify.com/")
-                .addConverterFactory(GsonConverterFactory.create())
-                .build();
-        ArtistDetailFragment.SpotifyApiService_Artist apiService = retrofit.create(ArtistDetailFragment.SpotifyApiService_Artist.class);
-        String authorization = "Bearer " + accessToken;
-        Call<Artist> call = apiService.getArtist(authorization, artistId);
-        call.enqueue(new Callback<Artist>() {
-
-            @Override
-            public void onResponse(Call<Artist> call, Response<Artist> response) {
-                AlertDialog.Builder builder = new AlertDialog.Builder(requireContext());
-                if (response.isSuccessful()) {
-                    Artist artist = response.body();
-                    artistName.setText(artist.getName());
-                    artistFollowers.setText(artist.getFollowers().getTotal() + "followers");
-                    Glide.with(requireContext()).load(artist.getImages().get(0).getUrl()).into(imageView);
-                } else {
-                    builder.setTitle("Cảnh báo");
-                    builder.setMessage(response.message());
-                    builder.setPositiveButton("OK", null);
-                    builder.show();
-                }
-            }
-
-            @Override
-            public void onFailure(Call<Artist> call, Throwable throwable) {
-
-            }
-        });
     }
 
     private void getArtistTopTrack(String accessToken) {
@@ -206,15 +197,13 @@ public class ArtistDetailFragment extends Fragment implements FetchAccessToken.A
 //        });
     }
 
-    public interface SpotifyApiService_Artist {
+    public interface SpotifyApiService {
         @GET("v1/artists/{artistId}")
         Call<Artist> getArtist(@Header("Authorization") String authorization, @Path("artistId") String artistId);
-    }
-    public interface SpotifyApiService_ArtistAlbums {
+
         @GET("v1/artists/{artistId}/albums")
         Call<ArtistAlbums> getArtistAlbums(@Header("Authorization") String authorization, @Path("artistId") String artistId);
-    }
-    public interface SpotifyApiService_ArtistTracks {
+
         @GET("v1/artists/{artistId}")
         Call<ArtistTopTrack> getArtistTopTrack(@Header("Authorization") String authorization, @Path("artistId") String artistId);
     }

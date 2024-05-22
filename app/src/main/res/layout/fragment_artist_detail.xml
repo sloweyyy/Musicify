@@ -93,7 +93,7 @@
             android:layout_marginBottom="10sp"/>
     </LinearLayout>
     <LinearLayout
-        android:layout_width="wrap_content"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="vertical"
         android:layout_marginLeft="29sp">
@@ -104,24 +104,13 @@
             android:textSize="16sp"
             android:textStyle="bold"
             android:textColor="@color/white"/>
-        <LinearLayout
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:orientation="horizontal">
 
-            <androidx.recyclerview.widget.RecyclerView
-                android:id="@+id/recyclerView_Albums"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginHorizontal="@dimen/_30sdp"
-                android:layout_weight="1" />
-        </LinearLayout>
-    </LinearLayout>
-    <LinearLayout
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:orientation="vertical"
-        android:layout_marginLeft="29sp">
+        <androidx.recyclerview.widget.RecyclerView
+            android:id="@+id/recyclerView_Albums"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_margin="@dimen/_10sdp"
+            android:orientation="horizontal"/>
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
@@ -129,14 +118,10 @@
             android:textSize="16sp"
             android:textStyle="bold"
             android:textColor="@color/white"/>
-        <LinearLayout
+        <androidx.recyclerview.widget.RecyclerView
+            android:id="@+id/recyclerView_Songs"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content">
-            <androidx.recyclerview.widget.RecyclerView
-                android:id="@+id/recyclerView_Songs"
-                android:layout_width="match_parent"
-                android:layout_height="0dp"
-                android:layout_marginHorizontal="@dimen/_30sdp"/>
-        </LinearLayout>
+            android:layout_height="wrap_content"
+            android:layout_margin="@dimen/_10sdp"/>
     </LinearLayout>
 </LinearLayout>
