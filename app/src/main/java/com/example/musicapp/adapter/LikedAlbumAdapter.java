@@ -37,14 +37,7 @@ import java.util.stream.Collectors;
 
 public class LikedAlbumAdapter extends RecyclerView.Adapter<LikedAlbumAdapter.ViewHolder>{
     private Context context;
-//    private List<AlbumSimplified> likedAlbumsList;
     private Map<AlbumSimplified, LocalDateTime> likedAlbums ;
-//
-//    public LikedAlbumAdapter(Context context, List<AlbumSimplified> likedAlbumsList) {
-//        this.context = context;
-//        this.likedAlbumsList = likedAlbumsList;
-//    }
-
 
     public LikedAlbumAdapter(Context context, Map<AlbumSimplified, LocalDateTime> likedAlbums ) {
         this.context = context;
@@ -83,7 +76,7 @@ public class LikedAlbumAdapter extends RecyclerView.Adapter<LikedAlbumAdapter.Vi
     private void checkIsLiked(String id, OnIsLikedCallback onIsLikedCallback) {
         String userId = FirebaseAuth.getInstance().getCurrentUser().getUid();
         FirebaseFirestore db = FirebaseFirestore.getInstance();
-
+//        FirebaseAuth mAuth = FirebaseAuth.getInstance();
         db.collection("users")
                 .whereEqualTo("id", userId)
                 .get()

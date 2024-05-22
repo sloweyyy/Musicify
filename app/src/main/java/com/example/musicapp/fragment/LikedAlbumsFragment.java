@@ -141,12 +141,6 @@ public class LikedAlbumsFragment extends Fragment implements FetchAccessToken.Ac
                     AlbumSimplified album = response.body();
                     likedAlbums.put(album, LocalDateTime.now());
                     adapter.notifyItemInserted(likedAlbums.size() - 1);
-                }else {
-                    AlertDialog.Builder builder = new AlertDialog.Builder(requireContext());
-                    builder.setTitle("Cảnh báo");
-                    builder.setMessage(response.message());
-                    builder.setPositiveButton("OK", null);
-                    builder.show();
                 }
             }
 

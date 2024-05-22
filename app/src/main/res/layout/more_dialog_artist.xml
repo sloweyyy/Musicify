@@ -28,13 +28,12 @@
             android:layout_marginVertical="@dimen/_7sdp"
             android:layout_marginLeft="@dimen/_10sdp"
             android:gravity="center_vertical">
-            <ImageView
+            <ImageButton
                 android:id="@+id/follow"
                 android:layout_width="25dp"
                 android:contentDescription="addToFollowedArtists"
                 android:layout_height="25dp"
-                android:src="@drawable/follow"
-                app:tint="@color/white"/>
+                android:background="@drawable/follow"/>
             <TextView
                 android:id="@+id/follow_or_not"
                 android:layout_width="wrap_content"
@@ -46,18 +45,18 @@
                 android:textColor="@color/white"/>
         </LinearLayout>
             <LinearLayout
-                android:id="@+id/report"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginVertical="@dimen/_7sdp"
                 android:layout_marginLeft="@dimen/_10sdp"
                 android:gravity="center_vertical">
-                <ImageView
+                <ImageButton
+                    android:id="@+id/report"
                     android:layout_width="25dp"
                     android:contentDescription="report Infor"
                     android:layout_height="25dp"
-                    android:src="@drawable/flag_24dp_fill0_wght400_grad0_opsz24"
-                    app:tint="@color/white"/>
+                    android:background="@drawable/flag_24dp_fill0_wght400_grad0_opsz24"
+                    android:backgroundTint="@color/white"/>
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
@@ -68,6 +67,7 @@
                     android:textColor="@color/white"/>
             </LinearLayout>
         <Button
+            android:id="@+id/cancel"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_gravity="end"

@@ -97,9 +97,9 @@ public class FollowedArtistAdapter extends RecyclerView.Adapter<FollowedArtistAd
             @Override
             public int compare(Artist artist1, Artist artist2) {
                 if (isAscending) {
-                    return artist1.getName().compareToIgnoreCase(artist2.getName());
-                } else {
                     return artist2.getName().compareToIgnoreCase(artist1.getName());
+                } else {
+                    return artist1.getName().compareToIgnoreCase(artist2.getName());
                 }
             }
         });
