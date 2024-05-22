@@ -92,18 +92,14 @@ public class SongHomeAdapter extends RecyclerView.Adapter<SongHomeAdapter.ViewHo
                         Song selected = songList.get(position);
                         PlaySongFragment fragment = new PlaySongFragment();
                         fragment.setSongId(selected.getId());
-                        String previousSongId = getPreviousSongId(position);
-                        String nextSongId = getNextSongId(position);
+                        fragment.setCurrentSongList(songList, selected.getId());
                         Bundle args = new Bundle();
                         args.putString("songId", selected.getId());
-                        args.putString("previousSongId", previousSongId);
-                        args.putString("nextSongId", nextSongId);
+                        args.putString("previousSongId", getPreviousSongId(position));
+                        args.putString("nextSongId", getNextSongId(position));
                         fragment.setArguments(args);
-                        ((AppCompatActivity) v.getContext()).getSupportFragmentManager()
-                                .beginTransaction()
-                                .replace(R.id.frame_layout, fragment)
-                                .addToBackStack(null)
-                                .commit();
+
+                        fragment.show(((AppCompatActivity) v.getContext()).getSupportFragmentManager(), "PlaySongFragment");
                     }
                 }
             });

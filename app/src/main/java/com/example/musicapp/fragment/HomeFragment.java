@@ -1,6 +1,7 @@
 package com.example.musicapp.fragment;
-
+ 
 import android.content.Context;
+import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -15,20 +16,18 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.fragment.app.Fragment;
-import androidx.recyclerview.widget.RecyclerView;
 import androidx.viewpager2.widget.ViewPager2;
 
 import com.bumptech.glide.Glide;
 import com.bumptech.glide.request.RequestOptions;
 import com.example.musicapp.R;
+import com.example.musicapp.activities.LoginActivity;
 import com.example.musicapp.adapter.HomeFragmentAdapter;
 import com.example.musicapp.adapter.PlaylistHomeAdapter;
 import com.example.musicapp.adapter.SongAdapter;
 import com.example.musicapp.adapter.SongHomeAdapter;
-import com.example.musicapp.model.PlaylistAPI;
 import com.example.musicapp.model.Song;
 import com.google.android.gms.tasks.OnCompleteListener;
-import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.Task;
 import com.google.android.material.tabs.TabLayout;
 import com.google.firebase.auth.FirebaseAuth;
@@ -42,11 +41,12 @@ import java.util.HashMap;
 import java.util.Map;
 
 public class HomeFragment extends Fragment  implements SongHomeAdapter.OnSongSelectedListener , SongAdapter.OnSongSelectedListener {
+
     private View view;
     private TabLayout tabLayout;
     private ViewPager2 viewPager2;
     ImageView artistImage;
-   String songId;
+    String songId;
     TextView recentSongArtist, recentSongName;
     String userId;
     FirebaseUser user;
@@ -67,8 +67,17 @@ public class HomeFragment extends Fragment  implements SongHomeAdapter.OnSongSel
         resumeBtn = view.findViewById(R.id.resumeBtn);
         homeFragmentAdapter = new HomeFragmentAdapter(getActivity());
         viewPager2.setAdapter(homeFragmentAdapter);
-         mAuth = FirebaseAuth.getInstance();
-         user = mAuth.getCurrentUser();
+        mAuth = FirebaseAuth.getInstance();
+        user = mAuth.getCurrentUser();
+
+        if (user == null) {
+            // User not logged in, navigate to login screen
+            Intent intent = new Intent(getActivity(), LoginActivity.class);
+            startActivity(intent);
+            getActivity().finish();
+            return null;  
+        }
+
         userId = user.getUid();
         artistImage = view.findViewById(R.id.artistImage);
         recentSongArtist = view.findViewById(R.id.recentSongArtist);
@@ -101,17 +110,13 @@ public class HomeFragment extends Fragment  implements SongHomeAdapter.OnSongSel
         resumeBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                if(songId != null) {
-                    PlaySongFragment fragment = new PlaySongFragment();
-                    fragment.setSongId(songId);
+                if (songId != null) {
+                    // playsongfragment is a bottom sheet
+                    PlaySongFragment playSongFragment = new PlaySongFragment();
                     Bundle args = new Bundle();
                     args.putString("songId", songId);
-                    fragment.setArguments(args);
-                    ((AppCompatActivity) v.getContext()).getSupportFragmentManager()
-                            .beginTransaction()
-                            .replace(R.id.frame_layout, fragment)
-                            .addToBackStack(null)
-                            .commit();
+                    playSongFragment.setArguments(args);
+                    playSongFragment.show(((AppCompatActivity) getContext()).getSupportFragmentManager(), "PlaySongFragment");
                 } else {
                     Toast.makeText(getContext(), "No recent song to resume", Toast.LENGTH_SHORT).show();
                 }
@@ -165,11 +170,11 @@ public class HomeFragment extends Fragment  implements SongHomeAdapter.OnSongSel
     private void updateRecentSong(Song song) {
         FirebaseAuth mAuth = FirebaseAuth.getInstance();
         FirebaseUser user = mAuth.getCurrentUser();
-        if(user!= null){
+        if (user != null) {
             userId = user.getUid();
         }
 
-        Log.d("title of song", "song title: "+song.getTitle());
+        Log.d("title of song", "song title: " + song.getTitle());
         if (recentSongName != null && recentSongArtist != null) {
             recentSongName.setText(song.getTitle());
             recentSongArtist.setText(song.getArtist());
