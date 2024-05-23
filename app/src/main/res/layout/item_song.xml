@@ -31,7 +31,7 @@
             <TextView
                 android:id="@+id/songTitle"
                 android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
+                android:layout_height="@dimen/_25sdp"
                 android:text="Song Title"
                 android:textSize="24sp"
                 android:textStyle="bold"

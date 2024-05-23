@@ -29,6 +29,7 @@ import com.example.musicapp.adapter.LikedAlbumAdapter;
 import com.example.musicapp.adapter.SongAdapter;
 import com.example.musicapp.model.AlbumSimplified;
 import com.example.musicapp.model.Artist;
+import com.example.musicapp.model.BottomAppBarListener;
 import com.example.musicapp.model.SimplifiedTrack;
 import com.example.musicapp.model.Song;
 import com.example.musicapp.model.Artist;
@@ -68,7 +69,6 @@ public class ArtistDetailFragment extends Fragment implements FetchAccessToken.A
     private String accessToken;
     private FetchAccessToken fetchAccessToken;
     private TextView artistName;
-    private TextView artistFollowers;
     private ImageView imageView;
 
     private boolean isFragmentAttached = false;
@@ -107,7 +107,6 @@ public class ArtistDetailFragment extends Fragment implements FetchAccessToken.A
                 if (response.isSuccessful()) {
                     Artist artist = response.body();
                     artistName.setText(artist.getName());
-                    artistFollowers.setText(artist.getFollowers().getTotal() + " followers");
                     Glide.with(requireContext()).load(artist.getImages().get(0).getUrl()).into(imageView);
                 }
             }
@@ -174,11 +173,11 @@ public class ArtistDetailFragment extends Fragment implements FetchAccessToken.A
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         view = inflater.inflate(R.layout.fragment_artist_detail, container, false);
+        ((BottomAppBarListener) requireActivity()).hideBottomAppBar();
         recyclerViewAlbums = view.findViewById(R.id.recyclerView_Albums);
         recyclerViewSongs = view.findViewById(R.id.recyclerView_Songs);
         artistName = view.findViewById(R.id.artistName);
         imageView = view.findViewById(R.id.imgArtist);
-        artistFollowers = view.findViewById(R.id.followers);
         backButton = view.findViewById(R.id.backBtn);
         moreButton = view.findViewById(R.id.moreBtn);
         LinearLayoutManager layoutManager = new LinearLayoutManager(getActivity());

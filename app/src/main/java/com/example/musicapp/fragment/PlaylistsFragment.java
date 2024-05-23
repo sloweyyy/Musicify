@@ -2,7 +2,6 @@ package com.example.musicapp.fragment;
 
 import static android.app.Activity.RESULT_OK;
 
-import android.annotation.SuppressLint;
 import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
@@ -14,7 +13,6 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
-import android.widget.Switch;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -98,11 +96,10 @@ public class PlaylistsFragment extends Fragment {
 
                 EditText textInputEditText = sheetView.findViewById(R.id.playListName);
                 Button createBtn = sheetView.findViewById(R.id.createPlaylist);
-                @SuppressLint("UseSwitchCompatOrMaterialCode") Switch privacySwitch = sheetView.findViewById(R.id.privacySwitch);
 
                 createBtn.setOnClickListener(v12 -> {
                     String playlistName = textInputEditText.getText().toString();
-                    String privacy = privacySwitch.isChecked() ? "Public" : "Private";
+
                     String userId = FirebaseAuth.getInstance().getCurrentUser().getUid();
 
 
@@ -111,7 +108,7 @@ public class PlaylistsFragment extends Fragment {
                         storageRef.putFile(selectedImageUri).addOnSuccessListener(taskSnapshot -> {
                             storageRef.getDownloadUrl().addOnSuccessListener(uri -> {
                                 String imageURL = uri.toString();
-                                Playlist newPlaylist = new Playlist(userId, playlistName, "Description", privacy, imageURL);
+                                Playlist newPlaylist = new Playlist(userId, playlistName, "Description", imageURL);
                                 savePlaylistToFirestore(newPlaylist, bottomSheetDialog);
                             });
                         }).addOnFailureListener(e -> {
@@ -119,7 +116,7 @@ public class PlaylistsFragment extends Fragment {
                             Log.e("PlaylistsFragment", "Error uploading image", e);
                         });
                     } else {
-                        Playlist newPlaylist = new Playlist(userId, playlistName, "Description", privacy, null);
+                        Playlist newPlaylist = new Playlist(userId, playlistName, "Description", null);
                         savePlaylistToFirestore(newPlaylist, bottomSheetDialog);
 
                     }
@@ -210,7 +207,7 @@ public class PlaylistsFragment extends Fragment {
                     String playlistId = documentReference.getId();
 
                     Playlist playlist = new Playlist(playlistId, newPlaylist.getUserId(), newPlaylist.getName(),
-                            newPlaylist.getDescription(), newPlaylist.getPrivacy(), newPlaylist.getImageURL());
+                            newPlaylist.getDescription(), newPlaylist.getImageURL());
 
                     documentReference.set(playlist)
                             .addOnSuccessListener(aVoid -> {

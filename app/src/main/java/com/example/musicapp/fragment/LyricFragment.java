@@ -4,6 +4,7 @@ import android.annotation.SuppressLint;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Looper;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -27,6 +28,10 @@ import com.example.musicapp.adapter.FetchAccessToken;
 import com.example.musicapp.manager.MediaPlayerManager;
 import com.example.musicapp.model.BottomAppBarListener;
 import com.example.musicapp.model.Song;
+import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.firestore.DocumentSnapshot;
+import com.google.firebase.firestore.FieldValue;
+import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.gson.annotations.SerializedName;
 
 import java.util.List;
@@ -193,6 +198,33 @@ public class LyricFragment extends Fragment implements FetchAccessToken.AccessTo
         backButtonLayout = view.findViewById(R.id.backButtonLayout);
         iconBack = view.findViewById(R.id.iconBack);
         heartBtn = view.findViewById(R.id.heartBtn);
+        checkIsLiked(songId,new OnIsLikedCallback() {
+            @Override
+            public void onResult(boolean isLiked) {
+                if (isLiked) {
+                    heartBtn.setImageResource(R.drawable.favourite_filled);
+                } else {
+                    heartBtn.setImageResource(R.drawable.favourite_outline);
+                }
+            }
+        });
+        heartBtn.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                checkIsLiked(songId, new OnIsLikedCallback() {
+                    @Override
+                    public void onResult(boolean isLiked) {
+                        if (isLiked) {
+                            removeSongFromLikedSongs(songId);
+                            heartBtn.setImageResource(R.drawable.favourite_outline);
+                        } else {
+                            addSongToLikedSongs(songId);
+                            heartBtn.setImageResource(R.drawable.favourite_filled);
+                        }
+                    }
+                });
+            }
+        });
         setupMediaPlayer();
         setupSeekBar();
         setupPauseButton();
@@ -438,6 +470,72 @@ public class LyricFragment extends Fragment implements FetchAccessToken.AccessTo
         } else {
             return songList.get(0).getId();
         }
+    }
+
+    private interface OnIsLikedCallback {
+        void onResult(boolean isLiked);
+    }
+
+    private void checkIsLiked(String id, OnIsLikedCallback callback) {
+        FirebaseAuth mAuth = FirebaseAuth.getInstance();
+        String userId = mAuth.getCurrentUser().getUid();
+        FirebaseFirestore db = FirebaseFirestore.getInstance();
+
+        db.collection("users").whereEqualTo("id", userId).get().addOnSuccessListener(queryDocumentSnapshots -> {
+            if (!queryDocumentSnapshots.isEmpty()) {
+                DocumentSnapshot userDoc = queryDocumentSnapshots.getDocuments().get(0);
+                List<String> likedSongs = (List<String>) userDoc.get("likedsong");
+                if (likedSongs != null && likedSongs.contains(id)) {
+                    callback.onResult(true);
+                } else {
+                    callback.onResult(false);
+                }
+            }
+        }).addOnFailureListener(e -> {
+            Log.e("SongAdapter", "Failed to retrieve user document: " + e.getMessage());
+            callback.onResult(false);
+        });
+    }
+    private void removeSongFromLikedSongs(String songId) {
+        FirebaseAuth mAuth = FirebaseAuth.getInstance();
+        String userId = mAuth.getCurrentUser().getUid();
+        FirebaseFirestore db = FirebaseFirestore.getInstance();
+
+        db.collection("users").whereEqualTo("id", userId).get().addOnSuccessListener(queryDocumentSnapshots -> {
+            if (!queryDocumentSnapshots.isEmpty()) {
+                DocumentSnapshot userDoc = queryDocumentSnapshots.getDocuments().get(0);
+                userDoc.getReference().update("likedsong", FieldValue.arrayRemove(songId)).addOnSuccessListener(aVoid -> {
+                    Toast.makeText(requireContext(), "Removed from liked songs successfully", Toast.LENGTH_SHORT).show();
+                }).addOnFailureListener(e -> {
+                    Log.e("SongAdapter", "Failed to remove song from liked songs: " + e.getMessage());
+                });
+            } else {
+                Log.e("SongAdapter", "No user document found with userId: " + userId);
+            }
+        }).addOnFailureListener(e -> {
+            Log.e("SongAdapter", "Failed to retrieve user document: " + e.getMessage());
+        });
+    }
+    public void addSongToLikedSongs(String songId) {
+        FirebaseAuth mAuth = FirebaseAuth.getInstance();
+        String userId = mAuth.getCurrentUser().getUid();
+        FirebaseFirestore db = FirebaseFirestore.getInstance();
+        db.collection("users").whereEqualTo("id", userId).get().addOnSuccessListener(queryDocumentSnapshots -> {
+            if (!queryDocumentSnapshots.isEmpty()) {
+                DocumentSnapshot userDoc = queryDocumentSnapshots.getDocuments().get(0);
+                userDoc.getReference().update("likedsong", FieldValue.arrayUnion(songId)).addOnSuccessListener(aVoid -> {
+
+                    Toast.makeText(requireContext(), "Add to liked songs successfully", Toast.LENGTH_SHORT).show();
+                }).addOnFailureListener(e -> {
+                    // Handle the error
+                    Log.e("SongAdapter", "Failed to add song to liked songs: " + e.getMessage());
+                });
+            } else {
+                Log.e("SongAdapter", "No user document found with userId: " + userId);
+            }
+        }).addOnFailureListener(e -> {
+            Log.e("SongAdapter", "Failed to retrieve user document: " + e.getMessage());
+        });
     }
 
     public interface MusixmatchApi {

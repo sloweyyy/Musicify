@@ -30,19 +30,19 @@
                 android:id="@+id/playButton"
                 android:layout_width="40dp"
                 android:layout_height="40dp"
-                android:background="@drawable/back_btn_custom"
-                android:src="@drawable/play_arrow_24dp_fill0_wght400_grad0_opsz24"
+                android:background="@drawable/fill_play"
+                android:src="@drawable/fill_play"
                 app:layout_constraintTop_toBottomOf="@+id/artistPic"
                 app:layout_constraintEnd_toEndOf="@+id/artistPic"
                 android:translationY="-20dp"
-                android:elevation="6dp" />
+                android:elevation="6dp"/>
         </androidx.constraintlayout.widget.ConstraintLayout>
         <TextView
             android:id="@+id/trackName"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:text="Bad Guy"
-            android:textSize="24dp"
+            android:textSize="@dimen/_15sdp"
             android:maxLines="1"
             android:ellipsize="end"
             android:scaleType="centerCrop"
@@ -57,7 +57,7 @@
             android:ellipsize="end"
             android:scaleType="centerCrop"
             android:text="Billie Eilish"
-            android:textSize="16dp"
+            android:textSize="@dimen/_12sdp"
             android:layout_marginStart="10dp" />
 
     </LinearLayout>

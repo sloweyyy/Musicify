@@ -52,7 +52,6 @@ public class PlaylistAdapterAPI extends RecyclerView.Adapter<PlaylistAdapterAPI.
         Glide.with(holder.itemView.getContext())
                 .load(playlist.images.get(0).getUrl())
                 .into(holder.imageView);
-        holder.anhOKhoa.setImageResource(R.drawable.three_dots);
     }
 
     @Override
@@ -79,7 +78,6 @@ public class PlaylistAdapterAPI extends RecyclerView.Adapter<PlaylistAdapterAPI.
             imageView = itemView.findViewById(R.id.playlistImage);
             textViewName = itemView.findViewById(R.id.playlistName);
             textViewTotal = itemView.findViewById(R.id.playlistCount);
-            anhOKhoa = itemView.findViewById(R.id.privacyIcon);
             this.listener = listener;
         }
 

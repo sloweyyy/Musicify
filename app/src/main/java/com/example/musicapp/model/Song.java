@@ -1,5 +1,7 @@
 package com.example.musicapp.model;
 
+import android.util.Log;
+
 public class Song {
     private String title;
 
@@ -65,6 +67,11 @@ public class Song {
         String artistName = "";
         String imageUrl = "";
         String id = "";
+
+        if (track == null) {
+            Log.e("Song", "SimplifiedTrack object is null!");
+            return new Song("Unknown Title", "Unknown Artist", "default_song_id");
+        }
 
         if (track.getArtists() != null && !track.getArtists().isEmpty()) {
             artistName = track.getArtists().get(0).getName();
