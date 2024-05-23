@@ -32,7 +32,9 @@
         android:layout_height="wrap_content"
         android:textSize="25dp"
         android:textAlignment="center"
-        android:text="Musicify"/>
+        android:fontFamily="@font/museo_moderno_regular"
+        android:text="Musicify"
+        android:textColor="@color/btnColor"/>
 
   <TextView
       android:id="@+id/typingt"
