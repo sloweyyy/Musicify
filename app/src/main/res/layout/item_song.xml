@@ -4,7 +4,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:layout_margin="8dp"
+    android:layout_marginVertical="8dp"
     app:cardCornerRadius="8dp"
     app:cardElevation="4dp">
 
@@ -32,6 +32,8 @@
                 android:id="@+id/songTitle"
                 android:layout_width="wrap_content"
                 android:layout_height="@dimen/_25sdp"
+                android:maxLines="1"
+                android:ellipsize="end"
                 android:text="Song Title"
                 android:textSize="24sp"
                 android:textStyle="bold"

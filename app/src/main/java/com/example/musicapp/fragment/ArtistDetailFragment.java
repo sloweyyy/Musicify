@@ -1,21 +1,24 @@
 package com.example.musicapp.fragment;
 
 import android.app.AlertDialog;
+
+import android.content.Context;
+import android.graphics.Color;
+import android.os.Bundle;
+
 import android.app.Dialog;
 import android.content.DialogInterface;
 import android.graphics.Color;
 import android.os.Handler;
 import android.os.Looper;
+
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
-
-import android.os.Bundle;
 import android.widget.ImageButton;
 import android.widget.ImageView;
-import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -29,14 +32,17 @@ import com.bumptech.glide.Glide;
 import com.example.musicapp.R;
 import com.example.musicapp.adapter.AlbumAdapter;
 import com.example.musicapp.adapter.FetchAccessToken;
-import com.example.musicapp.adapter.LikedAlbumAdapter;
 import com.example.musicapp.adapter.SongAdapter;
 import com.example.musicapp.model.AlbumSimplified;
 import com.example.musicapp.model.Artist;
 import com.example.musicapp.model.BottomAppBarListener;
 import com.example.musicapp.model.SimplifiedTrack;
 import com.example.musicapp.model.Song;
-import com.example.musicapp.model.Artist;
+import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.firestore.DocumentSnapshot;
+import com.google.firebase.firestore.FieldValue;
+import com.google.firebase.firestore.FirebaseFirestore;
+import com.google.gson.annotations.SerializedName;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -83,17 +89,22 @@ public class ArtistDetailFragment extends Fragment implements FetchAccessToken.A
     private Handler handler = new Handler(Looper.getMainLooper());
 
     private boolean isFragmentAttached = false;
+
     @Override
     public void onAttach(@NonNull Context context) {
         super.onAttach(context);
         isFragmentAttached = true;
     }
+
     @Override
     public void onDetach() {
         super.onDetach();
         isFragmentAttached = false;
     }
-    public ArtistDetailFragment() {}
+
+    public ArtistDetailFragment() {
+    }
+
     @Override
     public void onTokenReceived(String accessToken) {
         this.accessToken = accessToken;
@@ -169,6 +180,7 @@ public class ArtistDetailFragment extends Fragment implements FetchAccessToken.A
             }
         });
     }
+
     public interface SpotifyApiService {
         @GET("v1/artists/{artistId}")
         Call<Artist> getArtist(@Header("Authorization") String authorization, @Path("artistId") String artistId);
@@ -207,6 +219,12 @@ public class ArtistDetailFragment extends Fragment implements FetchAccessToken.A
         return view;
     }
 
+    @Override
+    public void onDestroyView() {
+        super.onDestroyView();
+        ((BottomAppBarListener) requireActivity()).showBottomAppBar();
+    }
+
     public void setArtistId(String artistId) {
         this.artistId = artistId;
     }
@@ -217,6 +235,7 @@ public class ArtistDetailFragment extends Fragment implements FetchAccessToken.A
         setupBackButton();
         setupMoreButton();
     }
+
     private void setupBackButton() {
         backButton.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -282,11 +301,13 @@ public class ArtistDetailFragment extends Fragment implements FetchAccessToken.A
                     addFollowedArtist(artistId, requireContext());
                     flBtn.setBackgroundResource(R.drawable.follow_fill);
 
-                    flText.setTextColor(Color.parseColor("#49A078"));
-                    flText.setText("Unfollow");
-                }
-            });
-        }});
+
+                        flText.setTextColor(Color.parseColor("#49A078"));
+                        flText.setText("Unfollow");
+                    }
+                });
+            }
+        });
         reportBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -376,6 +397,7 @@ public class ArtistDetailFragment extends Fragment implements FetchAccessToken.A
             }
         });
     }
+
     private void checkIsFollwed(String id, OnIsFollowedCallback onIsFollowedCallback) {
         String userId = FirebaseAuth.getInstance().getCurrentUser().getUid();
         FirebaseFirestore db = FirebaseFirestore.getInstance();
@@ -395,6 +417,7 @@ public class ArtistDetailFragment extends Fragment implements FetchAccessToken.A
                     onIsFollowedCallback.onResult(false);
                 });
     }
+
     private interface OnIsFollowedCallback {
         void onResult(boolean isFollowed);
     }
@@ -404,7 +427,7 @@ public class ArtistDetailFragment extends Fragment implements FetchAccessToken.A
 //        notifyDataSetChanged();
 //    }
 
-    public void unfollowArtist(String artistId,Context context) {
+    public void unfollowArtist(String artistId, Context context) {
         String userId = FirebaseAuth.getInstance().getCurrentUser().getUid();
         FirebaseFirestore db = FirebaseFirestore.getInstance();
 
@@ -451,13 +474,12 @@ public class ArtistDetailFragment extends Fragment implements FetchAccessToken.A
         @SerializedName("items")
         private List<AlbumSimplified> ListAlbum;
 
-        public List<AlbumSimplified> getListAlbum()
-        {
+        public List<AlbumSimplified> getListAlbum() {
             return ListAlbum;
         }
     }
 
-    public class ArtistTopTrack{
+    public class ArtistTopTrack {
         @SerializedName("tracks")
         private List<SimplifiedTrack> ListTrack;
 
