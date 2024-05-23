@@ -75,7 +75,7 @@ public class LyricFragment extends Fragment implements FetchAccessToken.AccessTo
     private MediaPlayerManager mediaPlayerManager;
     PlaySongFragment playSongFragment = new PlaySongFragment();
     private ImageView background, threeDots, artistAvata, heartBtn;
-    private String songNameValue, artistNameValue, avataValue, played_value, total_value, urlAudioValue, albumId;
+    private String songNameValue, artistNameValue, avataValue, played_value, total_value, urlAudioValue, albumId, artistId;
     private LinearLayout backButtonLayout;
     private Button iconBack;
     private TextView header, artistName, songName, playedDuration, totalDuration, lyric;
@@ -107,6 +107,7 @@ public class LyricFragment extends Fragment implements FetchAccessToken.AccessTo
             total_value = getArguments().getString("totalDuration");
             albumId = getArguments().getString("albumId");
             urlAudioValue = getArguments().getString("urlAudio");
+            artistId = getArguments().getString("artistId");
 
         }
         initializeViews();
@@ -372,6 +373,13 @@ public class LyricFragment extends Fragment implements FetchAccessToken.AccessTo
         iconBack = view.findViewById(R.id.iconBack);
         heartBtn = view.findViewById(R.id.heartBtn);
         threeDots = view.findViewById(R.id.threeDots);
+
+        threeDots.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                showMoreOptionsDialog(getContext());
+            }
+        });
         checkIsLiked(songId,new OnIsLikedCallback() {
             @Override
             public void onResult(boolean isLiked) {
@@ -397,6 +405,12 @@ public class LyricFragment extends Fragment implements FetchAccessToken.AccessTo
                         }
                     }
                 });
+            }
+        });
+        artistName.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                MoveToArtistDetail(artistId);
             }
         });
         setupMediaPlayer();
@@ -440,7 +454,15 @@ public class LyricFragment extends Fragment implements FetchAccessToken.AccessTo
                     int CurrentPosition = (mediaPlayerManager.getMediaPlayer().getCurrentPosition() / 1000);
                     seekBar.setProgress(CurrentPosition);
                     playedDuration.setText(formattedTime(CurrentPosition));
-                    handler.postDelayed(this, 500); // Update every 500 milliseconds
+                    handler.postDelayed(this, 500);
+                    if (CurrentPosition == mediaPlayerManager.getMediaPlayer().getDuration()/1000){
+                        mediaPlayerManager.getMediaPlayer().pause();
+                        mediaPlayerManager.setCurrentPosition(0);
+                        mediaPlayerManager.getMediaPlayer().seekTo(0);
+                        FragmentManager fragmentManager = getParentFragmentManager();
+                        fragmentManager.popBackStack();
+                        PlayNextSong();// Update every 500 milliseconds
+                    }
                 }
             }
         };

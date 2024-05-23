@@ -74,7 +74,7 @@ public class PlaySongFragment extends BottomSheetDialogFragment implements Fetch
 
     private String albumId;
     private MediaPlayerManager mediaPlayerManager;
-    private String songnameValue, artistnameValue, avataValue, played_value, total_value, urlAudioValue;
+    private String songnameValue, artistnameValue, avataValue, played_value, total_value, urlAudioValue, artistId;
     private TextView songname, artistname, duration_played, duration_total, lyric;
     private ImageView cover_art, threeDots;
     private ImageButton repeateBtn, previousBtn, pauseBtn, nextBtn, shuffleBtn, show_lyricBtn;
@@ -411,6 +411,7 @@ public class PlaySongFragment extends BottomSheetDialogFragment implements Fetch
         args.putString("urlAudio", urlAudioValue);
         args.putString("playedDuration", played_value);
         args.putString("totalDuration", total_value);
+        args.putString("artistId", artistId);
 
         lyricFragment.setArguments(args);
         ((AppCompatActivity) requireContext())
@@ -593,7 +594,7 @@ public class PlaySongFragment extends BottomSheetDialogFragment implements Fetch
         artistnameValue = artistName;
         avataValue = imageUrl;
         urlAudioValue = playUrl;
-
+        artistId = track.artists.get(0).getId();
         setupMediaPlayer(playUrl);
         setupSeekBar();
         setupPauseButton();
