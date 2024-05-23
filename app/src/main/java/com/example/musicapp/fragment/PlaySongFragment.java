@@ -483,7 +483,7 @@ public class PlaySongFragment extends BottomSheetDialogFragment implements Fetch
                 if (mediaPlayerManager.getMediaPlayer() != null) { // Check if mediaPlayer is initialized
                     mediaPlayerManager.getMediaPlayer().pause();
                 }
-                mediaPlayerManager.setIsPlaying(true);
+                mediaPlayerManager.setIsPlaying(false);
                 pauseBtn.setBackgroundResource(R.drawable.play);
             } else {
                 if (mediaPlayerManager.getMediaPlayer() != null) { // Check if mediaPlayer is initialized
@@ -491,6 +491,7 @@ public class PlaySongFragment extends BottomSheetDialogFragment implements Fetch
                 }
                 pauseBtn.setBackgroundResource(R.drawable.pause);
                 mediaPlayerManager.setIsPlaying(true);
+                handler.postDelayed(updateSeekBarRunnable, 0);
             }
         });
     }

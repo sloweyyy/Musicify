@@ -35,32 +35,31 @@ import java.util.Map;
 import java.util.stream.Collectors;
 
 
-public class LikedAlbumAdapter extends RecyclerView.Adapter<LikedAlbumAdapter.ViewHolder>{
+public class AlbumAdapter extends RecyclerView.Adapter<AlbumAdapter.ViewHolder>{
     private Context context;
-    private Map<AlbumSimplified, LocalDateTime> likedAlbums ;
+    private List<AlbumSimplified> likedAlbumsList;
 
-    public LikedAlbumAdapter(Context context, Map<AlbumSimplified, LocalDateTime> likedAlbums ) {
+    public AlbumAdapter(Context context, List<AlbumSimplified> likedAlbumsList) {
         this.context = context;
-        this.likedAlbums  = likedAlbums ;
+        this.likedAlbumsList = likedAlbumsList;
     }
+
 
     @NonNull
     @Override
     public ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
-        View view = LayoutInflater.from(context).inflate(R.layout.item_album, parent, false);
+        View view = LayoutInflater.from(context).inflate(R.layout.artist_item_album, parent, false);
         return new ViewHolder(view);
     }
 
     @Override
     public void onBindViewHolder(@NonNull ViewHolder holder, int position) {
-        AlbumSimplified album = (AlbumSimplified) likedAlbums.keySet().toArray()[position];
-        String songName = album.getName();
-        String artistName = album.getArtists().get(0).getName();
+        AlbumSimplified album = likedAlbumsList.get(position);
+        String albumname = album.getName();
         String imageUrl = album.getImages().get(0).getUrl();
-        holder.albumName.setText(songName);
-        holder.albumArtist.setText(artistName);
-//        Glide.with(context).load(imageUrl).into(holder.albumImage);
-        Glide.with(holder.itemView.getContext()).load(imageUrl).into(holder.albumImage);
+        holder.albumName.setText(albumname);
+        Glide.with(context).load(imageUrl).into(holder.albumImage);
+
         checkIsLiked(album.getId(), new OnIsLikedCallback() {
             @Override
             public void onResult(boolean isLiked) {
@@ -76,7 +75,7 @@ public class LikedAlbumAdapter extends RecyclerView.Adapter<LikedAlbumAdapter.Vi
     private void checkIsLiked(String id, OnIsLikedCallback onIsLikedCallback) {
         String userId = FirebaseAuth.getInstance().getCurrentUser().getUid();
         FirebaseFirestore db = FirebaseFirestore.getInstance();
-//        FirebaseAuth mAuth = FirebaseAuth.getInstance();
+
         db.collection("users")
                 .whereEqualTo("id", userId)
                 .get()
@@ -88,7 +87,7 @@ public class LikedAlbumAdapter extends RecyclerView.Adapter<LikedAlbumAdapter.Vi
                     }
                 })
                 .addOnFailureListener(e -> {
-                    Log.e("LikedAlbumAdapter", "Failed to retrieve user document: " + e.getMessage());
+                    Log.e("AlbumAdapter", "Failed to retrieve user document: " + e.getMessage());
                     onIsLikedCallback.onResult(false);
                 });
     }
@@ -103,23 +102,20 @@ public class LikedAlbumAdapter extends RecyclerView.Adapter<LikedAlbumAdapter.Vi
 
     @Override
     public int getItemCount() {
-        return likedAlbums .size();
+        return likedAlbumsList.size();
     }
 
     public class ViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener{
         private ImageView albumImage;
         private TextView albumName;
-        private TextView albumArtist;
-
         private ImageView heartBtn;
-        private LikedAlbumAdapter.OnItemClickListener listener;
+        private AlbumAdapter.OnItemClickListener listener;
 
         public ViewHolder(@NonNull View itemView) {
             super(itemView);
             itemView.setOnClickListener(this);
-            albumImage = itemView.findViewById(R.id.albumThumbnail);
-            albumName = itemView.findViewById(R.id.albumTitle);
-            albumArtist = itemView.findViewById(R.id.artistName);
+            albumImage = itemView.findViewById(R.id.imgAlbum);
+            albumName = itemView.findViewById(R.id.albumName);
             heartBtn = itemView.findViewById(R.id.heartBtn);
             this.listener = listener;
 
@@ -128,7 +124,7 @@ public class LikedAlbumAdapter extends RecyclerView.Adapter<LikedAlbumAdapter.Vi
                 public void onClick(View v) {
                     int position = getAbsoluteAdapterPosition();
                     if (position != RecyclerView.NO_POSITION) {
-                        AlbumSimplified albumSimplified = (AlbumSimplified) likedAlbums.keySet().toArray()[position];
+                        AlbumSimplified albumSimplified = likedAlbumsList.get(position);
                         checkIsLiked(albumSimplified.getId(), new OnIsLikedCallback() {
                             @Override
                             public void onResult(boolean isLiked) {
@@ -146,23 +142,21 @@ public class LikedAlbumAdapter extends RecyclerView.Adapter<LikedAlbumAdapter.Vi
             });
         }
 
-//        public void bind(AlbumSimplified album) {
-//            String songName = album.getName();
-//            String artistName = album.getArtists().get(0).getName();
-//            String imageUrl = album.getImages().get(0).getUrl();
-//
-//            albumName.setText(songName);
-//            albumArtist.setText(artistName);
-//            Glide.with(context).load(imageUrl).into(albumImage);
-//        }
+        public void bind(AlbumSimplified album) {
+            String albumname = album.getName();
+            String imageUrl = album.getImages().get(0).getUrl();
+
+            albumName.setText(albumname);
+            Glide.with(context).load(imageUrl).into(albumImage);
+        }
 
         @Override
         public void onClick(View v) {
             Log.e("Clicked On item", "hehe");
             int position = getAbsoluteAdapterPosition();
             if (position != RecyclerView.NO_POSITION) {
-//                AlbumSimplified selected = likedAlbums.get(position);
-                AlbumSimplified selected = (AlbumSimplified) likedAlbums.keySet().toArray()[position];
+                AlbumSimplified selected = likedAlbumsList.get(position);
+                AlbumSimplified albumSimplified = likedAlbumsList.get(position);
                 AlbumDetailFragment likedAlbumDetailFragment= new AlbumDetailFragment();
                 likedAlbumDetailFragment.setAlbumId(selected.getId());
                 Bundle args = new Bundle();
@@ -176,62 +170,19 @@ public class LikedAlbumAdapter extends RecyclerView.Adapter<LikedAlbumAdapter.Vi
                         .commit();
             }
         }
-        public void setOnItemClickListener(LikedAlbumAdapter.OnItemClickListener listenerInput) {
+        public void setOnItemClickListener(AlbumAdapter.OnItemClickListener listenerInput) {
             listener = listenerInput;
         }
     }
 
     // Method to update the likedAlbum list
-    public void updateLikedAlbumList(Map<AlbumSimplified, LocalDateTime> albums) {
-        likedAlbums.clear();
-        likedAlbums.putAll(albums);
+    public void updateLikedAlbumList(List<AlbumSimplified> albums) {
+        likedAlbumsList.clear();
+        likedAlbumsList.addAll(albums);
         notifyDataSetChanged();
     }
 
     // Method to sort the album list by name
-    public void sortAlbumByName() {
-        List<Map.Entry<AlbumSimplified, LocalDateTime>> entryList = new ArrayList<>(likedAlbums.entrySet());
-
-        entryList.sort((entry1, entry2) -> {
-            String name1 = entry1.getKey().getName();
-            String name2 = entry2.getKey().getName();
-
-            // Check for null before comparing
-            if (name1 == null && name2 == null) {
-                return 0; // Both are null, no difference
-            } else if (name1 == null) {
-                return -1; // album1 is null, sort it before album2
-            } else if (name2 == null) {
-                return 1; // album2 is null, sort it before album1
-            } else {
-                // Both are not null, sort normally
-                return name1.compareTo(name2);
-            }
-        });
-        likedAlbums.clear();
-        for (Map.Entry<AlbumSimplified, LocalDateTime> entry : entryList) {
-            likedAlbums.put(entry.getKey(), entry.getValue());
-        }
-
-        notifyDataSetChanged();
-    }
-
-    public void sortAlbumByRecentlyAdded() {
-        List<Map.Entry<AlbumSimplified, LocalDateTime>> sortedEntries = new ArrayList<>(likedAlbums.entrySet());
-        Collections.sort(sortedEntries, new Comparator<Map.Entry<AlbumSimplified, LocalDateTime>>() {
-            @Override
-            public int compare(Map.Entry<AlbumSimplified, LocalDateTime> entry1, Map.Entry<AlbumSimplified, LocalDateTime> entry2) {
-                return entry2.getValue().compareTo(entry1.getValue());
-            }
-        });
-
-        likedAlbums.clear();
-        for (Map.Entry<AlbumSimplified, LocalDateTime> entry : sortedEntries) {
-            likedAlbums.put(entry.getKey(), entry.getValue());
-        }
-
-        notifyDataSetChanged();
-    }
 
 
     // Method to delete a liked album from Firestore
@@ -251,14 +202,14 @@ public class LikedAlbumAdapter extends RecyclerView.Adapter<LikedAlbumAdapter.Vi
 
                                 })
                                 .addOnFailureListener(e -> {
-                                    Log.e("LikedAlbumAdapter", "Failed to remove album from liked albums: " + e.getMessage());
+                                    Log.e("AlbumAdapter", "Failed to remove album from liked albums: " + e.getMessage());
                                 });
                     } else {
-                        Log.e("LikedAlbumAdapter", "No user document found with userId: " + userId);
+                        Log.e("AlbumAdapter", "No user document found with userId: " + userId);
                     }
                 })
                 .addOnFailureListener(e -> {
-                    Log.e("LikedAlbumAdapter", "Failed to retrieve user document: " + e.getMessage());
+                    Log.e("AlbumAdapter", "Failed to retrieve user document: " + e.getMessage());
                 });
     }
     public void addAlbumToLikedAlbums(String albumId) {
@@ -277,14 +228,14 @@ public class LikedAlbumAdapter extends RecyclerView.Adapter<LikedAlbumAdapter.Vi
                                 })
                                 .addOnFailureListener(e -> {
                                     // Handle the error
-                                    Log.e("LikedAlbumAdapter", "Failed to add album to liked albums: " + e.getMessage());
+                                    Log.e("AlbumAdapter", "Failed to add album to liked albums: " + e.getMessage());
                                 });
                     } else {
-                        Log.e("LikedAlbumAdapter", "No user document found with userId: " + userId);
+                        Log.e("AlbumAdapter", "No user document found with userId: " + userId);
                     }
                 })
                 .addOnFailureListener(e -> {
-                    Log.e("LikedAlbumAdapter", "Failed to retrieve user document: " + e.getMessage());
+                    Log.e("AlbumAdapter", "Failed to retrieve user document: " + e.getMessage());
                 });
     }
 }

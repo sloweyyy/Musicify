@@ -108,7 +108,7 @@ public class LikedAlbumsFragment extends Fragment implements FetchAccessToken.Ac
     @Override
     public void onTokenReceived(String accessToken) {
         this.accessToken = accessToken;
-        String userId = "KRmDxRGH0sez8q3XRknqmmZq97S2";
+        String userId = FirebaseAuth.getInstance().getCurrentUser().getUid();
         FirebaseFirestore db = FirebaseFirestore.getInstance();
         db.collection("users").whereEqualTo("id", userId).get().addOnSuccessListener(queryDocumentSnapshots ->
         {
@@ -141,12 +141,6 @@ public class LikedAlbumsFragment extends Fragment implements FetchAccessToken.Ac
                     AlbumSimplified album = response.body();
                     likedAlbums.put(album, LocalDateTime.now());
                     adapter.notifyItemInserted(likedAlbums.size() - 1);
-                }else {
-                    AlertDialog.Builder builder = new AlertDialog.Builder(requireContext());
-                    builder.setTitle("Cảnh báo");
-                    builder.setMessage(response.message());
-                    builder.setPositiveButton("OK", null);
-                    builder.show();
                 }
             }
 
