@@ -45,6 +45,7 @@ public class PlaylistDetailAPI extends Fragment implements FetchAccessToken.Acce
     private ImageView imageView;
 
     private SongAdapter songAdapter;
+    HomeFragment homeFragment;
 
 
     @Override
@@ -65,6 +66,7 @@ public class PlaylistDetailAPI extends Fragment implements FetchAccessToken.Acce
         if (getArguments() != null) {
             playlistId = getArguments().getString("playlistId");
         }
+        homeFragment = new HomeFragment();
         fetchAccessToken = new FetchAccessToken();
         fetchAccessToken.getTokenFromSpotify(this);
         return view;
@@ -94,9 +96,13 @@ public class PlaylistDetailAPI extends Fragment implements FetchAccessToken.Acce
                     List<Song> songs = new ArrayList<>();
                     for (ItemModel item : playlist.tracksContainer.tracks) {
                         SimplifiedTrack track = item.track;
-                        songs.add(Song.fromSimplifiedTrack(track));
+                        if (track != null) {
+                            songs.add(Song.fromSimplifiedTrack(track));
+                        } else {
+
+                        }
                     }
-                    songAdapter = new SongAdapter(getContext(), songs);
+                    songAdapter = new SongAdapter(getContext(), songs, homeFragment);
                     recyclerView.setAdapter(songAdapter);
                     recyclerView.setVisibility(View.VISIBLE);
 

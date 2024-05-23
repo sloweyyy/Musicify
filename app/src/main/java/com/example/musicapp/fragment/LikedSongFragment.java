@@ -87,6 +87,7 @@ public class LikedSongFragment extends Fragment implements FetchAccessToken.Acce
     private FirebaseStorage storage;
     private static final int PICK_IMAGE_REQUEST = 1;
     private Uri selectedImageUri;
+    HomeFragment homeFragment;
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
@@ -103,9 +104,10 @@ public class LikedSongFragment extends Fragment implements FetchAccessToken.Acce
         search = view.findViewById(R.id.searchSong);
         songCount = view.findViewById(R.id.songCount);
         storage = FirebaseStorage.getInstance();
+        homeFragment = new HomeFragment();
         fetchAccessToken = new FetchAccessToken();
         fetchAccessToken.getTokenFromSpotify(this);
-        songAdapter = new SongAdapter(requireContext(), new ArrayList<>());
+        songAdapter = new SongAdapter(requireContext(), new ArrayList<>(),homeFragment);
         recyclerView.setAdapter(songAdapter);
         pauseContainer = view.findViewById(R.id.pauseContainer);
         pauseBtn = view.findViewById(R.id.pauseBtn);
@@ -191,7 +193,7 @@ public class LikedSongFragment extends Fragment implements FetchAccessToken.Acce
                     Log.e("FilteredSong: " + "", filteredSongs.toString());
                 }
             }
-            songAdapter = new SongAdapter(getContext(), filteredSongs);
+            songAdapter = new SongAdapter(getContext(), filteredSongs,homeFragment);
             songAdapter.notifyDataSetChanged();
             recyclerViewSearch.setAdapter(songAdapter);
         }

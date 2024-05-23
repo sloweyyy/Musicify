@@ -29,7 +29,7 @@ public class ForgetPasswordActivity extends AppCompatActivity {
     Button btnResetPassword;
     EditText inputResetEmail;
     FirebaseAuth mAuth;
-    ImageView iconBack;
+    Button iconBack;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -44,6 +44,7 @@ public class ForgetPasswordActivity extends AppCompatActivity {
         btnResetPassword = findViewById(R.id.btnResetPassword);
         inputResetEmail = findViewById(R.id.inputResetEmail);
         mAuth= FirebaseAuth.getInstance();
+        iconBack = findViewById(R.id.iconBack);
 
         iconBack.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -67,6 +68,7 @@ public class ForgetPasswordActivity extends AppCompatActivity {
                     @Override
                     public void onSuccess(Void unused) {
                         Toast.makeText(ForgetPasswordActivity.this, "Reset Password link has been sent to your registered Email", Toast.LENGTH_SHORT). show();
+                        // write code to save password changed to firebase store
                         Intent intent = new Intent(ForgetPasswordActivity.this, LoginActivity.class);
                         startActivity (intent);
                         finish();
@@ -77,14 +79,6 @@ public class ForgetPasswordActivity extends AppCompatActivity {
                             public void onFailure(@NonNull Exception e) {
                                 Log.d("TAG", "Error sending password reset email");
                                 Toast.makeText(ForgetPasswordActivity.this, "Error sending password reset email", Toast.LENGTH_SHORT). show();
-                            }
-                        }).addOnCompleteListener(new OnCompleteListener<Void>() {
-                            @Override
-                            public void onComplete(@NonNull Task<Void> task) {
-                                Toast.makeText(ForgetPasswordActivity.this, "Reset Password link has been sent to your registered Email", Toast.LENGTH_SHORT). show();
-                                Intent intent = new Intent(ForgetPasswordActivity.this, LoginActivity.class);
-                                startActivity (intent);
-                                finish();
                             }
                         });
             }

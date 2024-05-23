@@ -56,6 +56,9 @@ public class MainActivity extends AppCompatActivity implements BottomAppBarListe
             }
             return true;
         });
+        if (getIntent().getBooleanExtra("showProfileFragment", false)) {
+            replaceFragment(new ProfileFragment());
+        }
     }
 
     private void replaceFragment(Fragment fragment) {

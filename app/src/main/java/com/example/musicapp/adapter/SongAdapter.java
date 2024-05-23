@@ -30,8 +30,19 @@ public class SongAdapter extends RecyclerView.Adapter<SongAdapter.ViewHolder> {
 
     private Context context;
     private List<Song> songList;
+    public interface OnSongSelectedListener {
+        void onSongSelected(Song song);
+    }
 
-    public SongAdapter(Context context, List<Song> songList) {
+    private  OnSongSelectedListener listener;
+
+
+    public SongAdapter(Context context, List<Song> songList ,  OnSongSelectedListener listener) {
+        this.context = context;
+        this.songList = songList;
+        this.listener = listener;
+    }
+    public SongAdapter(Context context, List<Song> songList ) {
         this.context = context;
         this.songList = songList;
     }
@@ -189,6 +200,9 @@ public class SongAdapter extends RecyclerView.Adapter<SongAdapter.ViewHolder> {
                 fragment.setArguments(args);
 
                 fragment.show(((AppCompatActivity) v.getContext()).getSupportFragmentManager(), "PlaySongFragment");
+                // recent listening song
+                listener.onSongSelected(songList.get(position));
+
             }
         }
     }
