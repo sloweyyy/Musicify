@@ -51,7 +51,6 @@ public class LoginActivity extends AppCompatActivity {
     Button btnSignIn, iconBack;
     TextView btnRegisterNow;
     EditText editEmail, editPassword;
-    ImageView btnGoogle;
     TextView msgError;
     TextView textForgetPassword;
     SharedPreferences sharedPreferences;
@@ -85,43 +84,7 @@ public class LoginActivity extends AppCompatActivity {
         textForgetPassword = findViewById(R.id.forgetPassword);
         msgError = findViewById(R.id.msgError);
         iconBack = findViewById(R.id.iconBack);
-        btnGoogle = findViewById(R.id.btnGoogle);
         oneTapClient = Identity.getSignInClient(this);
-
-        btnGoogle.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                BeginSignInRequest signInRequest = BeginSignInRequest.builder()
-                        .setGoogleIdTokenRequestOptions(
-                                BeginSignInRequest.GoogleIdTokenRequestOptions.builder()
-                                        .setSupported(true)
-                                        .setServerClientId(getString(R.string.default_web_client_id))
-                                        .setFilterByAuthorizedAccounts(false)
-                                        .build()
-                        )
-                        .setAutoSelectEnabled(false)
-                        .build();
-                oneTapClient.beginSignIn(signInRequest)
-                        .addOnSuccessListener(new OnSuccessListener<BeginSignInResult>() {
-                            @Override
-                            public void onSuccess(BeginSignInResult result) {
-                                try {
-                                    startIntentSenderForResult(
-                                            result.getPendingIntent().getIntentSender(),
-                                            REQ_ONE_TAP, null, 0, 0, 0, null);
-                                } catch (IntentSender.SendIntentException e) {
-                                    Log.e(TAG, "Couldn't start One Tap UI: " + e.getLocalizedMessage());
-                                }
-                            }
-                        })
-                        .addOnFailureListener(new OnFailureListener() {
-                            @Override
-                            public void onFailure(@NonNull Exception e) {
-                                Log.e(TAG, "Couldn't start One Tap UI: " + e.getLocalizedMessage());
-                            }
-                        });
-            }
-        });
 
         iconBack.setOnClickListener(new View.OnClickListener() {
             @Override

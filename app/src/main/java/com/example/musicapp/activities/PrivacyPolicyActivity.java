@@ -59,7 +59,7 @@ public class PrivacyPolicyActivity extends AppCompatActivity {
                     Animation fadeIn = AnimationUtils.loadAnimation(getApplicationContext(), R.anim.fade_in);
                     tvPolicyContent.startAnimation(fadeIn);
                     tvPolicyContent.setVisibility(View.VISIBLE);
-                    imageButtonToggle.setImageResource(R.drawable.expand_circle_right_24dp_fill0_wght400_grad0_opsz24); // Assuming this is your 'expand' icon
+                    imageButtonToggle.setImageResource(R.drawable.expand_circle_down_24dp_fill0_wght400_grad0_opsz24);
                 } else {
                     Animation fadeOut = AnimationUtils.loadAnimation(getApplicationContext(), R.anim.fade_out);
                     fadeOut.setAnimationListener(new Animation.AnimationListener() {
@@ -77,7 +77,7 @@ public class PrivacyPolicyActivity extends AppCompatActivity {
                         }
                     });
                     tvPolicyContent.startAnimation(fadeOut);
-                    imageButtonToggle.setImageResource(R.drawable.expand_circle_down_24dp_fill0_wght400_grad0_opsz24);
+                    imageButtonToggle.setImageResource(R.drawable.expand_circle_right_24dp_fill0_wght400_grad0_opsz24);
             }
                 }
         });

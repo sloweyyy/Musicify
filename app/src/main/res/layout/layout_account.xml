@@ -62,9 +62,7 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:gravity="center"
-        android:orientation="horizontal"
-        tools:layout_editor_absoluteX="16dp"
-        tools:layout_editor_absoluteY="16dp">
+        android:orientation="horizontal">
 
         <ImageButton
             android:id="@+id/iconBack"
@@ -73,95 +71,13 @@
             android:layout_marginStart="10dp"
             android:layout_marginTop="10dp"
             android:background="?android:selectableItemBackgroundBorderless"
-            android:contentDescription="back_to_home"
             android:src="@drawable/arrow_back"
-            android:visibility="invisible"
+            android:visibility="visible"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent"
             app:tint="@color/white" />
 
-        <ImageButton
-            android:id="@+id/notificationIcon"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="10dp"
-            android:layout_marginRight="10dp"
-            android:background="?android:selectableItemBackgroundBorderless"
-            android:contentDescription="notify"
-            android:src="@drawable/notifications_24dp_fill0_wght400_grad0_opsz24"
-            android:tint="@color/white"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintTop_toTopOf="parent" />
 
-        <androidx.cardview.widget.CardView
-            android:id="@+id/notificationCounters"
-            android:layout_width="15dp"
-            android:layout_height="15dp"
-            android:translationX="-4dp"
-            android:translationY="5dp"
-            app:cardBackgroundColor="@color/yellow"
-            app:cardCornerRadius="50dp"
-            app:layout_constraintBottom_toTopOf="@+id/notificationIcon"
-            app:layout_constraintEnd_toEndOf="@+id/notificationIcon"
-            app:layout_constraintStart_toEndOf="@+id/notificationIcon"
-            app:layout_constraintTop_toTopOf="@+id/notificationIcon">
-
-            <TextView
-                android:id="@+id/counters"
-                android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                android:gravity="center"
-                android:text="0"
-                android:textAlignment="center"
-                android:textColor="@color/btnColor"
-                android:textSize="9dp"
-                android:textStyle="bold"
-                app:layout_constraintBottom_toBottomOf="parent"
-                app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toTopOf="parent" />
-        </androidx.cardview.widget.CardView>
-
-        <ScrollView
-            android:id="@+id/notificationPopup"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginLeft="100dp"
-            android:layout_marginRight="15dp"
-            android:background="@drawable/popup_background"
-            android:visibility="gone"
-            app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@id/notificationIcon"
-            app:layout_constraintWidth_percent="0.5">
-
-            <com.google.android.material.card.MaterialCardView
-                android:id="@+id/cardNotification"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:padding="10dp"
-                app:cardCornerRadius="45dp">
-
-                <LinearLayout
-                    android:id="@+id/linearLayout"
-                    android:layout_width="match_parent"
-                    android:layout_height="100dp"
-                    android:gravity="center"
-                    android:orientation="vertical">
-
-                    <TextView
-                        android:id="@+id/notificationText"
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:layout_marginLeft="10dp"
-                        android:drawableLeft="@drawable/notifications_24dp_fill0_wght400_grad0_opsz24"
-                        android:drawablePadding="10dp"
-                        android:text="hehehhehe" />
-                </LinearLayout>
-            </com.google.android.material.card.MaterialCardView>
-
-        </ScrollView>
     </androidx.constraintlayout.widget.ConstraintLayout>
 
     <ScrollView
@@ -203,16 +119,6 @@
                     android:text="Password settings"
                     android:textColor="@color/textColor" />
 
-                <TextView
-                    android:id="@+id/notification"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:layout_marginLeft="20dp"
-                    android:layout_marginTop="5dp"
-                    android:drawableLeft="@drawable/notifications_24dp_fill0_wght400_grad0_opsz24"
-                    android:drawablePadding="10dp"
-                    android:text="Show notifications"
-                    android:textColor="@color/textColor" />
 
             </LinearLayout>
 

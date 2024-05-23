@@ -75,6 +75,13 @@ public class PlaySongFragment extends BottomSheetDialogFragment implements Fetch
     private String songId, previousSongId, nextSongId;
 
     private SongAdapter songAdapter; // Add SongAdapter here
+    public interface OnPlayingStateChangeListener {
+        void onPlayingStateChanged(boolean isPlaying);
+    }
+    public void setPlayingStateChangedListener(OnPlayingStateChangeListener listener) {
+        this.playingStateChangeListener = listener;
+    }
+    private OnPlayingStateChangeListener playingStateChangeListener;
 
     @Override
     public void onTokenReceived(String accessToken) {
@@ -96,6 +103,9 @@ public class PlaySongFragment extends BottomSheetDialogFragment implements Fetch
             songId = getArguments().getString("songId");
             previousSongId = getArguments().getString("previousSongId");
             nextSongId = getArguments().getString("nextSongId");
+        }
+        if (getActivity() instanceof OnPlayingStateChangeListener) {
+            playingStateChangeListener = (OnPlayingStateChangeListener) getActivity();
         }
         backButtonLayout.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -483,14 +493,22 @@ public class PlaySongFragment extends BottomSheetDialogFragment implements Fetch
                 if (mediaPlayerManager.getMediaPlayer() != null) { // Check if mediaPlayer is initialized
                     mediaPlayerManager.getMediaPlayer().pause();
                 }
-                mediaPlayerManager.setIsPlaying(true);
+                mediaPlayerManager.setIsPlaying(false);
+                if (playingStateChangeListener != null) {
+                    playingStateChangeListener.onPlayingStateChanged(isPlaying);
+                }
                 pauseBtn.setBackgroundResource(R.drawable.play);
             } else {
-                if (mediaPlayerManager.getMediaPlayer() != null) { // Check if mediaPlayer is initialized
+                if (mediaPlayerManager.getMediaPlayer() != null) { 
                     mediaPlayerManager.getMediaPlayer().start();
                 }
                 pauseBtn.setBackgroundResource(R.drawable.pause);
                 mediaPlayerManager.setIsPlaying(true);
+                isPlaying = true;
+                if (playingStateChangeListener != null) {
+                    playingStateChangeListener.onPlayingStateChanged(isPlaying);
+                }
+                handler.postDelayed(updateSeekBarRunnable,0);
             }
         });
     }
