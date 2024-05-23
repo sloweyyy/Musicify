@@ -23,13 +23,14 @@
             android:layout_marginBottom="@dimen/_5sdp"
             android:textColor="#49A078"/>
         <LinearLayout
+            android:id="@+id/follow"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginVertical="@dimen/_7sdp"
             android:layout_marginLeft="@dimen/_10sdp"
             android:gravity="center_vertical">
             <ImageButton
-                android:id="@+id/follow"
+                android:id="@+id/followButton"
                 android:layout_width="25dp"
                 android:contentDescription="addToFollowedArtists"
                 android:layout_height="25dp"
@@ -44,28 +45,28 @@
                 android:layout_marginLeft="@dimen/_10sdp"
                 android:textColor="@color/white"/>
         </LinearLayout>
-            <LinearLayout
+        <LinearLayout
+            android:id="@+id/report"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginVertical="@dimen/_7sdp"
+            android:layout_marginLeft="@dimen/_10sdp"
+            android:gravity="center_vertical">
+            <ImageButton
+                android:layout_width="25dp"
+                android:contentDescription="report Infor"
+                android:layout_height="25dp"
+                android:background="@drawable/flag_24dp_fill0_wght400_grad0_opsz24"
+                android:backgroundTint="@color/white"/>
+            <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_marginVertical="@dimen/_7sdp"
+                android:text="Report"
+                android:textStyle="normal"
+                android:textSize="@dimen/_16sdp"
                 android:layout_marginLeft="@dimen/_10sdp"
-                android:gravity="center_vertical">
-                <ImageButton
-                    android:id="@+id/report"
-                    android:layout_width="25dp"
-                    android:contentDescription="report Infor"
-                    android:layout_height="25dp"
-                    android:background="@drawable/flag_24dp_fill0_wght400_grad0_opsz24"
-                    android:backgroundTint="@color/white"/>
-                <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="Report"
-                    android:textStyle="normal"
-                    android:textSize="@dimen/_16sdp"
-                    android:layout_marginLeft="@dimen/_10sdp"
-                    android:textColor="@color/white"/>
-            </LinearLayout>
+                android:textColor="@color/white"/>
+        </LinearLayout>
         <Button
             android:id="@+id/cancel"
             android:layout_width="wrap_content"

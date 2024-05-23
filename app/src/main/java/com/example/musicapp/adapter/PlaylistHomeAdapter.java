@@ -95,7 +95,7 @@ public class PlaylistHomeAdapter extends RecyclerView.Adapter<PlaylistHomeAdapte
             if (isLiked) {
                 holder.heartBtn.setImageResource(R.drawable.favourite_filled);
             } else {
-                holder.heartBtn.setImageResource(R.drawable.favourite_outline);
+                holder.heartBtn.setImageResource(R.drawable.heart_green_ouline);
             }
         });
     }
@@ -150,7 +150,7 @@ public class PlaylistHomeAdapter extends RecyclerView.Adapter<PlaylistHomeAdapte
 
                         checkIsLiked(playlist.getId(), isLiked -> {
                             if (isLiked) {
-                                heartBtn.setImageResource(R.drawable.favourite_outline);
+                                heartBtn.setImageResource(R.drawable.heart_green_ouline);
                                 removePlaylistFromLikedPlaylists(playlist.getId());
                             } else {
                                 heartBtn.setImageResource(R.drawable.favourite_filled);

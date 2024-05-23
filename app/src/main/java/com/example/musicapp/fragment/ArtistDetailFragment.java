@@ -1,7 +1,11 @@
 package com.example.musicapp.fragment;
 
 import android.app.AlertDialog;
+import android.app.Dialog;
+import android.content.DialogInterface;
 import android.graphics.Color;
+import android.os.Handler;
+import android.os.Looper;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -36,7 +40,9 @@ import com.example.musicapp.model.Artist;
 
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import retrofit2.Call;
 import retrofit2.Callback;
@@ -47,13 +53,16 @@ import retrofit2.http.GET;
 import retrofit2.http.Header;
 import retrofit2.http.Path;
 import com.example.musicapp.adapter.FetchAccessToken;
+import com.google.android.gms.tasks.OnFailureListener;
+import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FieldValue;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.gson.annotations.SerializedName;
 import android.content.Context;
-
+import jp.wasabeef.blurry.Blurry;
 
 public class ArtistDetailFragment extends Fragment implements FetchAccessToken.AccessTokenCallback {
     private RecyclerView recyclerViewAlbums;
@@ -71,6 +80,7 @@ public class ArtistDetailFragment extends Fragment implements FetchAccessToken.A
     HomeFragment homeFragment;
     private TextView artistName;
     private ImageView imageView;
+    private Handler handler = new Handler(Looper.getMainLooper());
 
     private boolean isFragmentAttached = false;
     @Override
@@ -237,8 +247,9 @@ public class ArtistDetailFragment extends Fragment implements FetchAccessToken.A
         builder.setView(dialogView);
 
         // Get references to the buttons in the dialog
-        ImageButton flBtn = dialogView.findViewById(R.id.follow);
-        ImageButton reportBtn = dialogView.findViewById(R.id.report);
+        LinearLayout fl =dialogView.findViewById(R.id.follow);
+        ImageButton flBtn = dialogView.findViewById(R.id.followButton);
+        LinearLayout reportBtn = dialogView.findViewById(R.id.report);
         TextView flText = dialogView.findViewById(R.id.follow_or_not);
         Button cancel = dialogView.findViewById(R.id.cancel);
         AlertDialog dialog = builder.create();
@@ -260,7 +271,7 @@ public class ArtistDetailFragment extends Fragment implements FetchAccessToken.A
         });
         // Set click listeners for the buttons
 
-        flBtn.setOnClickListener(v -> { if (isFragmentAttached) {
+        fl.setOnClickListener(v -> { if (isFragmentAttached) {
             checkIsFollwed(artistId, isFollowed -> {
                 if (isFollowed) {
                     unfollowArtist(artistId, requireContext());
@@ -279,14 +290,89 @@ public class ArtistDetailFragment extends Fragment implements FetchAccessToken.A
         reportBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                dialog.dismiss();
+                Dialog dialogReport = new Dialog(getActivity());
+                dialogReport.setContentView(R.layout.custom_report_dialog_artist);
+                if(getActivity() != null) {
+                    int width = (int)(getResources().getDisplayMetrics().widthPixels*0.90);
+                    dialogReport.getWindow().setLayout(width, ViewGroup.LayoutParams.WRAP_CONTENT);
+                }
+                dialogReport.setCancelable(false);
+                Button btnCancel = dialogReport.findViewById(R.id.btnCancel);
+                Button btnReportSend = dialogReport.findViewById(R.id.btnReportSend);
+                TextView inputReport = dialogReport.findViewById(R.id.inputReport);
+                TextView reportSucess = dialogReport.findViewById(R.id.reportSucess);
+                String reportContent = inputReport.getText().toString();
+
+                Blurry.with(getContext()).radius(10).sampling(2).onto((ViewGroup)view);
+                dialogReport.show();
+                btnCancel.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        dialogReport.dismiss();
+                    }
+                });
+                btnReportSend.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        if (reportContent.isEmpty()) {
+                            reportSucess.setText("Please give us feedback.");
+                            reportSucess.setTextColor(Color.RED);
+                            reportSucess.setVisibility(View.VISIBLE);
+                            inputReport.requestFocus();
+                            new Handler().postDelayed(new Runnable() {
+                                @Override
+                                public void run() {
+                                    reportSucess.setVisibility(View.GONE);
+                                }
+                            }, 6000);
+                        }
+                        else{
+                            Map<String, Object> updates = new HashMap<>();
+                            String subject = "Thanks for sending us Feedback&Error report";
+                            updates.put("reportContent", reportContent);
+                            FirebaseFirestore db = FirebaseFirestore.getInstance();
+                            db.collection("reports_1")
+                                    .add(updates)
+                                    .addOnSuccessListener(new OnSuccessListener<DocumentReference>() {
+                                        @Override
+                                        public void onSuccess(DocumentReference documentReference) {
+                                            Log.d("saveErrorReport", "DocumentSnapshot added with ID: " + documentReference.getId());
+                                        }
+                                    })
+                                    .addOnFailureListener(new OnFailureListener() {
+                                        @Override
+                                        public void onFailure(@NonNull Exception e) {
+
+                                        }
+                                    });
+                            dialog.setOnDismissListener(new DialogInterface.OnDismissListener() {
+                                @Override
+                                public void onDismiss(DialogInterface dialog) {
+                                    Blurry.delete((ViewGroup)view);
+                                }
+                            });
+                        }
+                        reportSucess.setVisibility(View.VISIBLE);
+                        reportSucess.setText("Thanks for giving us report! We hope you decide again");
+                        dialogReport.dismiss();
+                        new Handler().postDelayed(new Runnable() {
+                            @Override
+                            public void run() {
+                                dialogReport.dismiss();
+                            }
+                        },3000);
+                    }
+                });
+
             }
         });
+
 
         cancel.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 dialog.dismiss();
+                Blurry.delete((ViewGroup) dialogView);
             }
         });
     }

@@ -66,7 +66,7 @@ public class AlbumAdapter extends RecyclerView.Adapter<AlbumAdapter.ViewHolder>{
                 if (isLiked) {
                     holder.heartBtn.setImageResource(R.drawable.favourite_filled);
                 } else {
-                    holder.heartBtn.setImageResource(R.drawable.favourite_outline);
+                    holder.heartBtn.setImageResource(R.drawable.heart_green_ouline);
                 }
             }
         });
@@ -134,7 +134,7 @@ public class AlbumAdapter extends RecyclerView.Adapter<AlbumAdapter.ViewHolder>{
                             public void onResult(boolean isLiked) {
                                 if (isLiked) {
                                     unlikeAlbum(albumSimplified.getId());
-                                    heartBtn.setImageResource(R.drawable.favourite_outline);
+                                    heartBtn.setImageResource(R.drawable.heart_green_ouline);
                                 } else {
                                     addAlbumToLikedAlbums(albumSimplified.getId());
                                     heartBtn.setImageResource(R.drawable.favourite_filled);
@@ -160,7 +160,6 @@ public class AlbumAdapter extends RecyclerView.Adapter<AlbumAdapter.ViewHolder>{
             int position = getAbsoluteAdapterPosition();
             if (position != RecyclerView.NO_POSITION) {
                 AlbumSimplified selected = likedAlbumsList.get(position);
-                AlbumSimplified albumSimplified = likedAlbumsList.get(position);
                 AlbumDetailFragment likedAlbumDetailFragment= new AlbumDetailFragment();
                 likedAlbumDetailFragment.setAlbumId(selected.getId());
                 Bundle args = new Bundle();
