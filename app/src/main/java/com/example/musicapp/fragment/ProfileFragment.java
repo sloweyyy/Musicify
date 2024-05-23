@@ -6,6 +6,7 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.graphics.Color;
 import android.net.Uri;
 import android.os.Bundle;
 import android.os.Handler;
@@ -164,16 +165,37 @@ public class ProfileFragment extends Fragment {
         btnReportSend.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                String reportContent = inputReport.getText().toString();
-                saveErrorReport(reportContent,email);
-                reportSucess.setVisibility(View.VISIBLE);
-                reportSucess.setText("Thanks for giving us feedback!");
-                new Handler().postDelayed(new Runnable() {
-                    @Override
-                    public void run() {
-                        reportSucess.setVisibility(View.GONE);
-                    }
-                }, 6000);
+                String reportContent = inputReport.getText().toString().trim();
+                if (reportContent.isEmpty()) {
+                    reportSucess.setText("Please give us feedback.");
+                    reportSucess.setTextColor(Color.RED);
+                    reportSucess.setVisibility(View.VISIBLE);
+                    inputReport.requestFocus();
+                    new Handler().postDelayed(new Runnable() {
+                        @Override
+                        public void run() {
+                            reportSucess.setVisibility(View.GONE);
+                        }
+                    }, 6000);
+                } else {
+                    saveErrorReport(reportContent,email);
+                    reportSucess.setText("Thanks for giving us feedback!");
+                    reportSucess.setVisibility(View.VISIBLE);
+
+                    new Handler().postDelayed(new Runnable() {
+                        @Override
+                        public void run() {
+                            reportSucess.setVisibility(View.GONE);
+                            //dialog1.dismiss();
+                        }
+                    }, 6000);
+                    new Handler().postDelayed(new Runnable() {
+                        @Override
+                        public void run() {
+                            dialog1.dismiss();
+                        }
+                    },3000);
+                }
             }
         });
         btnDialogLogout.setOnClickListener(new View.OnClickListener() {
@@ -309,6 +331,7 @@ public class ProfileFragment extends Fragment {
                         Blurry.delete((ViewGroup)view);
                     }
                 });
+
             }
         });
         modifyName.setOnClickListener(new View.OnClickListener() {
@@ -360,7 +383,7 @@ public class ProfileFragment extends Fragment {
     private void saveErrorReport(  String reportContent,String recipientEmail) {
         Map<String, Object> updates = new HashMap<>();
         String subject = "Thanks for sending us Feedback&Error report";
-        updates.put("Image", email);
+        updates.put("email", email);
         updates.put("reportContent", reportContent);
         db.collection("reports")
                 .add(updates)
@@ -383,7 +406,7 @@ public class ProfileFragment extends Fragment {
             @Override
             public void run() {
                 final String username = "musicifya@gmail.com";
-                final String password = "gmdl pral fume bimt";
+                final String password = "kyza gvnf kcwg mijp";
                 String bodyTemplate = "Dear [{Name}],\n\n"
                         + "We have received your feedback regarding our app. Thank you for taking the time to share your thoughts and experiences with us. "
                         + "Your input is invaluable as it helps us to continuously improve our service.\n\n"

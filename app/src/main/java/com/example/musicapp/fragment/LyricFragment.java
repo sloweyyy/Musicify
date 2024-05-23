@@ -1,6 +1,12 @@
 package com.example.musicapp.fragment;
 
 import android.annotation.SuppressLint;
+import android.app.AlertDialog;
+import android.app.Dialog;
+import android.content.Context;
+import android.content.DialogInterface;
+import android.content.Intent;
+import android.graphics.Color;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Looper;
@@ -28,13 +34,18 @@ import com.example.musicapp.adapter.FetchAccessToken;
 import com.example.musicapp.manager.MediaPlayerManager;
 import com.example.musicapp.model.BottomAppBarListener;
 import com.example.musicapp.model.Song;
+import com.google.android.gms.tasks.OnFailureListener;
+import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FieldValue;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.gson.annotations.SerializedName;
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import retrofit2.Call;
 import retrofit2.Callback;
@@ -64,7 +75,7 @@ public class LyricFragment extends Fragment implements FetchAccessToken.AccessTo
     private MediaPlayerManager mediaPlayerManager;
     PlaySongFragment playSongFragment = new PlaySongFragment();
     private ImageView background, threeDots, artistAvata, heartBtn;
-    private String songNameValue, artistNameValue, avataValue, played_value, total_value, urlAudio;
+    private String songNameValue, artistNameValue, avataValue, played_value, total_value, urlAudioValue, albumId, artistId;
     private LinearLayout backButtonLayout;
     private Button iconBack;
     private TextView header, artistName, songName, playedDuration, totalDuration, lyric;
@@ -94,6 +105,9 @@ public class LyricFragment extends Fragment implements FetchAccessToken.AccessTo
             avataValue = getArguments().getString("avata");
             played_value = getArguments().getString("playedDuration");
             total_value = getArguments().getString("totalDuration");
+            albumId = getArguments().getString("albumId");
+            urlAudioValue = getArguments().getString("urlAudio");
+            artistId = getArguments().getString("artistId");
 
         }
         initializeViews();
@@ -161,11 +175,171 @@ public class LyricFragment extends Fragment implements FetchAccessToken.AccessTo
         return view;
     }
 
+    private void showMoreOptionsDialog(Context context) {
+        // Create a new dialog
+        AlertDialog.Builder builder = new AlertDialog.Builder(getContext());
+        View dialogView = LayoutInflater.from(getContext()).inflate(R.layout.more_dialog_song, null);
+
+        // Set the dialog's content view
+        builder.setView(dialogView);
+
+        LinearLayout addToPlaylist = dialogView.findViewById(R.id.addToPlaylist);
+        LinearLayout album = dialogView.findViewById(R.id.album);
+        LinearLayout share = dialogView.findViewById(R.id.share);
+        LinearLayout report = dialogView.findViewById(R.id.report);
+        Button cancel = dialogView.findViewById(R.id.cancel);
+        AlertDialog dialog = builder.create();
+        dialog.show();
+
+        report.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Dialog dialogReport = new Dialog(getActivity());
+                dialogReport.setContentView(R.layout.custom_report_dialog_2);
+                if(getActivity() != null) {
+                    int width = (int)(getResources().getDisplayMetrics().widthPixels*0.90);
+                    dialogReport.getWindow().setLayout(width, ViewGroup.LayoutParams.WRAP_CONTENT);
+                }
+                dialogReport.setCancelable(false);
+                Button btnCancel = dialogReport.findViewById(R.id.btnCancel);
+                Button btnReportSend = dialogReport.findViewById(R.id.btnReportSend);
+                TextView inputReport = dialogReport.findViewById(R.id.inputReport);
+                TextView reportSucess = dialogReport.findViewById(R.id.reportSucess);
+                String reportContent = inputReport.getText().toString();
+
+                //Blurry.with(getContext()).radius(10).sampling(2).onto((ViewGroup)view);
+                dialogReport.show();
+                btnCancel.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        dialogReport.dismiss();
+                    }
+                });
+                btnReportSend.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        if (reportContent.isEmpty()) {
+                            reportSucess.setText("Please give us feedback.");
+                            reportSucess.setTextColor(Color.RED);
+                            reportSucess.setVisibility(View.VISIBLE);
+                            inputReport.requestFocus();
+                            new Handler().postDelayed(new Runnable() {
+                                @Override
+                                public void run() {
+                                    reportSucess.setVisibility(View.GONE);
+                                }
+                            }, 6000);
+                        }
+                        else{
+                            Map<String, Object> updates = new HashMap<>();
+                            String subject = "Thanks for sending us Feedback&Error report";
+                            updates.put("reportContent", reportContent);
+                            FirebaseFirestore db = FirebaseFirestore.getInstance();
+                            db.collection("reports_1")
+                                    .add(updates)
+                                    .addOnSuccessListener(new OnSuccessListener<DocumentReference>() {
+                                        @Override
+                                        public void onSuccess(DocumentReference documentReference) {
+                                            Log.d("saveErrorReport", "DocumentSnapshot added with ID: " + documentReference.getId());
+                                        }
+                                    })
+                                    .addOnFailureListener(new OnFailureListener() {
+                                        @Override
+                                        public void onFailure(@NonNull Exception e) {
+
+                                        }
+                                    });
+                            dialog.setOnDismissListener(new DialogInterface.OnDismissListener() {
+                                @Override
+                                public void onDismiss(DialogInterface dialog) {
+                                    //Blurry.delete((ViewGroup)view);
+                                }
+                            });
+                        }
+                        reportSucess.setVisibility(View.VISIBLE);
+                        reportSucess.setText("Thanks for giving us report! We hope you decide again");
+                        dialogReport.dismiss();
+                        new Handler().postDelayed(new Runnable() {
+                            @Override
+                            public void run() {
+                                dialogReport.dismiss();
+                            }
+                        },3000);
+                    }
+                });
+
+            }
+        });
+        share.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent textIntent = new Intent(Intent.ACTION_SEND);
+                textIntent.putExtra(Intent.EXTRA_TEXT, urlAudioValue);
+                textIntent.setType("text/plain");
+                Intent shareIntent = Intent.createChooser(textIntent, "Send to");
+                startActivity(shareIntent);
+            }
+        });
+        album.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                MoveToAlbumDetail(albumId);
+                view.setVisibility(View.GONE);
+                dialog.dismiss();
+            }
+        });
+
+        cancel.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                dialog.dismiss();
+            }
+        });
+        addToPlaylist.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                AddToPlayListFragment addToPlayListFragment = new AddToPlayListFragment();
+                Bundle bundle = new Bundle();
+                bundle.putString("songId", songId);
+                addToPlayListFragment.setArguments(bundle);
+                addToPlayListFragment.show(getChildFragmentManager(), "AddToPlayListFragment");
+
+                dialog.dismiss(); // Dismiss your previous dialog if needed
+            }
+        });
+    }
     @Override
     public void onPause() {
         super.onPause();
         mediaPlayerManager.setCurrentPosition(mediaPlayerManager.getMediaPlayer().getCurrentPosition());
         mediaPlayerManager.getMediaPlayer().seekTo(mediaPlayerManager.getMediaPlayer().getCurrentPosition());
+    }
+    public void MoveToArtistDetail (String artistId)
+    {
+        ArtistDetailFragment artistDetailFragment = new ArtistDetailFragment();
+        artistDetailFragment.setArtistId(artistId);
+        Bundle args = new Bundle();
+        args.putString("artistId", artistId);
+        artistDetailFragment.setArguments(args);
+        ((AppCompatActivity)getContext()).getSupportFragmentManager()
+                .beginTransaction()
+                .replace(R.id.frame_layout, artistDetailFragment)
+                .addToBackStack(null)
+                .commit();
+
+    }
+    public void MoveToAlbumDetail(String albumId){
+        AlbumDetailFragment likedAlbumDetailFragment= new AlbumDetailFragment();
+        likedAlbumDetailFragment.setAlbumId(albumId);
+        Bundle args = new Bundle();
+        args.putString("albumId",albumId);
+        likedAlbumDetailFragment.setArguments(args);
+        // Add the Fragment to the Activity
+        ((AppCompatActivity)getContext()).getSupportFragmentManager()
+                .beginTransaction()
+                .replace(R.id.frame_layout, likedAlbumDetailFragment)
+                .addToBackStack(null)
+                .commit();
     }
 
     private void initializeViews() {
@@ -198,6 +372,14 @@ public class LyricFragment extends Fragment implements FetchAccessToken.AccessTo
         backButtonLayout = view.findViewById(R.id.backButtonLayout);
         iconBack = view.findViewById(R.id.iconBack);
         heartBtn = view.findViewById(R.id.heartBtn);
+        threeDots = view.findViewById(R.id.threeDots);
+
+        threeDots.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                showMoreOptionsDialog(getContext());
+            }
+        });
         checkIsLiked(songId,new OnIsLikedCallback() {
             @Override
             public void onResult(boolean isLiked) {
@@ -223,6 +405,12 @@ public class LyricFragment extends Fragment implements FetchAccessToken.AccessTo
                         }
                     }
                 });
+            }
+        });
+        artistName.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                MoveToArtistDetail(artistId);
             }
         });
         setupMediaPlayer();
@@ -266,7 +454,15 @@ public class LyricFragment extends Fragment implements FetchAccessToken.AccessTo
                     int CurrentPosition = (mediaPlayerManager.getMediaPlayer().getCurrentPosition() / 1000);
                     seekBar.setProgress(CurrentPosition);
                     playedDuration.setText(formattedTime(CurrentPosition));
-                    handler.postDelayed(this, 500); // Update every 500 milliseconds
+                    handler.postDelayed(this, 500);
+                    if (CurrentPosition == mediaPlayerManager.getMediaPlayer().getDuration()/1000){
+                        mediaPlayerManager.getMediaPlayer().pause();
+                        mediaPlayerManager.setCurrentPosition(0);
+                        mediaPlayerManager.getMediaPlayer().seekTo(0);
+                        FragmentManager fragmentManager = getParentFragmentManager();
+                        fragmentManager.popBackStack();
+                        PlayNextSong();// Update every 500 milliseconds
+                    }
                 }
             }
         };
