@@ -6,7 +6,6 @@ import android.app.Application;
 import android.app.NotificationChannel;
 import android.app.NotificationManager;
 import android.app.PendingIntent;
-import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
@@ -38,7 +37,6 @@ import com.example.musicapp.fragment.FavouriteFragment;
 import com.example.musicapp.fragment.HomeFragment;
 import com.example.musicapp.fragment.PlaySongFragment;
 import com.example.musicapp.fragment.ProfileFragment;
-import com.example.musicapp.manager.MediaPlayerManager;
 import com.example.musicapp.model.BottomAppBarListener;
 import com.example.musicapp.model.Song;
 import com.google.firebase.auth.FirebaseAuth;
@@ -53,13 +51,14 @@ import java.util.List;
 import java.util.Map;
 
 public class MainActivity extends AppCompatActivity implements BottomAppBarListener, PlaySongFragment.OnPlayingStateChangeListener, PlaySongFragment.MiniPlayerListener {
+    private boolean isPlayingMusic;
+
     private static final String MUSIC_NOTIFICATION_CHANNEL_ID = "Musicify";
     private static final int NOTIFICATION_ID = 1001;
     ActivityMainBinding binding;
     private static final int PERMISSION_REQUEST_CODE = 1;
     String currentSongName;
     FirebaseFirestore db;
-    private boolean isPlayingMusic;
     String songId;
     FirebaseUser currentUser;
     SharedPreferences sharedPreferences;
@@ -69,12 +68,23 @@ public class MainActivity extends AppCompatActivity implements BottomAppBarListe
     private int currentSongIndex = 0;
     private List<Song> songList;
 
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         binding = ActivityMainBinding.inflate(getLayoutInflater());
         db = FirebaseFirestore.getInstance();
         setContentView(binding.getRoot());
+
+        // load login state
+        currentUser = FirebaseAuth.getInstance().getCurrentUser();
+        if (currentUser == null) {
+            // User not logged in, navigate to login screen
+            Intent intent = new Intent(MainActivity.this, Launching.class);
+            startActivity(intent);
+            finish();
+            return;
+        }
         miniPlayerSongTitle = findViewById(R.id.mini_player_song_title);
         miniPlayerArtistName = findViewById(R.id.mini_player_artist_name);
         miniPlayerImage = findViewById(R.id.mini_player_image);
@@ -135,16 +145,6 @@ public class MainActivity extends AppCompatActivity implements BottomAppBarListe
             }
         });
 
-
-        // load login state
-        currentUser = FirebaseAuth.getInstance().getCurrentUser();
-        if (currentUser == null) {
-            // User not logged in, navigate to login screen
-            Intent intent = new Intent(MainActivity.this, Launching.class);
-            startActivity(intent);
-            finish();
-            return;
-        }
         requestNotificationPermission();
         registerActivityLifecycleCallbacks(activityLifecycleCallbacks);
         replaceFragment(new HomeFragment());
@@ -175,6 +175,32 @@ public class MainActivity extends AppCompatActivity implements BottomAppBarListe
         playSongFragment.setArguments(args);
         playSongFragment.show(getSupportFragmentManager(), "PlaySongFragment");
     }
+
+    @Override
+    public void updateMiniPlayer(List<Song> songList, int currentPosition) {
+        this.songList = songList;
+        this.currentSongIndex = currentPosition;
+
+        if (songList != null && !songList.isEmpty() && currentPosition >= 0) {
+            Song currentSong = songList.get(currentPosition);
+            miniPlayerSongTitle.setText(currentSong.getTitle());
+            miniPlayerArtistName.setText(currentSong.getArtist());
+            Glide.with(this).load(currentSong.getImageUrl()).into(miniPlayerImage);
+        } else {
+            Log.e("MainActivity", "Cannot update mini player: songList not ready or invalid index");
+        }
+    }
+
+    @Override
+    public void showMiniPlayer() {
+        miniPlayerLayout.setVisibility(View.VISIBLE);
+    }
+
+    @Override
+    public void hideMiniPlayer() {
+        miniPlayerLayout.setVisibility(View.GONE);
+    }
+
 
     @Override
     protected void onNewIntent(Intent intent) {
@@ -335,44 +361,22 @@ public class MainActivity extends AppCompatActivity implements BottomAppBarListe
     }
 
     private void sendContinueListeningNotification(String currentSongName) {
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-                NotificationChannel channel = new NotificationChannel(
-                        MUSIC_NOTIFICATION_CHANNEL_ID,
-                        "Music Channel",
-                        NotificationManager.IMPORTANCE_HIGH
-                );
-                NotificationManager notificationManager = getSystemService(NotificationManager.class);
-                if (notificationManager != null) {
-                    notificationManager.createNotificationChannel(channel);
-                }
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+            NotificationChannel channel = new NotificationChannel(
+                    MUSIC_NOTIFICATION_CHANNEL_ID,
+                    "Music Channel",
+                    NotificationManager.IMPORTANCE_HIGH
+            );
+            NotificationManager notificationManager = getSystemService(NotificationManager.class);
+            if (notificationManager != null) {
+                notificationManager.createNotificationChannel(channel);
             }
+        }
         Intent intent = new Intent(this, MainActivity.class);
         intent.setAction(Intent.ACTION_MAIN);
         intent.addCategory(Intent.CATEGORY_LAUNCHER);
 
         intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_SINGLE_TOP);
-
-        PendingIntent pendingIntent = PendingIntent.getActivity(this, 0, intent, PendingIntent.FLAG_UPDATE_CURRENT | PendingIntent.FLAG_IMMUTABLE);
-
-            NotificationCompat.Builder builder = new NotificationCompat.Builder(this, MUSIC_NOTIFICATION_CHANNEL_ID)
-                    .setSmallIcon(R.drawable.notifications_24dp_fill0_wght400_grad0_opsz24)
-                    .setContentTitle("Continue Listening")
-                    .setContentText("Tap to resume " + currentSongName)
-                    .setPriority(NotificationCompat.PRIORITY_MAX)
-                    .setContentIntent(pendingIntent)
-                    .setAutoCancel(true);
-
-            NotificationManagerCompat notificationManager = NotificationManagerCompat.from(this);
-            if (ContextCompat.checkSelfPermission(this, Manifest.permission.POST_NOTIFICATIONS) == PackageManager.PERMISSION_GRANTED ||
-                    Build.VERSION.SDK_INT < Build.VERSION_CODES.TIRAMISU) {
-                notificationManager.notify(NOTIFICATION_ID, builder.build());
-            } else {
-                // Handle permission denial case
-            }
-        }
-        Intent intent = new Intent(this, MainActivity.class);
-        intent.putExtra("songId", songId);
-        intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
 
         PendingIntent pendingIntent = PendingIntent.getActivity(this, 0, intent, PendingIntent.FLAG_UPDATE_CURRENT | PendingIntent.FLAG_IMMUTABLE);
 
@@ -402,31 +406,4 @@ public class MainActivity extends AppCompatActivity implements BottomAppBarListe
         else
             Log.d("isPlaying", "false");
     }
-
-    @Override
-    public void updateMiniPlayer(List<Song> songList, int currentPosition) {
-        this.songList = songList;
-        this.currentSongIndex = currentPosition;
-
-        if (songList != null && !songList.isEmpty() && currentPosition >= 0) {
-            Song currentSong = songList.get(currentPosition);
-            miniPlayerSongTitle.setText(currentSong.getTitle());
-            miniPlayerArtistName.setText(currentSong.getArtist());
-            Glide.with(this).load(currentSong.getImageUrl()).into(miniPlayerImage);
-        } else {
-            Log.e("MainActivity", "Cannot update mini player: songList not ready or invalid index");
-        }
-    }
-
-    @Override
-    public void showMiniPlayer() {
-        miniPlayerLayout.setVisibility(View.VISIBLE);
-    }
-
-    @Override
-    public void hideMiniPlayer() {
-        miniPlayerLayout.setVisibility(View.GONE);
-    }
-
-
 }
