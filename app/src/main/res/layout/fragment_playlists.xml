@@ -24,7 +24,7 @@
             <LinearLayout
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_marginStart="50dp"
+                android:layout_marginStart="30dp"
                 android:layout_marginTop="10dp"
                 android:layout_marginEnd="10dp"
                 android:layout_marginBottom="10dp"
@@ -41,12 +41,11 @@
 
                     <ImageView
                         android:id="@+id/iconAddPlaylist"
-                        android:layout_width="51dp"
+                        android:layout_width="50dp"
                         android:layout_height="32dp"
                         android:layout_gravity="center"
                         android:clickable="true"
                         android:focusable="true"
-                        android:paddingLeft="8dp"
                         android:src="@drawable/add"
                         app:tint="@color/caribbean_current" />
 
@@ -68,7 +67,7 @@
             <LinearLayout
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_marginStart="50dp"
+                android:layout_marginStart="30dp"
                 android:layout_marginTop="10dp"
                 android:layout_marginEnd="10dp"
                 android:layout_marginBottom="10dp"
@@ -91,7 +90,6 @@
                         android:layout_gravity="center"
                         android:clickable="true"
                         android:focusable="true"
-                        android:paddingLeft="8dp"
                         android:src="@drawable/liked"
                         app:tint="@color/caribbean_current"
 
