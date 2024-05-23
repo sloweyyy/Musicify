@@ -34,8 +34,8 @@
             android:layout_marginEnd="16dp"
             app:menu="@menu/bottom_nav"
             android:background="@drawable/transparent_background"
-            app:itemIconTint="@color/caribbean_current"
-            app:itemTextColor="@color/caribbean_current"
+            app:itemIconTint="@color/green"
+            app:itemTextColor="@color/green"
             app:itemIconSize="32dp"
             />
     </com.google.android.material.bottomappbar.BottomAppBar>

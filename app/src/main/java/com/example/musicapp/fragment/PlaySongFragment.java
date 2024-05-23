@@ -244,6 +244,7 @@ public class PlaySongFragment extends BottomSheetDialogFragment implements Fetch
                     @Override
                     public void onClick(View v) {
                         dialogReport.dismiss();
+
                     }
                 });
                 btnReportSend.setOnClickListener(new View.OnClickListener() {
@@ -298,7 +299,6 @@ public class PlaySongFragment extends BottomSheetDialogFragment implements Fetch
                         },3000);
                     }
                 });
-
             }
         });
         share.setOnClickListener(new View.OnClickListener() {
@@ -672,12 +672,19 @@ public class PlaySongFragment extends BottomSheetDialogFragment implements Fetch
     }
 
     public void setupPauseButton() {
+            mediaPlayerManager.setIsPlaying(true);
+            isPlaying = true;
+            if (playingStateChangeListener != null) {
+                playingStateChangeListener.onPlayingStateChanged(isPlaying);
+            }
         pauseBtn.setOnClickListener(v -> {
             if (mediaPlayerManager.getIsPlaying() == true) {
                 if (mediaPlayerManager.getMediaPlayer() != null) { // Check if mediaPlayer is initialized
+                    //currentPosition = mediaPlayerManager.getMediaPlayer().getCurrentPosition();
                     mediaPlayerManager.getMediaPlayer().pause();
                 }
                 mediaPlayerManager.setIsPlaying(false);
+                isPlaying = false;
                 if (playingStateChangeListener != null) {
                     playingStateChangeListener.onPlayingStateChanged(isPlaying);
                 }
@@ -723,7 +730,7 @@ public class PlaySongFragment extends BottomSheetDialogFragment implements Fetch
                 .replace(R.id.frame_layout, likedAlbumDetailFragment)
                 .addToBackStack(null)
                 .commit();
-    }
+    } 
     public void showError(Response<TrackModel> response) {
         try {
             assert response.errorBody() != null;
