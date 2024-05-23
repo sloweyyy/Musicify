@@ -13,7 +13,7 @@
         android:layout_height="wrap_content">
         <LinearLayout
             android:layout_width="match_parent"
-            android:layout_height="230dp">
+            android:layout_height="@dimen/_150sdp">
             <ImageView
                 android:id="@+id/imgArtist"
                 android:layout_width="match_parent"
@@ -80,21 +80,13 @@
             android:id="@+id/artistName"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginBottom="10sp"
             android:text="Artist's Name"
             android:textColor="@color/white"
-            android:textSize="20sp"
+            android:textSize="@dimen/_20sdp"
             android:textStyle="bold" />
 
-        <TextView
-            android:id="@+id/followers"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="Followers"
-            android:textColor="@color/white"
-            android:layout_marginBottom="10sp"/>
     </LinearLayout>
-    <ScrollView
+    <androidx.core.widget.NestedScrollView
         android:layout_width="match_parent"
         android:layout_height="match_parent">
         <LinearLayout
@@ -129,6 +121,6 @@
                 android:layout_height="wrap_content"
                 android:layout_margin="@dimen/_10sdp"/>
         </LinearLayout>
-    </ScrollView>
+    </androidx.core.widget.NestedScrollView>
 
 </LinearLayout>
