@@ -93,7 +93,9 @@ public class MainActivity extends AppCompatActivity implements BottomAppBarListe
         ImageView miniPlayerPlayPauseButton = findViewById(R.id.mini_player_play_pause_button);
         ImageView miniPlayerNextButton = findViewById(R.id.mini_player_next_button);
         ImageView miniPlayerPreviousButton = findViewById(R.id.mini_player_previous_button);
-
+        miniPlayerPlayPauseButton.setVisibility(View.GONE);
+        miniPlayerNextButton.setVisibility(View.GONE);
+        miniPlayerPreviousButton.setVisibility(View.GONE);
 
         miniPlayerNextButton.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -136,12 +138,13 @@ public class MainActivity extends AppCompatActivity implements BottomAppBarListe
 
             @Override
             public void onClick(View v) {
-                if (songList != null && !songList.isEmpty() && currentSongIndex >= 0) {
-                    showPlaySongFragment(songList.get(currentSongIndex).getId(), songList);
-                } else {
-                    Log.e("MainActivity", "Cannot update mini player: songList not ready or invalid index");
-                    return;
-                }
+//                if (songList != null && !songList.isEmpty() && currentSongIndex >= 0) {
+//                    showPlaySongFragment(songList.get(currentSongIndex).getId(), songList);
+//                } else {
+//                    Log.e("MainActivity", "Cannot update mini player: songList not ready or invalid index");
+//                    return;
+//                }
+                return;
             }
         });
 
