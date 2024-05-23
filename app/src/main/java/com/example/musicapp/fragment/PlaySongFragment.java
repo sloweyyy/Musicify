@@ -2,6 +2,8 @@ package com.example.musicapp.fragment;
 
 import android.annotation.SuppressLint;
 import android.app.AlertDialog;
+import android.content.Context;
+import android.graphics.Color;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Looper;
@@ -58,7 +60,7 @@ public class PlaySongFragment extends BottomSheetDialogFragment implements Fetch
     private MediaPlayerManager mediaPlayerManager;
     private String songnameValue, artistnameValue, avataValue, played_value, total_value, urlAudioValue;
     private TextView songname, artistname, duration_played, duration_total, lyric;
-    private ImageView cover_art;
+    private ImageView cover_art, threeDots;
     private ImageButton repeateBtn, previousBtn, pauseBtn, nextBtn, shuffleBtn, show_lyricBtn;
 
     private LinearLayout backButtonLayout, lyricLayout;
@@ -178,8 +180,45 @@ public class PlaySongFragment extends BottomSheetDialogFragment implements Fetch
             }
         });
 
+        threeDots.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                showMoreOptionsDialog(getContext());
+            }
+        });
 
         return view;
+    }
+    private void showMoreOptionsDialog(Context context) {
+        // Create a new dialog
+        AlertDialog.Builder builder = new AlertDialog.Builder(getContext());
+        View dialogView = LayoutInflater.from(getContext()).inflate(R.layout.more_dialog_song, null);
+
+        // Set the dialog's content view
+        builder.setView(dialogView);
+
+        LinearLayout addToPlaylist = dialogView.findViewById(R.id.addToPlaylist);
+        LinearLayout album = dialogView.findViewById(R.id.album);
+        LinearLayout download = dialogView.findViewById(R.id.download);
+        LinearLayout share = dialogView.findViewById(R.id.share);
+        LinearLayout report = dialogView.findViewById(R.id.report);
+        Button cancel = dialogView.findViewById(R.id.cancel);
+        AlertDialog dialog = builder.create();
+        dialog.show();
+
+        report.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+
+            }
+        });
+
+        cancel.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                dialog.dismiss();
+            }
+        });
     }
 
     public void setCurrentSongList(List<Song> songList, String currentSongId) {
@@ -278,6 +317,7 @@ public class PlaySongFragment extends BottomSheetDialogFragment implements Fetch
         nextBtn = view.findViewById(R.id.nextBtn);
         shuffleBtn = view.findViewById(R.id.shuffleBtn);
         cover_art = view.findViewById(R.id.imageCon);
+        threeDots = view.findViewById(R.id.threeDots);
         seekBar = view.findViewById(R.id.seekbar);
         backButtonLayout = view.findViewById(R.id.backButtonLayout);
         iconBackPlaying = view.findViewById(R.id.iconBackPlaying);
@@ -316,7 +356,6 @@ public class PlaySongFragment extends BottomSheetDialogFragment implements Fetch
         });
 
     }
-
     private void checkIsLiked(String id, OnIsLikedCallback callback) {
         FirebaseAuth mAuth = FirebaseAuth.getInstance();
         String userId = mAuth.getCurrentUser().getUid();
@@ -337,7 +376,6 @@ public class PlaySongFragment extends BottomSheetDialogFragment implements Fetch
             callback.onResult(false);
         });
     }
-
     private void removeSongFromLikedSongs(String songId) {
         FirebaseAuth mAuth = FirebaseAuth.getInstance();
         String userId = mAuth.getCurrentUser().getUid();
@@ -358,7 +396,6 @@ public class PlaySongFragment extends BottomSheetDialogFragment implements Fetch
             Log.e("SongAdapter", "Failed to retrieve user document: " + e.getMessage());
         });
     }
-
     public void addSongToLikedSongs(String songId) {
         FirebaseAuth mAuth = FirebaseAuth.getInstance();
         String userId = mAuth.getCurrentUser().getUid();
@@ -380,7 +417,6 @@ public class PlaySongFragment extends BottomSheetDialogFragment implements Fetch
             Log.e("SongAdapter", "Failed to retrieve user document: " + e.getMessage());
         });
     }
-
     private void getTrack(String accessToken) {
         Retrofit retrofit = new Retrofit.Builder().baseUrl("https://api.spotify.com/").addConverterFactory(GsonConverterFactory.create()).build();
 
@@ -406,7 +442,6 @@ public class PlaySongFragment extends BottomSheetDialogFragment implements Fetch
             }
         });
     }
-
     public void setupTrack(TrackModel track) {
         String songName = track.getName();
         String artistName = track.artists.get(0).getName();
@@ -426,19 +461,16 @@ public class PlaySongFragment extends BottomSheetDialogFragment implements Fetch
         setupSeekBar();
         setupPauseButton();
     }
-
     @Override
     public void onPause() {
         super.onPause();
         if (mediaPlayerManager.getMediaPlayer() != null) {
         }
     }
-
     @Override
     public void onResume() {
         super.onResume();
     }
-
     public void setupMediaPlayer(String playUrl) {
         if (playUrl != null && !playUrl.isEmpty()) {
             mediaPlayerManager.setMediaSource(playUrl);
@@ -463,7 +495,6 @@ public class PlaySongFragment extends BottomSheetDialogFragment implements Fetch
             handler.postDelayed(updateSeekBarRunnable, 0);
         }
     }
-
     public void setupSeekBar() {
         seekBar.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
             @Override
@@ -486,7 +517,6 @@ public class PlaySongFragment extends BottomSheetDialogFragment implements Fetch
         });
 
     }
-
     public void setupPauseButton() {
         pauseBtn.setOnClickListener(v -> {
             if (mediaPlayerManager.getIsPlaying() == true) {
@@ -512,7 +542,6 @@ public class PlaySongFragment extends BottomSheetDialogFragment implements Fetch
             }
         });
     }
-
     public void showError(Response<TrackModel> response) {
         try {
             assert response.errorBody() != null;
@@ -526,14 +555,12 @@ public class PlaySongFragment extends BottomSheetDialogFragment implements Fetch
             Log.e("Error handling response", e.getMessage());
         }
     }
-
     @SuppressLint("DefaultLocale")
     private String formattedTime(int currentPosition) {
         int minutes = currentPosition / 60;
         int seconds = currentPosition % 60;
         return String.format("%02d:%02d", minutes, seconds);
     }
-
     @Override
     public void onDestroy() {
         super.onDestroy();
@@ -543,7 +570,6 @@ public class PlaySongFragment extends BottomSheetDialogFragment implements Fetch
         }
         handler.removeCallbacks(updateSeekBarRunnable);
     }
-
     @Override
     public void onSongSelected(String songId, String previousSongId, String nextSongId) {
         this.songId = songId;
@@ -552,7 +578,6 @@ public class PlaySongFragment extends BottomSheetDialogFragment implements Fetch
         // Instead of calling playPreviousSong here, update the current song data in PlaySongFragment
         updateCurrentSong(songId);
     }
-
     private void updateCurrentSong(String newSongId) {
         if (newSongId != null && !newSongId.isEmpty() && !newSongId.equals(songId)) {
             this.songId = newSongId;
@@ -571,7 +596,6 @@ public class PlaySongFragment extends BottomSheetDialogFragment implements Fetch
             return songList.get(songList.size() - 1).getId();
         }
     }
-
     private String getNextSongId(String currentSongId) {
         int currentIndex = getCurrentSongIndex(currentSongId);
         if (currentIndex < songList.size() - 1) {
@@ -580,22 +604,6 @@ public class PlaySongFragment extends BottomSheetDialogFragment implements Fetch
             return songList.get(0).getId();
         }
     }
-
-//    private void playPreviousSong(String previousSongId) {
-//        setSongId(previousSongId);
-//        if (playSongFragment == null) {
-//            playSongFragment = new PlaySongFragment();
-//            playSongFragment.setSongId(previousSongId);
-//            Bundle args = new Bundle();
-//            args.putString("songId", previousSongId);
-//            playSongFragment.setArguments(args);
-//        } else {
-//            playSongFragment.setSongId(previousSongId);
-//        }
-//
-//        playSongFragment.show(getParentFragmentManager(), "PlaySongFragment");
-//    }
-
     public void onPreviousClicked(View view) {
         if (this instanceof OnSongSelectedListener) {
             ((OnSongSelectedListener) this).onSongSelected(songId, previousSongId, nextSongId);

@@ -62,11 +62,11 @@ public class FollowedArtistFragment extends Fragment implements FetchAccessToken
             public void onClick(View v) {
                 isRecentlyPlayed[0] = !isRecentlyPlayed[0];
                 if (isRecentlyPlayed[0]) {
-                    recentlyPlayedIcon.setImageResource(R.drawable.up_arrow);
+                    recentlyPlayedIcon.setImageResource(R.drawable.down_arrow);
                     recentlyPlayedText.setText("Name A-Z");
                     adapter.sortArtistByName(); // Call sortArtistByName()
                 } else {
-                    recentlyPlayedIcon.setImageResource(R.drawable.down_arrow);
+                    recentlyPlayedIcon.setImageResource(R.drawable.up_arrow);
                     recentlyPlayedText.setText("Name Z-A");
                     adapter.sortArtistByName();
                 }
@@ -117,12 +117,6 @@ public class FollowedArtistFragment extends Fragment implements FetchAccessToken
                     Artist artist = response.body();
                     followedArtists.add(artist);
                     adapter.notifyItemInserted(followedArtists.size() - 1);
-                } else {
-                    AlertDialog.Builder builder = new AlertDialog.Builder(requireContext());
-                    builder.setTitle("Cảnh báo");
-                    builder.setMessage(response.message());
-                    builder.setPositiveButton("OK", null);
-                    builder.show();
                 }
             }
 

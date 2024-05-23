@@ -4,7 +4,8 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:orientation="vertical">
+    android:orientation="vertical"
+    tools:context=".fragment.ArtistDetailFragment">
 
 
     <RelativeLayout
@@ -13,16 +14,13 @@
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="230dp">
-
             <ImageView
                 android:id="@+id/imgArtist"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:adjustViewBounds="true"
                 android:scaleType="centerCrop"
-                android:src="@drawable/rounded_img" />
-
-
+                android:src="@drawable/rounded_img"/>
         </LinearLayout>
 
         <LinearLayout
@@ -41,7 +39,7 @@
                 android:orientation="horizontal">
 
                 <Button
-                    android:id="@+id/iconBack"
+                    android:id="@+id/backBtn"
                     android:layout_width="25dp"
                     android:layout_height="25dp"
                     android:layout_marginLeft="10dp"
@@ -62,7 +60,7 @@
                 android:gravity="center">
 
                 <Button
-                    android:id="@+id/iconMore"
+                    android:id="@+id/moreBtn"
                     android:layout_width="25sp"
                     android:layout_height="25sp"
                     android:background="@drawable/more_vert_btn"
@@ -77,53 +75,60 @@
         android:gravity="center"
         android:orientation="vertical"
         android:layout_margin="12sp">
+
         <TextView
             android:id="@+id/artistName"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:layout_marginBottom="10sp"
+            android:text="Artist's Name"
+            android:textColor="@color/white"
             android:textSize="20sp"
-            android:textStyle="bold"
-            android:text="Đàm Vĩnh Slay"
-            android:textColor="@color/white"
-            android:layout_marginBottom="10sp"/>
+            android:textStyle="bold" />
+
         <TextView
-            android:id="@+id/albums_track_count"
+            android:id="@+id/followers"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="3 Album, 67 Track"
+            android:text="Followers"
             android:textColor="@color/white"
             android:layout_marginBottom="10sp"/>
-        <TextView
-            android:id="@+id/artistDescription"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="Gì gì đó đ biet"
-            />
     </LinearLayout>
-    <LinearLayout
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:orientation="vertical"
-        android:layout_marginLeft="29sp">
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="Albums"
-            android:textSize="16sp"
-            android:textStyle="bold"
-            android:textColor="@color/white"/>
+    <ScrollView
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
         <LinearLayout
-            android:layout_width="wrap_content"
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:orientation="horizontal">
+            android:orientation="vertical"
+            android:layout_marginLeft="29sp">
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Albums"
+                android:textSize="18sp"
+                android:textStyle="bold"
+                android:textColor="@color/white"/>
+
             <androidx.recyclerview.widget.RecyclerView
-                android:id="@+id/recyclerView"
-                android:layout_width="0dp"
-                android:layout_height="match_parent"
-                android:layout_weight="1"
-                android:layout_marginStart="30dp"
-                android:layout_marginEnd="30dp"/>
+                android:id="@+id/recyclerView_Albums"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_margin="@dimen/_10sdp"
+                android:orientation="horizontal"/>
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Songs"
+                android:textSize="18sp"
+                android:textStyle="bold"
+                android:textColor="@color/white"/>
+            <androidx.recyclerview.widget.RecyclerView
+                android:id="@+id/recyclerView_Songs"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_margin="@dimen/_10sdp"/>
         </LinearLayout>
-    </LinearLayout>
+    </ScrollView>
 
 </LinearLayout>

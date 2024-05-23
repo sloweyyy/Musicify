@@ -67,7 +67,6 @@ public class AlbumDetailFragment extends Fragment implements FetchAccessToken.Ac
         if (getArguments() != null) {
             albumId = getArguments().getString("albumId");
         }
-//        setupBackButton();
         fetchAccessToken = new FetchAccessToken();
         fetchAccessToken.getTokenFromSpotify(this);
         return view;
@@ -138,7 +137,6 @@ public class AlbumDetailFragment extends Fragment implements FetchAccessToken.Ac
     public interface SpotifyApiService {
         @GET("v1/albums/{albumId}")
         Call<AlbumSimplified> getSongs(@Header("Authorization") String authorization, @Path("albumId") String albumId);
-
     }
 
     private void setupRecyclerView() {
