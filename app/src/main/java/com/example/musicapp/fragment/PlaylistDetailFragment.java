@@ -109,8 +109,8 @@ public class PlaylistDetailFragment extends Fragment implements FetchAccessToken
         descriptionTextView = view.findViewById(R.id.playlistDescription);
         fetchAccessToken = new FetchAccessToken();
         fetchAccessToken.getTokenFromSpotify((FetchAccessToken.AccessTokenCallback) this);
-        setupBackButton();
         threeDotsButton = view.findViewById(R.id.threeDots);
+        descriptionTextView.setVisibility(View.GONE);
 
         storage = FirebaseStorage.getInstance();
 
@@ -137,6 +137,7 @@ public class PlaylistDetailFragment extends Fragment implements FetchAccessToken
         } else {
             // Handle the case where the RecyclerView isn't found
         }
+        setupBackButton();
 
 
         threeDotsButton.setOnClickListener(v -> {
