@@ -6,6 +6,7 @@ import android.app.Dialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.graphics.Color;
 import android.net.Uri;
 import android.os.Bundle;
 import android.os.Handler;
@@ -41,6 +42,7 @@ import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment;
 import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.database.collection.LLRBNode;
 import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FieldValue;
@@ -72,7 +74,7 @@ public class PlaySongFragment extends BottomSheetDialogFragment implements Fetch
 
     private String albumId;
     private MediaPlayerManager mediaPlayerManager;
-    private String songnameValue, artistnameValue, avataValue, played_value, total_value, urlAudioValue;
+    private String songnameValue, artistnameValue, avataValue, played_value, total_value, urlAudioValue, artistId;
     private TextView songname, artistname, duration_played, duration_total, lyric;
     private ImageView cover_art, threeDots;
     private ImageButton repeateBtn, previousBtn, pauseBtn, nextBtn, shuffleBtn, show_lyricBtn;
@@ -199,13 +201,7 @@ public class PlaySongFragment extends BottomSheetDialogFragment implements Fetch
             }
         });
 
-        threeDots.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                showMoreOptionsDialog(getContext());
-                Log.d("PlaySongFragment", "onClick: Three dots clicked" + songId);
-            }
-        });
+
 
         return view;
     }
@@ -220,7 +216,6 @@ public class PlaySongFragment extends BottomSheetDialogFragment implements Fetch
 
         LinearLayout addToPlaylist = dialogView.findViewById(R.id.addToPlaylist);
         LinearLayout album = dialogView.findViewById(R.id.album);
-        LinearLayout download = dialogView.findViewById(R.id.download);
         LinearLayout share = dialogView.findViewById(R.id.share);
         LinearLayout report = dialogView.findViewById(R.id.report);
         Button cancel = dialogView.findViewById(R.id.cancel);
@@ -230,72 +225,80 @@ public class PlaySongFragment extends BottomSheetDialogFragment implements Fetch
         report.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Dialog dialog = new Dialog(getActivity());
-                dialog.setContentView(R.layout.custom_report_dialog_2);
+                Dialog dialogReport = new Dialog(getActivity());
+                dialogReport.setContentView(R.layout.custom_report_dialog_2);
                 if(getActivity() != null) {
                     int width = (int)(getResources().getDisplayMetrics().widthPixels*0.90);
-                    dialog.getWindow().setLayout(width, ViewGroup.LayoutParams.WRAP_CONTENT);
+                    dialogReport.getWindow().setLayout(width, ViewGroup.LayoutParams.WRAP_CONTENT);
                 }
-                dialog.setCancelable(false);
-                Button btnCancel = dialog.findViewById(R.id.btnCancel);
-                Button btnReportSend = dialog.findViewById(R.id.btnReportSend);
-                TextView inputReport = dialog.findViewById(R.id.inputReport);
-                TextView reportSucess = dialog.findViewById(R.id.reportSucess);
+                dialogReport.setCancelable(false);
+                Button btnCancel = dialogReport.findViewById(R.id.btnCancel);
+                Button btnReportSend = dialogReport.findViewById(R.id.btnReportSend);
+                TextView inputReport = dialogReport.findViewById(R.id.inputReport);
+                TextView reportSucess = dialogReport.findViewById(R.id.reportSucess);
                 String reportContent = inputReport.getText().toString();
 
-                Blurry.with(getContext()).radius(10).sampling(2).onto((ViewGroup)view);
-                dialog.show();
+                //Blurry.with(getContext()).radius(10).sampling(2).onto((ViewGroup)view);
+                dialogReport.show();
                 btnCancel.setOnClickListener(new View.OnClickListener() {
                     @Override
                     public void onClick(View v) {
-                        dialog.dismiss();
+                        dialogReport.dismiss();
+
                     }
                 });
                 btnReportSend.setOnClickListener(new View.OnClickListener() {
                     @Override
                     public void onClick(View v) {
-                        Map<String, Object> updates = new HashMap<>();
-                        String subject = "Thanks for sending us Feedback&Error report";
-                        updates.put("reportContent", reportContent);
-                        FirebaseFirestore db = FirebaseFirestore.getInstance();
-                        db.collection("reports_1")
-                                .add(updates)
-                                .addOnSuccessListener(new OnSuccessListener<DocumentReference>() {
-                                    @Override
-                                    public void onSuccess(DocumentReference documentReference) {
-                                        Log.d("saveErrorReport", "DocumentSnapshot added with ID: " + documentReference.getId());
-                                    }
-                                })
-                                .addOnFailureListener(new OnFailureListener() {
-                                    @Override
-                                    public void onFailure(@NonNull Exception e) {
+                        if (reportContent.isEmpty()) {
+                            reportSucess.setText("Please give us feedback.");
+                            reportSucess.setTextColor(Color.RED);
+                            reportSucess.setVisibility(View.VISIBLE);
+                            inputReport.requestFocus();
+                            new Handler().postDelayed(new Runnable() {
+                                @Override
+                                public void run() {
+                                    reportSucess.setVisibility(View.GONE);
+                                }
+                            }, 6000);
+                        }
+                        else{
+                            Map<String, Object> updates = new HashMap<>();
+                            String subject = "Thanks for sending us Feedback&Error report";
+                            updates.put("reportContent", reportContent);
+                            FirebaseFirestore db = FirebaseFirestore.getInstance();
+                            db.collection("reports_1")
+                                    .add(updates)
+                                    .addOnSuccessListener(new OnSuccessListener<DocumentReference>() {
+                                        @Override
+                                        public void onSuccess(DocumentReference documentReference) {
+                                            Log.d("saveErrorReport", "DocumentSnapshot added with ID: " + documentReference.getId());
+                                        }
+                                    })
+                                    .addOnFailureListener(new OnFailureListener() {
+                                        @Override
+                                        public void onFailure(@NonNull Exception e) {
 
-                                    }
-                                });
-                        dialog.setOnDismissListener(new DialogInterface.OnDismissListener() {
+                                        }
+                                    });
+                            dialog.setOnDismissListener(new DialogInterface.OnDismissListener() {
+                                @Override
+                                public void onDismiss(DialogInterface dialog) {
+                                    //Blurry.delete((ViewGroup)view);
+                                }
+                            });
+                        }
+                        reportSucess.setVisibility(View.VISIBLE);
+                        reportSucess.setText("Thanks for giving us report! We hope you decide again");
+                        dialogReport.dismiss();
+                        new Handler().postDelayed(new Runnable() {
                             @Override
-                            public void onDismiss(DialogInterface dialog) {
-                                Blurry.delete((ViewGroup)view);
+                            public void run() {
+                                dialogReport.dismiss();
                             }
-                        });
+                        },3000);
                     }
                 });
-                reportSucess.setVisibility(View.VISIBLE);
-                reportSucess.setText("Thanks for giving us report! We hope you decide again");
-                new Handler().postDelayed(new Runnable() {
-                    @Override
-                    public void run() {
-                        reportSucess.setVisibility(View.GONE);
-                    }
-                }, 6000);
-                if(reportSucess.getVisibility() == View.GONE){
-                    new Handler().postDelayed(new Runnable() {
-                        @Override
-                        public void run() {
-                            dialog.dismiss();
-                        }
-                    },6000);
-                }
             }
         });
         share.setOnClickListener(new View.OnClickListener() {
@@ -323,7 +326,6 @@ public class PlaySongFragment extends BottomSheetDialogFragment implements Fetch
                 dialog.dismiss();
             }
         });
-
         addToPlaylist.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -405,12 +407,19 @@ public class PlaySongFragment extends BottomSheetDialogFragment implements Fetch
         args.putString("songName", songnameValue);
         args.putString("artistName", artistnameValue);
         args.putString("avata", avataValue);
-
+        args.putString("albumId", albumId);
+        args.putString("urlAudio", urlAudioValue);
         args.putString("playedDuration", played_value);
         args.putString("totalDuration", total_value);
+        args.putString("artistId", artistId);
 
         lyricFragment.setArguments(args);
-        ((AppCompatActivity) requireContext()).getSupportFragmentManager().beginTransaction().replace(R.id.frame_layout, lyricFragment, "LyricFragment").addToBackStack("LyricFragment").commit();
+        ((AppCompatActivity) requireContext())
+                .getSupportFragmentManager()
+                .beginTransaction()
+                .replace(R.id.frame_layout, lyricFragment, "LyricFragment")
+                .addToBackStack("LyricFragment")
+                .commit();
     }
 
     @Override
@@ -469,6 +478,12 @@ public class PlaySongFragment extends BottomSheetDialogFragment implements Fetch
                         }
                     }
                 });
+            }
+        });
+        threeDots.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                showMoreOptionsDialog(getContext());
             }
         });
 
@@ -579,7 +594,7 @@ public class PlaySongFragment extends BottomSheetDialogFragment implements Fetch
         artistnameValue = artistName;
         avataValue = imageUrl;
         urlAudioValue = playUrl;
-
+        artistId = track.artists.get(0).getId();
         setupMediaPlayer(playUrl);
         setupSeekBar();
         setupPauseButton();
@@ -610,7 +625,7 @@ public class PlaySongFragment extends BottomSheetDialogFragment implements Fetch
             mediaPlayerManager.setMediaSource(playUrl);
             mediaPlayerManager.setIsPlaying(true);
             if (mediaPlayerManager.getIsPlaying()) {
-                mediaPlayerManager.getMediaPlayer().seekTo(mediaPlayerManager.getCurrentPosition());
+                mediaPlayerManager.getMediaPlayer().seekTo(0);
                 mediaPlayerManager.getMediaPlayer().start();
             }
             seekBar.setMax((int) (mediaPlayerManager.getMediaPlayer().getDuration() / 1000));
