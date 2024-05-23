@@ -76,7 +76,6 @@ public class AddToPlaylistAdapter extends RecyclerView.Adapter<AddToPlaylistAdap
 
             playlistName.setText(playlist.getName());
 
-            // Calculate song count here
             int songCount = playlist.getSongs().size();
             playlistCount.setText(songCount + " songs");
         }
@@ -90,13 +89,13 @@ public class AddToPlaylistAdapter extends RecyclerView.Adapter<AddToPlaylistAdap
                 .addOnSuccessListener(aVoid -> {
                     Toast.makeText(context, "Added to playlist", Toast.LENGTH_SHORT).show();
 
-                    // Update the song count locally and in the UI
                     Playlist updatedPlaylist = playlistList.get(position);
                     updatedPlaylist.getSongs().add(songId);
-                    notifyItemChanged(position); // Tell the adapter to refresh the item
+                    notifyItemChanged(position);
                 })
                 .addOnFailureListener(e -> {
                     Toast.makeText(context, "Error adding to playlist", Toast.LENGTH_SHORT).show();
                 });
     }
+
 }
