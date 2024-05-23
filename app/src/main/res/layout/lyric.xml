@@ -222,7 +222,7 @@
                     android:contentDescription="pause"
                     android:layout_width="@dimen/_20sdp"
                     android:layout_height="@dimen/_20sdp"
-                    android:background="@drawable/pause"/>
+                    android:background="@drawable/ic_pause"/>
             </RelativeLayout>
             <Space
                 android:layout_width="wrap_content"
