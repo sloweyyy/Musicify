@@ -6,6 +6,7 @@ import android.app.NotificationChannel;
 import android.Manifest;
 import android.app.NotificationManager;
 import android.app.PendingIntent;
+import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
@@ -36,6 +37,7 @@ import com.example.musicapp.fragment.FavouriteFragment;
 import com.example.musicapp.fragment.HomeFragment;
 import com.example.musicapp.fragment.PlaySongFragment;
 import com.example.musicapp.fragment.ProfileFragment;
+import com.example.musicapp.manager.MediaPlayerManager;
 import com.example.musicapp.model.BottomAppBarListener;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.firebase.auth.FirebaseAuth;
@@ -105,14 +107,19 @@ public class MainActivity extends AppCompatActivity implements BottomAppBarListe
     }
 
     private void handleIntent(Intent intent) {
-        if (intent != null && intent.hasExtra("songId")) {
-            String songId = intent.getStringExtra("songId");
-            if (songId != null && !songId.isEmpty()) {
-                PlaySongFragment playSongFragment = new PlaySongFragment();
-                Bundle args = new Bundle();
-                args.putString("songId", songId);
-                playSongFragment.setArguments(args);
-                playSongFragment.show(getSupportFragmentManager(), "PlaySongFragment");
+
+        if (intent != null) {
+            if (intent.hasExtra("songId")) {
+                String songId = intent.getStringExtra("songId");
+                Fragment fragment = getSupportFragmentManager().findFragmentByTag("PlaySongFragment");
+                if (fragment == null || !fragment.isVisible()) {
+                    PlaySongFragment playSongFragment = new PlaySongFragment();
+                    Bundle args = new Bundle();
+                    args.putString("songId", songId);
+                    playSongFragment.setArguments(args);
+                    playSongFragment.show(getSupportFragmentManager(), "PlaySongFragment");
+                } else {
+                }
             }
         }
     }
@@ -261,11 +268,13 @@ public class MainActivity extends AppCompatActivity implements BottomAppBarListe
                     notificationManager.createNotificationChannel(channel);
                 }
             }
-            Intent intent = new Intent(this, MainActivity.class);
-            intent.putExtra("songId", songId);
-            intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
+        Intent intent = new Intent(this, MainActivity.class);
+        intent.setAction(Intent.ACTION_MAIN);
+        intent.addCategory(Intent.CATEGORY_LAUNCHER);
 
-            PendingIntent pendingIntent = PendingIntent.getActivity(this, 0, intent, PendingIntent.FLAG_UPDATE_CURRENT | PendingIntent.FLAG_IMMUTABLE);
+        intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_SINGLE_TOP);
+
+        PendingIntent pendingIntent = PendingIntent.getActivity(this, 0, intent, PendingIntent.FLAG_UPDATE_CURRENT | PendingIntent.FLAG_IMMUTABLE);
 
             NotificationCompat.Builder builder = new NotificationCompat.Builder(this, MUSIC_NOTIFICATION_CHANNEL_ID)
                     .setSmallIcon(R.drawable.notifications_24dp_fill0_wght400_grad0_opsz24)
