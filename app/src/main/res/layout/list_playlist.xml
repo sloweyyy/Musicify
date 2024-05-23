@@ -26,7 +26,7 @@
             android:orientation="horizontal">
 
             <Button
-                android:id="@+id/iconBackPlaying"
+                android:id="@+id/iconBack"
                 android:layout_width="@dimen/_20sdp"
                 android:layout_height="@dimen/_20sdp"
                 android:layout_marginLeft="@dimen/_10sdp"
@@ -47,13 +47,10 @@
 
         </TextView>
 
-        <ImageView
-            android:id="@+id/threeDots"
+        <Space
             android:layout_width="@dimen/_25sdp"
             android:layout_height="@dimen/_25sdp"
-            android:layout_marginStart="@dimen/_10sdp"
-            android:src="@drawable/three_dots"
-            app:tint="@color/white" />
+            />
     </LinearLayout>
 
     <androidx.recyclerview.widget.RecyclerView

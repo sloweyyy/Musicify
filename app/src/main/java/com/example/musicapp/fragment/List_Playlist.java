@@ -6,12 +6,15 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Button;
+import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
+import androidx.fragment.app.FragmentManager;
 import androidx.recyclerview.widget.GridLayoutManager;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
@@ -42,6 +45,8 @@ public class List_Playlist extends Fragment implements FetchAccessToken.AccessTo
     private String categoryId;
 
     private PlaylistAdapter adapter;
+    private LinearLayout backButtonLayout;
+    private Button iconBack;
     TextView header;
     private FetchAccessToken fetchAccessToken;
     @Nullable
@@ -52,11 +57,28 @@ public class List_Playlist extends Fragment implements FetchAccessToken.AccessTo
         header = view.findViewById(R.id.PlaylistHeaderName);
         LinearLayoutManager layoutManager = new LinearLayoutManager(getActivity());
         recyclerView.setLayoutManager(layoutManager);
+        backButtonLayout = view.findViewById(R.id.backButtonLayout);
+        iconBack = view.findViewById(R.id.iconBack);
         if (getArguments() != null) {
             categoryId = getArguments().getString("categoryId");
         }
         fetchAccessToken = new FetchAccessToken();
         fetchAccessToken.getTokenFromSpotify(this);
+        backButtonLayout.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                FragmentManager fragmentManager = getParentFragmentManager();
+                fragmentManager.popBackStack();
+            }
+        });
+
+        iconBack.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                FragmentManager fragmentManager = getParentFragmentManager();
+                fragmentManager.popBackStack();
+            }
+        });
         return view;
     }
 

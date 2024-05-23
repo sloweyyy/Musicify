@@ -482,6 +482,12 @@ public class PlaySongFragment extends BottomSheetDialogFragment implements Fetch
         setupMediaPlayer(playUrl);
         setupSeekBar();
         setupPauseButton();
+        artistname.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                MoveToArtistDetail(track.artists.get(0).getId());
+            }
+        });
     }
     @Override
     public void onPause() {
@@ -559,6 +565,11 @@ public class PlaySongFragment extends BottomSheetDialogFragment implements Fetch
                 handler.postDelayed(updateSeekBarRunnable, 0);
             }
         });
+    }
+
+    public void MoveToArtistDetail (String artistId)
+    {
+
     }
     public void showError(Response<TrackModel> response) {
         try {
@@ -668,15 +679,26 @@ public class PlaySongFragment extends BottomSheetDialogFragment implements Fetch
         public static class ArtistModel {
             @SerializedName("name")
             private String name;
+            @SerializedName("id")
+            private String id;
 
             public String getName() {
                 return name;
+            }
+
+            public String getId() {
+                return id;
             }
         }
 
         public static class AlbumModel {
             @SerializedName("images")
             private List<ImageModel> images;
+            @SerializedName("id")
+            private String id;
+            public String getId() {
+                return id;
+            }
 
             public static class ImageModel {
                 @SerializedName("url")
