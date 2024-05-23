@@ -18,7 +18,7 @@
         <ImageView
             android:id="@+id/backgroundAvatar"
             android:layout_width="match_parent"
-            android:layout_height="230dp"
+            android:layout_height="@dimen/_150sdp"
             android:background="@drawable/bg_avatar_corners"
             android:scaleType="fitXY" />
 
@@ -43,9 +43,9 @@
             <EditText
                 android:id="@+id/Name"
                 android:layout_width="wrap_content"
-
                 android:layout_height="wrap_content"
-                android:textColor="@color/textColor" />
+                android:textColor="@color/textColor"
+                android:textSize="@dimen/_17sdp"/>
 
             <ImageButton
                 android:id="@+id/modifyName"
@@ -92,6 +92,15 @@
             android:layout_height="wrap_content"
             android:orientation="vertical">
 
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginLeft="@dimen/_15sdp"
+                android:layout_marginTop="@dimen/_15sdp"
+                android:layout_marginBottom="@dimen/_10sdp"
+                android:text="Settings"
+                android:textColor="@color/textSettingsColor"
+                android:textSize="@dimen/_18sdp" />
             <LinearLayout
                 android:id="@+id/linearLayout2"
                 android:layout_width="match_parent"
@@ -100,33 +109,38 @@
                 android:orientation="vertical">
 
                 <TextView
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:layout_marginLeft="15dp"
-                    android:layout_marginBottom="5dp"
-                    android:text="Settings"
-                    android:textColor="@color/textSettingsColor"
-                    android:textSize="20dp" />
-
-                <TextView
                     android:id="@+id/modifyPassword"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:layout_marginLeft="20dp"
-                    android:layout_marginTop="5dp"
+                    android:layout_marginLeft="@dimen/_20sdp"
                     android:drawableLeft="@drawable/manage_accounts_24dp_fill0_wght400_grad0_opsz24"
                     android:drawablePadding="10dp"
+                    android:drawableTint="@color/white"
+                    android:textSize="@dimen/_14sdp"
                     android:text="Password settings"
-                    android:textColor="@color/textColor" />
+                    android:textColor="@color/textColor"
+                    android:gravity="center_vertical"/>
 
 
             </LinearLayout>
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginLeft="@dimen/_15sdp"
+                android:layout_marginTop="@dimen/_15sdp"
+                android:layout_marginBottom="@dimen/_10sdp"
+                android:text="Options"
+                android:textColor="@color/textSettingsColor"
+                android:textSize="@dimen/_18sdp" />
+
 
             <LinearLayout
                 android:id="@+id/linearLayout3"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="15dp"
+                android:layout_marginBottom="15dp"
+                android:layout_marginHorizontal="@dimen/_25sdp"
                 android:gravity="center"
                 android:orientation="vertical"
                 app:layout_constraintStart_toStartOf="parent"
@@ -135,65 +149,66 @@
                 <TextView
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:layout_marginLeft="15dp"
-                    android:layout_marginBottom="5dp"
-                    android:text="Options"
-                    android:textColor="@color/textSettingsColor"
-                    android:textSize="20dp" />
-
-                <TextView
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:layout_marginLeft="20dp"
-                    android:layout_marginTop="5dp"
                     android:id="@+id/update"
                     android:drawableLeft="@drawable/update_24dp_fill0_wght400_grad0_opsz24"
+                    android:drawableTint="@color/white"
+                    android:textSize="@dimen/_14sdp"
                     android:drawablePadding="10dp"
+                    android:gravity="center_vertical"
                     android:text="Check for updates"
-                    android:textColor="@color/textColor" />
+                    android:textColor="@color/textColor"
+                    android:layout_marginBottom="@dimen/_5sdp"/>
 
                 <TextView
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:layout_marginLeft="20dp"
                     android:id="@+id/feedbackError"
                     android:layout_marginTop="5dp"
                     android:drawableLeft="@drawable/flag_24dp_fill0_wght400_grad0_opsz24"
+                    android:drawableTint="@color/white"
+                    android:textSize="@dimen/_14sdp"
                     android:drawablePadding="10dp"
                     android:text="Give feedbacks and report errors"
-                    android:textColor="@color/textColor" />
+                    android:textColor="@color/textColor"
+                    android:layout_marginBottom="@dimen/_5sdp"
+                    android:gravity="center_vertical"/>
 
                 <TextView
                     android:id="@+id/termsAndConditions"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:layout_marginLeft="20dp"
                     android:layout_marginTop="5dp"
                     android:drawableLeft="@drawable/description_24dp_fill0_wght400_grad0_opsz24"
                     android:drawablePadding="10dp"
+                    android:drawableTint="@color/white"
+                    android:textSize="@dimen/_14sdp"
                     android:text="Terms and conditions"
-                    android:textColor="@color/textColor" />
+                    android:textColor="@color/textColor"
+                    android:layout_marginBottom="@dimen/_5sdp"
+                    android:gravity="center_vertical"/>
 
                 <TextView
                     android:id="@+id/privacyPolicy"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:layout_marginLeft="20dp"
                     android:layout_marginTop="5dp"
                     android:drawableLeft="@drawable/admin_panel_settings_24dp_fill0_wght400_grad0_opsz24"
                     android:drawablePadding="10dp"
+                    android:drawableTint="@color/white"
+                    android:textSize="@dimen/_14sdp"
                     android:text="Privacy policy"
-                    android:textColor="@color/textColor" />
+                    android:textColor="@color/textColor"
+                    android:layout_marginBottom="@dimen/_5sdp"
+                    android:gravity="center_vertical"/>
 
                 <Button
                     android:id="@+id/btnLogout"
                     android:layout_width="230dp"
                     android:layout_height="50dp"
-                    android:layout_marginLeft="24dp"
                     android:layout_marginTop="15dp"
-                    android:layout_marginRight="24dp"
                     android:background="@drawable/button_custom_selector"
                     android:text="Log out"
+                    android:textSize="@dimen/_14sdp"
                     android:textColor="@color/textColor"
                     app:backgroundTint="@color/btnColor" />
                 </LinearLayout>

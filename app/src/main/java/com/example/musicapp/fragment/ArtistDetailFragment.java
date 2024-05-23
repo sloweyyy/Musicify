@@ -29,6 +29,7 @@ import com.example.musicapp.adapter.LikedAlbumAdapter;
 import com.example.musicapp.adapter.SongAdapter;
 import com.example.musicapp.model.AlbumSimplified;
 import com.example.musicapp.model.Artist;
+import com.example.musicapp.model.BottomAppBarListener;
 import com.example.musicapp.model.SimplifiedTrack;
 import com.example.musicapp.model.Song;
 import com.example.musicapp.model.Artist;
@@ -172,6 +173,7 @@ public class ArtistDetailFragment extends Fragment implements FetchAccessToken.A
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         view = inflater.inflate(R.layout.fragment_artist_detail, container, false);
+        ((BottomAppBarListener) requireActivity()).hideBottomAppBar();
         recyclerViewAlbums = view.findViewById(R.id.recyclerView_Albums);
         recyclerViewSongs = view.findViewById(R.id.recyclerView_Songs);
         artistName = view.findViewById(R.id.artistName);
