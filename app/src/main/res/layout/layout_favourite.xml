@@ -6,51 +6,16 @@
 
     <LinearLayout
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="20dp">
-
-        <LinearLayout
-            android:layout_width="35dp"
-            android:layout_height="35dp"
-            android:layout_marginLeft="15dp"
-            android:background="@drawable/back_btn_custom"
-            android:gravity="center"
-            android:orientation="horizontal"
-            android:visibility="invisible">
-
-            <Button
-                android:id="@+id/iconBack"
-                android:layout_width="25dp"
-                android:layout_height="25dp"
-                android:layout_marginLeft="10dp"
-                android:background="@drawable/arrow_back"
-                app:backgroundTint="@android:color/white" />
-        </LinearLayout>
-
-
+        android:layout_height="@dimen/_25sdp"
+        android:layout_marginTop="@dimen/_15sdp">
         <TextView
             android:id="@+id/textView"
             android:layout_width="326dp"
             android:layout_height="match_parent"
             android:layout_weight="1"
             android:gravity="center"
-            android:textSize="20dp" />
-
-        <LinearLayout
-            android:layout_width="35dp"
-            android:layout_height="35dp"
-            android:layout_marginRight="15dp"
-            android:background="@drawable/back_btn_custom"
-            android:gravity="center">
-
-            <Button
-                android:id="@+id/iconMore"
-                android:layout_width="25dp"
-                android:layout_height="25dp"
-                android:background="@drawable/more_vert_btn"
-                android:paddingLeft="28dp"
-                app:backgroundTint="@android:color/white" />
-        </LinearLayout>
+            android:textSize="@dimen/_20sdp"
+            android:textColor="@color/btnColor"/>
     </LinearLayout>
 
     <com.google.android.material.tabs.TabLayout
