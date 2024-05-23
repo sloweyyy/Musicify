@@ -63,6 +63,8 @@ public class LikedAlbumsFragment extends Fragment implements FetchAccessToken.Ac
     private static final int PICK_IMAGE_REQUEST = 1;
     private Uri selectedImageUri;
 
+
+
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
@@ -95,7 +97,6 @@ public class LikedAlbumsFragment extends Fragment implements FetchAccessToken.Ac
         };
         sortIcon.setOnClickListener(recentlyAddedClickListener);
         sortText.setOnClickListener(recentlyAddedClickListener);
-
         return view;
     }
 
@@ -117,6 +118,7 @@ public class LikedAlbumsFragment extends Fragment implements FetchAccessToken.Ac
             }
         }).addOnFailureListener(e -> {});
     }
+
     public interface SpotifyApi {
         @GET("v1/albums/{albumId}")
         Call<AlbumSimplified> getAlbum(@Header("Authorization") String authorization, @Path("albumId") String albumId);
@@ -143,4 +145,5 @@ public class LikedAlbumsFragment extends Fragment implements FetchAccessToken.Ac
             }
         });
     }
+
 }

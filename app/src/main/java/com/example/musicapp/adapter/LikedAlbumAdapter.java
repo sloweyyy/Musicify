@@ -40,6 +40,7 @@ public class LikedAlbumAdapter extends RecyclerView.Adapter<LikedAlbumAdapter.Vi
     private Context context;
     private List<AlbumSimplified> likedAlbumsList;
     private boolean isAscending = false;
+
     public LikedAlbumAdapter(Context context, List<AlbumSimplified> likedAlbumsList) {
         this.context = context;
         this.likedAlbumsList  = likedAlbumsList ;
@@ -206,9 +207,10 @@ public class LikedAlbumAdapter extends RecyclerView.Adapter<LikedAlbumAdapter.Vi
                     .addOnSuccessListener(queryDocumentSnapshots -> {
                         if (!queryDocumentSnapshots.isEmpty()) {
                             DocumentSnapshot userDoc = queryDocumentSnapshots.getDocuments().get(0);
-                            userDoc.getReference().update("likedAlbumsList", FieldValue.arrayRemove(albumId))
+                            userDoc.getReference().update("likedAlbums", FieldValue.arrayRemove(albumId))
                                     .addOnSuccessListener(aVoid -> {
                                         Toast.makeText(context, "Removed from liked albums successfully", Toast.LENGTH_SHORT).show();
+                                        notifyDataSetChanged();
                                     })
                                     .addOnFailureListener(e -> {
                                         Log.e("LikedAlbumAdapter", "Failed to remove album from liked albums: " + e.getMessage());
