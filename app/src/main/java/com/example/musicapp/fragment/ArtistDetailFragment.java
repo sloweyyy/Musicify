@@ -68,6 +68,7 @@ public class ArtistDetailFragment extends Fragment implements FetchAccessToken.A
     private String artistId;
     private String accessToken;
     private FetchAccessToken fetchAccessToken;
+    HomeFragment homeFragment;
     private TextView artistName;
     private ImageView imageView;
 
@@ -146,7 +147,7 @@ public class ArtistDetailFragment extends Fragment implements FetchAccessToken.A
                     for (SimplifiedTrack simplifiedTrack : artistTopTrack.getListTrack()) {
                         songs.add(Song.fromSimplifiedTrack(simplifiedTrack));
                     }
-                    songAdapter = new SongAdapter(getContext(), songs);
+                    songAdapter = new SongAdapter(getContext(), songs, homeFragment);
                     recyclerViewSongs.setAdapter(songAdapter);
                     recyclerViewSongs.setVisibility(View.VISIBLE);
 
@@ -192,6 +193,7 @@ public class ArtistDetailFragment extends Fragment implements FetchAccessToken.A
         setupBackButton();
         fetchAccessToken = new FetchAccessToken();
         fetchAccessToken.getTokenFromSpotify(this);
+        homeFragment = new HomeFragment();
         return view;
     }
 

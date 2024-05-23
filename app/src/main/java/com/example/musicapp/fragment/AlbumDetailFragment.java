@@ -52,6 +52,7 @@ public class AlbumDetailFragment extends Fragment implements FetchAccessToken.Ac
     private TextView albumName;
 
     private ImageView imageView;
+    HomeFragment homeFragment;
 
     public AlbumDetailFragment() {}
 
@@ -69,6 +70,7 @@ public class AlbumDetailFragment extends Fragment implements FetchAccessToken.Ac
         }
         fetchAccessToken = new FetchAccessToken();
         fetchAccessToken.getTokenFromSpotify(this);
+        homeFragment = new HomeFragment();
         return view;
     }
 
@@ -97,7 +99,7 @@ public class AlbumDetailFragment extends Fragment implements FetchAccessToken.Ac
                     for (SimplifiedTrack simplifiedTrack : albumSimplified.getTracksContainer().tracks) {
                         songs.add(Song.fromSimplifiedTrack(simplifiedTrack));
                     }
-                    songAdapter = new SongAdapter(getContext(), songs);
+                    songAdapter = new SongAdapter(getContext(), songs, homeFragment);
                     recyclerView.setAdapter(songAdapter);
                     recyclerView.setVisibility(View.VISIBLE);
 
