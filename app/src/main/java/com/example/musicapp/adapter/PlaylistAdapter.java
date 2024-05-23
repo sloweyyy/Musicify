@@ -2,6 +2,7 @@ package com.example.musicapp.adapter;
 
 import android.content.Context;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -75,22 +76,24 @@ public class PlaylistAdapter extends RecyclerView.Adapter<PlaylistAdapter.ViewHo
         private ImageView playlistImage;
         private TextView playlistName;
         private TextView playlistCount;
-        private ImageView privacyIcon;
 
         public ViewHolder(@NonNull View itemView) {
             super(itemView);
             playlistImage = itemView.findViewById(R.id.playlistImage);
             playlistName = itemView.findViewById(R.id.playlistName);
             playlistCount = itemView.findViewById(R.id.playlistCount);
-            privacyIcon = itemView.findViewById(R.id.privacyIcon);
         }
 
         public void bind(Playlist playlist) {
-            Glide.with(context).load(playlist.getImageURL()).placeholder(R.drawable.image_up).error(R.drawable.image_up).into(playlistImage);
+            Glide.with(context).load(playlist.getImageURL())
+                    .placeholder(R.drawable.image_up).error(R.drawable.image_up)
+                    .into(playlistImage);
 
             playlistName.setText(playlist.getName());
-            playlistCount.setText(playlist.getSongCount() + " songs");
-            privacyIcon.setImageResource(playlist.getPrivacyIcon());
+
+            // Calculate song count here
+            int songCount = playlist.getSongs().size();
+            playlistCount.setText(songCount + " songs");
         }
     }
 
@@ -104,20 +107,26 @@ public class PlaylistAdapter extends RecyclerView.Adapter<PlaylistAdapter.ViewHo
 
     public void fetchPlaylists() {
         FirebaseFirestore db = FirebaseFirestore.getInstance();
-        db.collection("playlists").whereEqualTo("userId", userId).get().addOnSuccessListener(queryDocumentSnapshots -> {
-            List<Playlist> playlists = new ArrayList<>();
-            for (QueryDocumentSnapshot document : queryDocumentSnapshots) {
-                String imageURL = document.getString("imageURL");
-                Playlist playlist = document.toObject(Playlist.class);
-                playlist.setImageURL(imageURL);
+        db.collection("playlists")
+                .whereEqualTo("userId", userId)
+                .get()
+                .addOnSuccessListener(queryDocumentSnapshots -> {
+                    List<Playlist> playlists = new ArrayList<>();
+                    for (QueryDocumentSnapshot document : queryDocumentSnapshots) {
+                        Playlist playlist = document.toObject(Playlist.class);
+                        playlist.setId(document.getId());
 
-                playlist.setId(document.getId());
+                        // Get the songs array (assuming "songs" is the field name)
+                        List<String> songs = (List<String>) document.get("songs");
+                        playlist.setSongs(songs != null ? songs : new ArrayList<>());
 
-                playlists.add(playlist);
-            }
-            updatePlaylistList(playlists);
-        }).addOnFailureListener(e -> {
-        });
+                        playlists.add(playlist);
+                    }
+                    updatePlaylistList(playlists);
+                })
+                .addOnFailureListener(e -> {
+                    Log.e("PlaylistAdapter", "Failed to fetch playlists", e);
+                });
     }
 
 

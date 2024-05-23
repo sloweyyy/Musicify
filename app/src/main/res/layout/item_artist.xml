@@ -4,7 +4,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:layout_margin="8dp"
+    android:layout_marginVertical="8dp"
     app:cardCornerRadius="8dp"
     app:cardElevation="4dp">
 
@@ -12,7 +12,7 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="horizontal"
-        android:padding="16dp"
+        android:padding="@dimen/_8sdp"
         android:gravity="center_vertical">
 
         <androidx.cardview.widget.CardView
@@ -21,8 +21,8 @@
             app:cardCornerRadius="@dimen/_100sdp">
             <ImageView
                 android:id="@+id/artisthumbnail"
-                android:layout_width="64dp"
-                android:layout_height="64dp"
+                android:layout_width="66dp"
+                android:layout_height="66dp"
                 android:src="@drawable/playlist_image" />
         </androidx.cardview.widget.CardView>
 
@@ -33,7 +33,7 @@
             android:layout_height="wrap_content"
             android:layout_marginHorizontal="@dimen/_20sdp"
             android:text="Artist Name"
-            android:textSize="24sp"
+            android:textSize="@dimen/_17sdp"
             android:textStyle="bold" />
 
 

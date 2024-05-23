@@ -1,8 +1,8 @@
 package com.example.musicapp.model;
+
 import com.google.gson.annotations.SerializedName;
+
 import java.util.List;
-import java.time.LocalDateTime;
-import java.util.Map;
 
 public class AlbumSimplified {
     @SerializedName("images")
@@ -10,11 +10,6 @@ public class AlbumSimplified {
 
     @SerializedName("id")
     private String id;
-
-//    private LocalDateTime timeCreate;
-//
-//    private Map<AlbumSimplified, LocalDateTime> likedAlbums ;
-
 
     @SerializedName("name")
     private String name;
@@ -25,12 +20,17 @@ public class AlbumSimplified {
     @SerializedName("tracks")
     private Tracks tracksContainer;
 
-    public class Tracks {
+    // No need to create a separate Track class if it's only used for deserialization
+    public static class Tracks {
         @SerializedName("items")
         public List<SimplifiedTrack> tracks;
-        public List<SimplifiedTrack> getTrack() {return tracks;}
+
+        public List<SimplifiedTrack> getTracks() {
+            return tracks;
+        }
     }
 
+    // Getters
     public String getName() {
         return name;
     }
@@ -43,18 +43,11 @@ public class AlbumSimplified {
         return id;
     }
 
-//    public LocalDateTime getTimeCreate() {
-//        return timeCreate;
-//    }
-
-//    public Map<AlbumSimplified, LocalDateTime> getLikedAlbums() {
-//        return likedAlbums;
-//    }
-
     public List<Image> getImages() {
         return images;
     }
-    public Tracks getTracksContainer(){return tracksContainer;}
 
-
+    public Tracks getTracksContainer() {
+        return tracksContainer;
+    }
 }
