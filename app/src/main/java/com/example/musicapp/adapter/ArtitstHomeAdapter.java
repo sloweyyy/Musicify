@@ -18,6 +18,7 @@ import com.bumptech.glide.Glide;
 import com.example.musicapp.R;
 import com.example.musicapp.fragment.ArtistDetailFragment;
 import com.example.musicapp.model.Artist;
+import com.google.android.material.card.MaterialCardView;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.firestore.FieldValue;
@@ -110,6 +111,7 @@ public class ArtitstHomeAdapter extends RecyclerView.Adapter<ArtitstHomeAdapter.
         TextView artistName, totalFollowers;
         ImageView heartBtn;
         ImageView cicleArtistImg;
+        MaterialCardView card;
 
         public ViewHolder(@NonNull View itemView) {
             super(itemView);
@@ -118,7 +120,64 @@ public class ArtitstHomeAdapter extends RecyclerView.Adapter<ArtitstHomeAdapter.
             artistName = itemView.findViewById(R.id.artistName);
             totalFollowers = itemView.findViewById(R.id.totalFollowers);
             cicleArtistImg = itemView.findViewById(R.id.cicleArtistImg);
-
+            card= itemView.findViewById(R.id.card);
+            cicleArtistImg.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    int position = getAbsoluteAdapterPosition();
+                    if (position != RecyclerView.NO_POSITION) {
+                        Artist selected = artistList.get(position);
+                        ArtistDetailFragment fragment = new ArtistDetailFragment();
+                        fragment.setArtistId(selected.getId());
+                        Bundle args = new Bundle();
+                        args.putString("artistId", selected.getId());
+                        fragment.setArguments(args);
+                        ((AppCompatActivity) v.getContext()).getSupportFragmentManager()
+                                .beginTransaction()
+                                .replace(R.id.frame_layout, fragment)
+                                .addToBackStack(null)
+                                .commit();
+                    }
+                }
+            });
+            card.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    int position = getAbsoluteAdapterPosition();
+                    if (position != RecyclerView.NO_POSITION) {
+                        Artist selected = artistList.get(position);
+                        ArtistDetailFragment fragment = new ArtistDetailFragment();
+                        fragment.setArtistId(selected.getId());
+                        Bundle args = new Bundle();
+                        args.putString("artistId", selected.getId());
+                        fragment.setArguments(args);
+                        ((AppCompatActivity) v.getContext()).getSupportFragmentManager()
+                                .beginTransaction()
+                                .replace(R.id.frame_layout, fragment)
+                                .addToBackStack(null)
+                                .commit();
+                    }
+                }
+            });
+            artistName.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    int position = getAbsoluteAdapterPosition();
+                    if (position != RecyclerView.NO_POSITION) {
+                        Artist selected = artistList.get(position);
+                        ArtistDetailFragment fragment = new ArtistDetailFragment();
+                        fragment.setArtistId(selected.getId());
+                        Bundle args = new Bundle();
+                        args.putString("artistId", selected.getId());
+                        fragment.setArguments(args);
+                        ((AppCompatActivity) v.getContext()).getSupportFragmentManager()
+                                .beginTransaction()
+                                .replace(R.id.frame_layout, fragment)
+                                .addToBackStack(null)
+                                .commit();
+                    }
+                }
+            });
 
             heartBtn.setOnClickListener(new View.OnClickListener() {
                 @Override
@@ -158,22 +217,23 @@ public class ArtitstHomeAdapter extends RecyclerView.Adapter<ArtitstHomeAdapter.
                     .addOnFailureListener(e -> Log.e("ArtitstHomeAdapter", "Error removing artist from liked artists", e));
         }
 
+
         @Override
         public void onClick(View v) {
-            int position = getAbsoluteAdapterPosition();
-            if (position != RecyclerView.NO_POSITION) {
-                Artist selected = artistList.get(position);
-                ArtistDetailFragment fragment = new ArtistDetailFragment();
-                fragment.setArtistId(selected.getId());
-                Bundle args = new Bundle();
-                args.putString("artistId", selected.getId());
-                fragment.setArguments(args);
-                ((AppCompatActivity) v.getContext()).getSupportFragmentManager()
-                        .beginTransaction()
-                        .replace(R.id.frame_layout, fragment)
-                        .addToBackStack(null)
-                        .commit();
-            }
+                int position = getAbsoluteAdapterPosition();
+                if (position != RecyclerView.NO_POSITION) {
+                    Artist selected = artistList.get(position);
+                    ArtistDetailFragment fragment = new ArtistDetailFragment();
+                    fragment.setArtistId(selected.getId());
+                    Bundle args = new Bundle();
+                    args.putString("artistId", selected.getId());
+                    fragment.setArguments(args);
+                    ((AppCompatActivity) v.getContext()).getSupportFragmentManager()
+                            .beginTransaction()
+                            .replace(R.id.frame_layout, fragment)
+                            .addToBackStack(null)
+                            .commit();
+                }
         }
     }
 

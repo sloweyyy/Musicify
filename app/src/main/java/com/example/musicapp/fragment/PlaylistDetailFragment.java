@@ -12,7 +12,6 @@ import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageView;
-import android.widget.Switch;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -24,8 +23,10 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.bumptech.glide.Glide;
 import com.example.musicapp.R;
+import com.example.musicapp.adapter.FetchAccessToken;
 import com.example.musicapp.adapter.SongAdapter;
 import com.example.musicapp.model.Playlist;
+import com.example.musicapp.model.SimplifiedTrack;
 import com.example.musicapp.model.Song;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.material.bottomsheet.BottomSheetDialog;
@@ -38,8 +39,16 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
+import retrofit2.Call;
+import retrofit2.Callback;
+import retrofit2.Response;
+import retrofit2.Retrofit;
+import retrofit2.converter.gson.GsonConverterFactory;
+import retrofit2.http.GET;
+import retrofit2.http.Header;
+import retrofit2.http.Path;
 
-public class PlaylistDetailFragment extends Fragment {
+public class PlaylistDetailFragment extends Fragment implements FetchAccessToken.AccessTokenCallback {
 
     private RecyclerView recyclerView;
     private SongAdapter adapter;
@@ -64,6 +73,10 @@ public class PlaylistDetailFragment extends Fragment {
     private TextView nameTextView;
     private TextView descriptionTextView;
     private String mPlaylistId;
+    private FetchAccessToken fetchAccessToken;
+    private String accessToken;
+    private List<String> spotifySongIds;
+    private SongAdapter songAdapter;
 
 
     public PlaylistDetailFragment() {
@@ -94,9 +107,10 @@ public class PlaylistDetailFragment extends Fragment {
         thumbnailImageView = view.findViewById(R.id.playlistBanner);
         nameTextView = view.findViewById(R.id.playlistName);
         descriptionTextView = view.findViewById(R.id.playlistDescription);
-
-        setupBackButton();
+        fetchAccessToken = new FetchAccessToken();
+        fetchAccessToken.getTokenFromSpotify((FetchAccessToken.AccessTokenCallback) this);
         threeDotsButton = view.findViewById(R.id.threeDots);
+        descriptionTextView.setVisibility(View.GONE);
 
         storage = FirebaseStorage.getInstance();
 
@@ -112,13 +126,18 @@ public class PlaylistDetailFragment extends Fragment {
         nameTextView.setText(mPlaylistName);
         descriptionTextView.setText(mPlaylistDescription);
 
-        recyclerView = view.findViewById(R.id.recyclerView);
-        recyclerView = view.findViewById(R.id.recyclerView); // Find RecyclerView
+        recyclerView = view.findViewById(R.id.recyclerViewSongDetail);
         if (recyclerView != null) {
-            setupRecyclerView(); // Call setupRecyclerView after finding the RecyclerView
+            setupRecyclerView(); // Call setupRecyclerView() first
+            if (mPlaylistId != null) {
+                fetchPlaylistSongs(mPlaylistId);
+            } else {
+                Log.e("PlaylistDetailFragment", "Playlist ID is null");
+            }
         } else {
-            // Handle the case where the RecyclerView isn't found (log an error, show a message, etc.)
+            // Handle the case where the RecyclerView isn't found
         }
+        setupBackButton();
 
 
         threeDotsButton.setOnClickListener(v -> {
@@ -141,22 +160,98 @@ public class PlaylistDetailFragment extends Fragment {
 
     private void setupBackButton() {
         backButton = getView().findViewById(R.id.iconBack);
-        backButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                if (getFragmentManager() != null) {
-                    getFragmentManager().popBackStack();
-                }
-            }
-        });
+        backButton.setOnClickListener(v -> requireActivity().onBackPressed());
+
     }
 
 
     private void setupRecyclerView() {
         songList = new ArrayList<>();
-        adapter = new SongAdapter(getContext(), songList);
-        recyclerView.setLayoutManager(new LinearLayoutManager(getContext())); // Set layout manager here
+        adapter = new SongAdapter(getContext(), songList, song -> {
+            // Handle song selection here (e.g., play the song)
+        });
+        recyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
         recyclerView.setAdapter(adapter);
+    }
+
+    private void fetchPlaylistSongs(String playlistId) {
+        FirebaseFirestore db = FirebaseFirestore.getInstance();
+        db.collection("playlists").document(playlistId).get().addOnSuccessListener(documentSnapshot -> {
+            if (documentSnapshot.exists()) {
+                Playlist playlist = documentSnapshot.toObject(Playlist.class);
+
+                // Get Spotify song IDs from playlist (assuming the field is named 'spotifySongIds')
+                assert playlist != null;
+                spotifySongIds = playlist.getSongs();
+
+                if (spotifySongIds != null && !spotifySongIds.isEmpty()) {
+                    // Fetch Spotify tracks using the IDs
+                    fetchSpotifyTracks(spotifySongIds);
+                } else {
+                    // Handle the case where there are no Spotify songs in the playlist
+                    Log.d("PlaylistDetailFragment", "No Spotify songs found in the playlist");
+                    // You might want to display a message to the user or fetch songs from your "songs" collection
+                }
+            } else {
+                Log.d("PlaylistDetailFragment", "No playlist found with ID: " + playlistId);
+            }
+        }).addOnFailureListener(e -> {
+            Log.e("PlaylistDetailFragment", "Error fetching playlist songs", e);
+        });
+    }
+
+    private void fetchSpotifyTracks(List<String> trackIds) {
+        Retrofit retrofit = new Retrofit.Builder().baseUrl("https://api.spotify.com/").addConverterFactory(GsonConverterFactory.create()).build();
+
+        SpotifyApiService apiService = retrofit.create(SpotifyApiService.class);
+
+        List<Song> fetchedSongs = new ArrayList<>();
+
+        for (String trackId : trackIds) {
+            Call<SimplifiedTrack> call = apiService.getTrack("Bearer " + accessToken, trackId);
+            call.enqueue(new Callback<SimplifiedTrack>() {
+                @Override
+                public void onResponse(Call<SimplifiedTrack> call, Response<SimplifiedTrack> response) {
+                    if (response.isSuccessful()) {
+                        SimplifiedTrack simplifiedTrack = response.body(); // Get SimplifiedTrack
+                        Song song = Song.fromSimplifiedTrack(simplifiedTrack); // Convert to Song
+                        fetchedSongs.add(song);
+
+                        if (fetchedSongs.size() == trackIds.size()) {
+                            adapter.clearSongs();
+                            songList.addAll(fetchedSongs);
+                            adapter.notifyDataSetChanged();
+                        }
+
+                    } else {
+                        Log.e("PlaylistDetailFragment", "Error fetching Spotify track: " + response.code());
+                        // Handle API errors
+                    }
+                }
+
+                @Override
+                public void onFailure(Call<SimplifiedTrack> call, Throwable t) {
+                    Log.e("PlaylistDetailFragment", "Error fetching Spotify track", t);
+                    // Handle network errors
+                }
+            });
+        }
+    }
+
+
+    private void fetchSongDetails(String songId) {
+        FirebaseFirestore db = FirebaseFirestore.getInstance();
+        db.collection("songs") // Assuming your songs are in a "songs" collection
+                .document(songId).get().addOnSuccessListener(documentSnapshot -> {
+                    if (documentSnapshot.exists()) {
+                        Song song = documentSnapshot.toObject(Song.class);
+                        adapter.addSong(song); // Add the song to the adapter
+                    } else {
+                        Log.d("PlaylistDetailFragment", "No song found with ID: " + songId);
+                    }
+                }).addOnFailureListener(e -> {
+                    Log.e("PlaylistDetailFragment", "Error fetching song details", e);
+                });
     }
 
     private void loadSongsFromSpotify() {
@@ -171,15 +266,13 @@ public class PlaylistDetailFragment extends Fragment {
 
         TextView titleTextView = sheetView.findViewById(R.id.createPlaylistTitle);
         EditText playlistNameEditText = sheetView.findViewById(R.id.playListName);
-        Switch privacySwitch = sheetView.findViewById(R.id.privacySwitch);
         ImageView playlistImage = sheetView.findViewById(R.id.playlistImage);
         Button updateButton = sheetView.findViewById(R.id.createPlaylist);
-
+        Button cancelButton = sheetView.findViewById(R.id.cancelCreatePlaylist);
         titleTextView.setText("Edit Playlist");
         updateButton.setText("Update");
 
         playlistNameEditText.setText(playlist.getName());
-        privacySwitch.setChecked(playlist.getPrivacy().equals("Public"));
         if (playlist.getImageURL() != null) {
             Glide.with(requireContext()).load(playlist.getImageURL()).into(playlistImage);
             selectedImageUri = Uri.parse(playlist.getImageURL());
@@ -190,7 +283,6 @@ public class PlaylistDetailFragment extends Fragment {
 
         updateButton.setOnClickListener(v -> {
             String newName = playlistNameEditText.getText().toString();
-            String newPrivacy = privacySwitch.isChecked() ? "Public" : "Private";
 
             if (selectedImageUri != null && !selectedImageUri.toString().equals(playlist.getImageURL())) {
                 StorageReference storageRef = storage.getReference().child("playlist/" + UUID.randomUUID().toString());
@@ -198,16 +290,19 @@ public class PlaylistDetailFragment extends Fragment {
                     storageRef.getDownloadUrl().addOnSuccessListener(uri -> {
                         String newImageURL = uri.toString();
 
-                        updatePlaylist(playlist, newName, newPrivacy, newImageURL, editPlaylistDialog);
+                        updatePlaylist(playlist, newName, newImageURL, editPlaylistDialog);
                     });
                 }).addOnFailureListener(e -> {
                     Toast.makeText(requireContext(), "Failed to upload image", Toast.LENGTH_SHORT).show();
                     Log.e("PlaylistDetailFragment", "Error uploading image", e);
                 });
             } else {
-                updatePlaylist(playlist, newName, newPrivacy, playlist.getImageURL(), editPlaylistDialog);
+                updatePlaylist(playlist, newName, playlist.getImageURL(), editPlaylistDialog);
             }
         });
+
+        cancelButton.setOnClickListener(v -> editPlaylistDialog.dismiss());
+
 
         playlistImage.setOnClickListener(v -> {
             Intent intent = new Intent(Intent.ACTION_PICK);
@@ -230,32 +325,31 @@ public class PlaylistDetailFragment extends Fragment {
         }
     }
 
-    private void updatePlaylist(Playlist playlist, String newName, String newPrivacy, String newImageURL, BottomSheetDialog bottomSheetDialog) {
+    private void updatePlaylist(Playlist playlist, String newName, String newImageURL, BottomSheetDialog bottomSheetDialog) {
         if (selectedImageUri != null && !selectedImageUri.toString().equals(playlist.getImageURL())) {
             StorageReference storageRef = storage.getReference().child("playlist/" + UUID.randomUUID().toString());
             storageRef.putFile(selectedImageUri).addOnSuccessListener(taskSnapshot -> {
                 storageRef.getDownloadUrl().addOnSuccessListener(uri -> {
                     String uploadedImageURL = uri.toString();
-                    updatePlaylistInFirestore(playlist, newName, newPrivacy, uploadedImageURL, bottomSheetDialog);
+                    updatePlaylistInFirestore(playlist, newName, uploadedImageURL, bottomSheetDialog);
                 });
             }).addOnFailureListener(e -> {
                 Toast.makeText(requireContext(), "Failed to upload image", Toast.LENGTH_SHORT).show();
                 Log.e("PlaylistDetailFragment", "Error uploading image", e);
             });
         } else {
-            updatePlaylistInFirestore(playlist, newName, newPrivacy, newImageURL, bottomSheetDialog);
+            updatePlaylistInFirestore(playlist, newName, newImageURL, bottomSheetDialog);
         }
     }
 
 
-    private void updatePlaylistInFirestore(Playlist playlist, String newName, String newPrivacy, String newImageURL, BottomSheetDialog bottomSheetDialog) {
+    private void updatePlaylistInFirestore(Playlist playlist, String newName, String newImageURL, BottomSheetDialog bottomSheetDialog) {
         FirebaseFirestore db = FirebaseFirestore.getInstance();
-        db.collection("playlists").document(playlist.getId()).update("name", newName, "privacy", newPrivacy, "imageURL", newImageURL).addOnSuccessListener(aVoid -> {
+        db.collection("playlists").document(playlist.getId()).update("name", newName, "imageURL", newImageURL).addOnSuccessListener(aVoid -> {
             Toast.makeText(requireContext(), "Playlist updated successfully", Toast.LENGTH_SHORT).show();
             bottomSheetDialog.dismiss();
 
             currentPlaylist.setName(newName);
-            currentPlaylist.setPrivacy(newPrivacy);
             currentPlaylist.setImageURL(newImageURL);
 
             nameTextView.setText(newName);
@@ -270,6 +364,22 @@ public class PlaylistDetailFragment extends Fragment {
     public void getPlaylistById(String playlistId, OnCompleteListener<DocumentSnapshot> listener) {
         FirebaseFirestore db = FirebaseFirestore.getInstance();
         db.collection("playlists").document(playlistId).get().addOnCompleteListener(listener);
+    }
+
+    public interface SpotifyApiService {
+        @GET("v1/tracks/{trackId}")
+        Call<SimplifiedTrack> getTrack(@Header("Authorization") String authorization, @Path("trackId") String trackId);
+    }
+
+    @Override
+    public void onTokenReceived(String accessToken) {
+        this.accessToken = accessToken;
+        // Initiate the fetching of Spotify tracks
+        if (mPlaylistId != null) {
+            fetchPlaylistSongs(mPlaylistId);
+        } else {
+            Log.e("PlaylistDetailFragment", "Playlist ID is null");
+        }
     }
 
 

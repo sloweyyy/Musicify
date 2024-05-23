@@ -5,12 +5,15 @@ import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Button;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
+import androidx.fragment.app.FragmentManager;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
@@ -40,6 +43,8 @@ public class PlaylistDetailAPI extends Fragment implements FetchAccessToken.Acce
     private FetchAccessToken fetchAccessToken;
     private PlaylistSimplified playlistSimplified;
     private String playlistId;
+    private LinearLayout backButtonLayout;
+    private Button iconBack;
     private TextView playlistName;
     private TextView playlistDescription;
     private ImageView imageView;
@@ -61,6 +66,8 @@ public class PlaylistDetailAPI extends Fragment implements FetchAccessToken.Acce
         playlistName = view.findViewById(R.id.playlistName);
         playlistDescription = view.findViewById(R.id.playlistDescription);
         imageView = view.findViewById(R.id.playlistBanner);
+        backButtonLayout = view.findViewById(R.id.backButtonLayout);
+        iconBack = view.findViewById(R.id.iconBack);
         LinearLayoutManager layoutManager = new LinearLayoutManager(getActivity());
         recyclerView.setLayoutManager(layoutManager);
         if (getArguments() != null) {
@@ -69,6 +76,21 @@ public class PlaylistDetailAPI extends Fragment implements FetchAccessToken.Acce
         homeFragment = new HomeFragment();
         fetchAccessToken = new FetchAccessToken();
         fetchAccessToken.getTokenFromSpotify(this);
+        backButtonLayout.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                FragmentManager fragmentManager = getParentFragmentManager();
+                fragmentManager.popBackStack();
+            }
+        });
+
+        iconBack.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                FragmentManager fragmentManager = getParentFragmentManager();
+                fragmentManager.popBackStack();
+            }
+        });
         return view;
     }
 
@@ -91,7 +113,7 @@ public class PlaylistDetailAPI extends Fragment implements FetchAccessToken.Acce
                 if (response.isSuccessful()) {
                     PlaylistSimplified playlist = response.body();
                     playlistName.setText(playlist.getName());
-                    playlistDescription.setText(playlist.getDescription());
+                    playlistDescription.setText(playlist.getDescription().split("\\.")[0]);
                     Glide.with(requireContext()).load(playlist.images.get(0).getUrl()).into(imageView);
                     List<Song> songs = new ArrayList<>();
                     for (ItemModel item : playlist.tracksContainer.tracks) {

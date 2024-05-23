@@ -27,7 +27,6 @@
             android:paddingLeft="28dp"
             app:backgroundTint="@android:color/white" />
     </LinearLayout>
-
     <!-- Nút ba dấu chấm -->
     <LinearLayout
         android:id="@+id/iconThreeDots"
@@ -50,22 +49,30 @@
     </LinearLayout>
 
 
-    <!-- Phần còn lại của layout -->
-    <ImageView
-        android:id="@+id/playlistBanner"
+    <androidx.cardview.widget.CardView
+        android:id="@+id/playlistBannerContainer"
         android:layout_width="350dp"
         android:layout_height="200dp"
         android:layout_below="@id/backButtonLayout"
         android:layout_centerHorizontal="true"
         android:layout_marginTop="16dp"
-        android:scaleType="centerCrop"
-        android:src="@drawable/playlist_image" />
+        app:cardCornerRadius="@dimen/_20sdp">
+
+        <ImageView
+            android:id="@+id/playlistBanner"
+            android:layout_width="350dp"
+            android:layout_height="200dp"
+            android:scaleType="centerCrop"
+            android:src="@drawable/playlist_image" />
+    </androidx.cardview.widget.CardView>
+
+    <!-- Phần còn lại của layout -->
 
     <TextView
         android:id="@+id/playlistName"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_below="@id/playlistBanner"
+        android:layout_below="@id/playlistBannerContainer"
         android:layout_centerHorizontal="true"
         android:layout_marginTop="16dp"
         android:text="Playlist Name"

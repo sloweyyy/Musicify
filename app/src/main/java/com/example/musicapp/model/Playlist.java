@@ -2,6 +2,9 @@ package com.example.musicapp.model;
 
 import com.example.musicapp.R;
 
+import java.util.ArrayList;
+import java.util.List;
+
 public class Playlist {
     private String id;
     private String userId;
@@ -9,41 +12,44 @@ public class Playlist {
     private String description;
     private int thumbnail;
     private String imageURL;
+    private List<String> songs; // Add a field to store song IDs
 
 
     private String privacy;
 
     private int privacyIcon;
+    private int songCount;
 
     public Playlist() {
 
     }
 
-    public Playlist(String id, String userId, String name, String description, String privacy, String imageURL) {
+    public Playlist(String id, String userId, String name, String description, String imageURL) {
         this.id = id;
         this.userId = userId;
         this.name = name;
         this.description = description;
-        this.privacy = privacy;
         this.imageURL = imageURL;
-        if ("Private".equals(privacy)) {
-            setPrivacyIcon(R.drawable.ic_private);
-        } else {
-            setPrivacyIcon(R.drawable.ic_public);
-        }
+
     }
 
-    public Playlist(String userId, String name, String description, String privacy, String imageURL) {
+
+    public Playlist(String userId, String name, String description, String imageURL) {
         this.userId = userId;
         this.name = name;
         this.description = description;
-        this.privacy = privacy;
         this.imageURL = imageURL;
-        if ("Private".equals(privacy)) {
-            setPrivacyIcon(R.drawable.ic_private);
-        } else {
-            setPrivacyIcon(R.drawable.ic_public);
+    }
+
+    public List<String> getSongs() {
+        if (songs == null) {
+            songs = new ArrayList<>(); // Initialize if null
         }
+        return songs;
+    }
+
+    public void setSongs(List<String> songs) {
+        this.songs = songs;
     }
 
 
@@ -65,6 +71,10 @@ public class Playlist {
 
     public int getSongCount() {
         return 0;
+    }
+
+    public void setSongCount(int songCount) {
+        this.songCount = songCount;
     }
 
     public int getImageResource() {

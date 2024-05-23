@@ -83,7 +83,11 @@ public class AlbumAdapter extends RecyclerView.Adapter<AlbumAdapter.ViewHolder>{
                     if (!queryDocumentSnapshots.isEmpty()) {
                         DocumentSnapshot userDoc = queryDocumentSnapshots.getDocuments().get(0);
                         List<String> likedAlbums = (List<String>) userDoc.get("likedAlbums");
-                        onIsLikedCallback.onResult(likedAlbums.contains(id));
+                        if (likedAlbums != null) {
+                            onIsLikedCallback.onResult(likedAlbums.contains(id));
+                        } else {
+                            onIsLikedCallback.onResult(false);
+                        }
                     }
                 })
                 .addOnFailureListener(e -> {
