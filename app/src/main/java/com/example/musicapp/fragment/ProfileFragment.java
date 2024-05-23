@@ -1,22 +1,16 @@
 package com.example.musicapp.fragment;
  
 import android.app.Dialog;
-import android.app.NotificationChannel;
-import android.app.NotificationManager;
-import android.app.PendingIntent;
 import static android.app.Activity.RESULT_OK;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.net.Uri;
-import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Looper;
-import android.os.StrictMode;
 import android.util.Log;
-import android.view.Gravity;
 import android.view.KeyEvent;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -36,7 +30,6 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
-import androidx.core.app.NotificationCompat;
 import androidx.core.content.ContextCompat;
 import androidx.fragment.app.Fragment;
 
@@ -84,18 +77,15 @@ import jp.wasabeef.blurry.Blurry;
 
 public class ProfileFragment extends Fragment {
     View view;
-    ImageButton notificationIcon, iconBack, modifyName;
+    ImageButton iconBack, modifyName;
     ImageView backgroundAvatar;
     CircleImageView avatar;
     Button logout;
     EditText Name;
     private FirebaseAuth.AuthStateListener mAuthListener;
 
-    FrameLayout notificationDotHolder;
     TextView counterView;
     private FirebaseStorage storage;
-    LinearLayout linearLayout;
-    ScrollView notificationPopup;
     StorageReference storageReference;
     private static final int PICK_IMAGE_REQUEST = 1;
     private static final int PICK_AVATAR_IMAGE_REQUEST = 2;
@@ -103,7 +93,6 @@ public class ProfileFragment extends Fragment {
     int notificationCount;
     Uri selectedImageUri = null;
     FirebaseAuth mAuth;
-    //    TextView notificationText;
     String data = "";
     FirebaseUser user;
     FirebaseFirestore db;
@@ -118,6 +107,7 @@ public class ProfileFragment extends Fragment {
     TextInputEditText inputReport;
     TextView reportSucess;
     String email;
+    String name;
 
     @Nullable
     @Override
@@ -126,18 +116,15 @@ public class ProfileFragment extends Fragment {
         Name = view.findViewById(R.id.Name);
         backgroundAvatar = view.findViewById(R.id.backgroundAvatar);
         avatar = view.findViewById(R.id.avatarImage);
+        iconBack = view.findViewById(R.id.iconBack);
         mAuth = FirebaseAuth.getInstance();
         db = FirebaseFirestore.getInstance();
         storage = FirebaseStorage.getInstance();
-        notification = view.findViewById(R.id.notification);
-        counterView = view.findViewById(R.id.counters);
-        notificationIcon = view.findViewById(R.id.notificationIcon);
         privacyPolicy = view.findViewById(R.id.privacyPolicy);
         logout = view.findViewById(R.id.btnLogout);
         modifyName = view.findViewById(R.id.modifyName);
         modifyPassword = view.findViewById(R.id.modifyPassword);
         user = mAuth.getCurrentUser();
-        notificationPopup = view.findViewById(R.id.notificationPopup);
         termsAndConditions = view.findViewById(R.id.termsAndConditions);
         update = view.findViewById(R.id.update);
         feedbackError = view.findViewById(R.id.feedbackError);
@@ -203,16 +190,6 @@ public class ProfileFragment extends Fragment {
             }
         });
 
-        if (notificationPopup != null) {
-            linearLayout = notificationPopup.findViewById(R.id.linearLayout);
-        } else {
-            Log.e("ProfileFragment", "notificationPopup is null");
-        }
-
-        if (getArguments() != null) {
-            data = getArguments().getString("data", "");
-            notifications.add(data);
-        }
         if (user != null) {
             DocumentReference docRef = db.collection("users").document(user.getUid());
             docRef.get().addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
@@ -223,13 +200,9 @@ public class ProfileFragment extends Fragment {
                         if (document != null && document.exists()) {
 
                             if (document.contains("Name")) {
-                                String name = document.getString("Name");
+                                name = document.getString("Name");
                                 email = document.getString("email");
                                 Name.setText(name);
-                            }
-                            if (document.contains("notificationCount")) {
-                                notificationCount = document.getLong("notificationCount").intValue();
-                                counterView.setText(String.valueOf(notificationCount));
                             }
 
                             if (document.contains("backgroundImageUrl")) {
@@ -301,17 +274,7 @@ public class ProfileFragment extends Fragment {
 
             }
         });
-        notification.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                if (notificationPopup.getVisibility() == View.GONE) {
-                    Intent intent = new Intent();
-                    notificationPopup.setVisibility(View.VISIBLE);
-                } else {
-                    notificationPopup.setVisibility(View.GONE);
-                }
-            }
-        });
+
 
         termsAndConditions.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -333,17 +296,6 @@ public class ProfileFragment extends Fragment {
                         .replace(R.id.frame_layout, fragment)
                         .addToBackStack(null)
                         .commit();
-            }
-        });
-        notificationIcon.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                if (notificationPopup.getVisibility() == View.GONE) {
-                    notificationPopup.setVisibility(View.VISIBLE);
-                    updateNotifications(notifications);
-                } else {
-                    notificationPopup.setVisibility(View.GONE);
-                }
             }
         });
         logout.setOnClickListener(new View.OnClickListener() {
@@ -405,8 +357,9 @@ public class ProfileFragment extends Fragment {
         });
         return view;
     }
-    private void saveErrorReport(  String reportContent,String email) {
+    private void saveErrorReport(  String reportContent,String recipientEmail) {
         Map<String, Object> updates = new HashMap<>();
+        String subject = "Thanks for sending us Feedback&Error report";
         updates.put("Image", email);
         updates.put("reportContent", reportContent);
         db.collection("reports")
@@ -423,6 +376,68 @@ public class ProfileFragment extends Fragment {
 
                     }
                 });
+        ExecutorService emailExecutor = Executors.newSingleThreadExecutor();
+        Handler handler = new Handler(Looper.getMainLooper());
+
+        emailExecutor.execute(new Runnable() {
+            @Override
+            public void run() {
+                final String username = "musicifya@gmail.com";
+                final String password = "gmdl pral fume bimt";
+                String bodyTemplate = "Dear [{Name}],\n\n"
+                        + "We have received your feedback regarding our app. Thank you for taking the time to share your thoughts and experiences with us. "
+                        + "Your input is invaluable as it helps us to continuously improve our service.\n\n"
+                        + "Our team will review your feedback and take the necessary actions. We will contact you directly if we require any additional information. "
+                        + "We are committed to providing you with the best possible experience, and your feedback is a key part of that effort.\n\n"
+                        + "Thank you once again for your contribution.\n\n"
+                        + "Best regards,\n"
+                        + "[Nguyen Thi Bich Gau - Manager Of Fake App]\n"
+                        + "[Musicify]";
+                String body = bodyTemplate.replace("[{Name}]", name);
+                Properties prop = new Properties();
+                prop.put("mail.smtp.host", "smtp.gmail.com");
+                prop.put("mail.smtp.port", "587");
+                prop.put("mail.smtp.auth", "true");
+                prop.put("mail.smtp.starttls.enable", "true");
+
+                Session session = Session.getInstance(prop,
+                        new javax.mail.Authenticator() {
+                            protected PasswordAuthentication getPasswordAuthentication() {
+                                return new PasswordAuthentication(username, password);
+                            }
+                        });
+
+                try {
+                    Message message = new MimeMessage(session);
+                    message.setFrom(new InternetAddress("musicifya@gmail.com"));
+                    message.setRecipients(
+                            Message.RecipientType.TO,
+                            InternetAddress.parse(recipientEmail)
+                    );
+                    message.setSubject(subject);
+                    message.setText(body);
+
+                    Transport.send(message);
+
+                    handler.post(new Runnable() {
+                        @Override
+                        public void run() {
+                            System.out.println("Email sent successfully");
+                        }
+                    });
+
+                } catch (MessagingException e) {
+                    e.printStackTrace();
+                    handler.post(new Runnable() {
+                        @Override
+                        public void run() {
+                            System.out.println("Failed to send email");
+                        }
+                    });
+                }
+            }
+        });
+
 
     }
 
@@ -439,45 +454,9 @@ public class ProfileFragment extends Fragment {
         updateDocument(updates);
     }
 
-    private void updateCounterInFirestore(int notificationCount) {
-        Map<String, Object> updates = new HashMap<>();
-        updates.put("notificationCount", notificationCount + 1);
-        updateDocument(updates);
-        counterView.setText(String.valueOf(notificationCount));
-    }
 
-    private void addNotificationCardToView(String notificationMessage) {
-        if (linearLayout == null) {
-            Log.e("ProfileFragment", "linearLayout is null");
-            return;
-        }
 
-        MaterialCardView cardView = new MaterialCardView(getActivity());
-        LinearLayout.LayoutParams layoutParams = new LinearLayout.LayoutParams(
-                LinearLayout.LayoutParams.MATCH_PARENT,
-                LinearLayout.LayoutParams.WRAP_CONTENT);
-        cardView.setLayoutParams(layoutParams);
-        TextView notificationTextView = new TextView(getActivity());
-        notificationTextView.setLayoutParams(new ViewGroup.LayoutParams(
-                LinearLayout.LayoutParams.MATCH_PARENT,
-                LinearLayout.LayoutParams.WRAP_CONTENT));
-        notificationTextView.setText(notificationMessage);
-        notificationTextView.setTextColor(getResources().getColor(R.color.textColor));
 
-        notificationTextView.setGravity(Gravity.CENTER_VERTICAL);
-
-        cardView.addView(notificationTextView);
-
-        linearLayout.addView(cardView);
-    }
-
-    private void updateNotifications(List<String> notifications) {
-        linearLayout.removeAllViews();
-        for (String message : notifications) {
-            addNotificationCardToView(message);
-        }
-        updateCounterInFirestore(notificationCount);
-    }
 
     @Override
     public void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {

@@ -3,7 +3,9 @@ package com.example.musicapp.fragment;
 import android.annotation.SuppressLint;
 import android.app.AlertDialog;
 import android.content.Context;
+import android.content.Intent;
 import android.graphics.Color;
+import android.net.Uri;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Looper;
@@ -76,7 +78,15 @@ public class PlaySongFragment extends BottomSheetDialogFragment implements Fetch
     private ImageView heartBtn;
     private String songId, previousSongId, nextSongId;
 
+
     private SongAdapter songAdapter; // Add SongAdapter here
+    public interface OnPlayingStateChangeListener {
+        void onPlayingStateChanged(boolean isPlaying);
+    }
+    public void setPlayingStateChangedListener(OnPlayingStateChangeListener listener) {
+        this.playingStateChangeListener = listener;
+    }
+    private OnPlayingStateChangeListener playingStateChangeListener;
 
     @Override
     public void onTokenReceived(String accessToken) {
@@ -98,6 +108,9 @@ public class PlaySongFragment extends BottomSheetDialogFragment implements Fetch
             songId = getArguments().getString("songId");
             previousSongId = getArguments().getString("previousSongId");
             nextSongId = getArguments().getString("nextSongId");
+        }
+        if (getActivity() instanceof OnPlayingStateChangeListener) {
+            playingStateChangeListener = (OnPlayingStateChangeListener) getActivity();
         }
         backButtonLayout.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -200,6 +213,35 @@ public class PlaySongFragment extends BottomSheetDialogFragment implements Fetch
             @Override
             public void onClick(View v) {
 
+            }
+        });
+        share.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                String data = "Nga";
+                if (data != null){
+//                    songnameValue = songName;
+//                    artistnameValue = artistName;
+//                    avataValue = imageUrl;
+//                    urlAudioValue = playUrl;
+                    Intent textIntent = new Intent(Intent.ACTION_SEND);
+                    textIntent.putExtra(Intent.EXTRA_TEXT, songnameValue + " (" + artistnameValue + ")");
+                    textIntent.setType("text/plain");
+
+                    // Chia sẻ audio/ảnh
+                    Intent mediaIntent = new Intent(Intent.ACTION_SEND);
+                    mediaIntent.putExtra(Intent.EXTRA_STREAM, Uri.parse(urlAudioValue)); // Hoặc imageUri
+                    mediaIntent.setType("audio/*"); // Hoặc "image/*"
+
+                    Intent imageIntent = new Intent(Intent.ACTION_SEND);
+                    imageIntent.putExtra(Intent.EXTRA_STREAM, Uri.parse(avataValue));
+                    imageIntent.setType("image/*");
+
+                    // Tạo Intent Chooser
+                    Intent shareIntent = Intent.createChooser(textIntent, "Send to");
+                    shareIntent.putExtra(Intent.EXTRA_INITIAL_INTENTS, new Intent[] { mediaIntent,imageIntent, textIntent });
+                    startActivity(shareIntent);
+                }
             }
         });
 
@@ -478,6 +520,9 @@ public class PlaySongFragment extends BottomSheetDialogFragment implements Fetch
                         int CurrentPosition = (mediaPlayerManager.getMediaPlayer().getCurrentPosition() / 1000);
                         seekBar.setProgress(CurrentPosition);
                         duration_played.setText(formattedTime(CurrentPosition));
+                        if (CurrentPosition == mediaPlayerManager.getMediaPlayer().getDuration() / 1000 ){
+                            PlayNextSong();
+                        }
                         handler.postDelayed(this, 500); // Update every 500 milliseconds
                     }
                 }
@@ -514,14 +559,21 @@ public class PlaySongFragment extends BottomSheetDialogFragment implements Fetch
                     mediaPlayerManager.getMediaPlayer().pause();
                 }
                 mediaPlayerManager.setIsPlaying(false);
+                if (playingStateChangeListener != null) {
+                    playingStateChangeListener.onPlayingStateChanged(isPlaying);
+                }
                 pauseBtn.setBackgroundResource(R.drawable.play);
             } else {
-                if (mediaPlayerManager.getMediaPlayer() != null) { // Check if mediaPlayer is initialized
+                if (mediaPlayerManager.getMediaPlayer() != null) { 
                     mediaPlayerManager.getMediaPlayer().start();
                 }
                 pauseBtn.setBackgroundResource(R.drawable.pause);
                 mediaPlayerManager.setIsPlaying(true);
-                handler.postDelayed(updateSeekBarRunnable, 0);
+                isPlaying = true;
+                if (playingStateChangeListener != null) {
+                    playingStateChangeListener.onPlayingStateChanged(isPlaying);
+                }
+                handler.postDelayed(updateSeekBarRunnable,0);
             }
         });
     }
