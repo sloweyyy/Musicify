@@ -24,6 +24,7 @@ import android.widget.Toast;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.recyclerview.widget.RecyclerView;
 
 import com.bumptech.glide.Glide;
 import com.example.musicapp.R;
@@ -31,6 +32,8 @@ import com.example.musicapp.adapter.FetchAccessToken;
 import com.example.musicapp.adapter.SongAdapter;
 import com.example.musicapp.manager.MediaPlayerManager;
 import com.example.musicapp.manager.OnSongSelectedListener;
+import com.example.musicapp.model.AlbumSimplified;
+import com.example.musicapp.model.Artist;
 import com.example.musicapp.model.BottomAppBarListener;
 import com.example.musicapp.model.Song;
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment;
@@ -59,6 +62,8 @@ public class PlaySongFragment extends BottomSheetDialogFragment implements Fetch
     private Runnable updateSeekBarRunnable;
     private int currentPosition;
     private List<Song> songList;
+
+    private String albumId;
     private MediaPlayerManager mediaPlayerManager;
     private String songnameValue, artistnameValue, avataValue, played_value, total_value, urlAudioValue;
     private TextView songname, artistname, duration_played, duration_total, lyric;
@@ -218,30 +223,19 @@ public class PlaySongFragment extends BottomSheetDialogFragment implements Fetch
         share.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                String data = "Nga";
-                if (data != null){
-//                    songnameValue = songName;
-//                    artistnameValue = artistName;
-//                    avataValue = imageUrl;
-//                    urlAudioValue = playUrl;
-                    Intent textIntent = new Intent(Intent.ACTION_SEND);
-                    textIntent.putExtra(Intent.EXTRA_TEXT, songnameValue + " (" + artistnameValue + ")");
-                    textIntent.setType("text/plain");
-
-                    // Chia sẻ audio/ảnh
-                    Intent mediaIntent = new Intent(Intent.ACTION_SEND);
-                    mediaIntent.putExtra(Intent.EXTRA_STREAM, Uri.parse(urlAudioValue)); // Hoặc imageUri
-                    mediaIntent.setType("audio/*"); // Hoặc "image/*"
-
-                    Intent imageIntent = new Intent(Intent.ACTION_SEND);
-                    imageIntent.putExtra(Intent.EXTRA_STREAM, Uri.parse(avataValue));
-                    imageIntent.setType("image/*");
-
-                    // Tạo Intent Chooser
-                    Intent shareIntent = Intent.createChooser(textIntent, "Send to");
-                    shareIntent.putExtra(Intent.EXTRA_INITIAL_INTENTS, new Intent[] { mediaIntent,imageIntent, textIntent });
-                    startActivity(shareIntent);
-                }
+                Intent textIntent = new Intent(Intent.ACTION_SEND);
+                textIntent.putExtra(Intent.EXTRA_TEXT, urlAudioValue);
+                textIntent.setType("text/plain");
+                Intent shareIntent = Intent.createChooser(textIntent, "Send to");
+                startActivity(shareIntent);
+            }
+        });
+        album.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                MoveToAlbumDetail(albumId);
+                view.setVisibility(View.GONE);
+                dialog.dismiss();
             }
         });
 
@@ -484,6 +478,7 @@ public class PlaySongFragment extends BottomSheetDialogFragment implements Fetch
         artistname.setText(artistName);
         Glide.with(getActivity()).load(imageUrl).into(cover_art);
 
+        albumId = track.album.getId();
         songnameValue = songName;
         artistnameValue = artistName;
         avataValue = imageUrl;
@@ -496,8 +491,10 @@ public class PlaySongFragment extends BottomSheetDialogFragment implements Fetch
             @Override
             public void onClick(View v) {
                 MoveToArtistDetail(track.artists.get(0).getId());
+                view.setVisibility(View.GONE);
             }
         });
+
     }
     @Override
     public void onPause() {
@@ -586,7 +583,30 @@ public class PlaySongFragment extends BottomSheetDialogFragment implements Fetch
 
     public void MoveToArtistDetail (String artistId)
     {
+            ArtistDetailFragment artistDetailFragment = new ArtistDetailFragment();
+            artistDetailFragment.setArtistId(artistId);
+            Bundle args = new Bundle();
+            args.putString("artistId", artistId);
+            artistDetailFragment.setArguments(args);
+            ((AppCompatActivity)getContext()).getSupportFragmentManager()
+                    .beginTransaction()
+                    .replace(R.id.frame_layout, artistDetailFragment)
+                    .addToBackStack(null)
+                    .commit();
 
+    }
+    public void MoveToAlbumDetail(String albumId){
+        AlbumDetailFragment likedAlbumDetailFragment= new AlbumDetailFragment();
+        likedAlbumDetailFragment.setAlbumId(albumId);
+        Bundle args = new Bundle();
+        args.putString("albumId",albumId);
+        likedAlbumDetailFragment.setArguments(args);
+        // Add the Fragment to the Activity
+        ((AppCompatActivity)getContext()).getSupportFragmentManager()
+                .beginTransaction()
+                .replace(R.id.frame_layout, likedAlbumDetailFragment)
+                .addToBackStack(null)
+                .commit();
     }
     public void showError(Response<TrackModel> response) {
         try {
