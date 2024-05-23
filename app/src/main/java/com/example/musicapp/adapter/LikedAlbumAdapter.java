@@ -59,8 +59,8 @@ public class LikedAlbumAdapter extends RecyclerView.Adapter<LikedAlbumAdapter.Vi
         String imageUrl = album.getImages().get(0).getUrl();
         holder.albumName.setText(songName);
         holder.albumArtist.setText(artistName);
-        Glide.with(context).load(imageUrl).into(holder.albumImage);
-
+//        Glide.with(context).load(imageUrl).into(holder.albumImage);
+        Glide.with(holder.itemView.getContext()).load(imageUrl).into(holder.albumImage);
         checkIsLiked(album.getId(), new OnIsLikedCallback() {
             @Override
             public void onResult(boolean isLiked) {
@@ -146,15 +146,15 @@ public class LikedAlbumAdapter extends RecyclerView.Adapter<LikedAlbumAdapter.Vi
             });
         }
 
-        public void bind(AlbumSimplified album) {
-            String songName = album.getName();
-            String artistName = album.getArtists().get(0).getName();
-            String imageUrl = album.getImages().get(0).getUrl();
-
-            albumName.setText(songName);
-            albumArtist.setText(artistName);
-            Glide.with(context).load(imageUrl).into(albumImage);
-        }
+//        public void bind(AlbumSimplified album) {
+//            String songName = album.getName();
+//            String artistName = album.getArtists().get(0).getName();
+//            String imageUrl = album.getImages().get(0).getUrl();
+//
+//            albumName.setText(songName);
+//            albumArtist.setText(artistName);
+//            Glide.with(context).load(imageUrl).into(albumImage);
+//        }
 
         @Override
         public void onClick(View v) {
