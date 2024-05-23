@@ -1,0 +1,68 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:id="@+id/mini_player_layout"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:background="@color/black"
+    android:gravity="center_vertical"
+    android:orientation="horizontal"
+    android:padding="8dp"
+    android:visibility="visible">
+
+    <ImageView
+        android:id="@+id/mini_player_image"
+        android:layout_width="50dp"
+        android:layout_height="50dp"
+        android:src="@drawable/playlist_image" />
+
+    <LinearLayout
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="8dp"
+        android:layout_weight="1"
+        android:orientation="vertical">
+
+        <TextView
+            android:id="@+id/mini_player_song_title"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:ellipsize="end"
+            android:maxLines="1"
+            android:text="Hiện không có bài hát nào phát"
+            android:textColor="@color/white"
+            android:textSize="16sp" />
+
+        <TextView
+            android:id="@+id/mini_player_artist_name"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:ellipsize="end"
+            android:maxLines="1"
+            android:text="Không rõ"
+            android:textColor="@color/gray"
+            android:textSize="14sp" />
+    </LinearLayout>
+
+    <ImageView
+        android:id="@+id/mini_player_previous_button"
+        android:layout_width="30dp"
+        android:layout_height="30dp"
+        android:src="@drawable/previous"
+        app:tint="@color/green" />
+
+    <ImageView
+        android:id="@+id/mini_player_play_pause_button"
+        android:layout_width="30dp"
+        android:layout_height="30dp"
+        android:src="@drawable/ic_play"
+        app:tint="@color/green" />
+
+    <ImageView
+        android:id="@+id/mini_player_next_button"
+        android:layout_width="30dp"
+        android:layout_height="30dp"
+        android:src="@drawable/next"
+        app:tint="@color/green" />
+
+</LinearLayout>

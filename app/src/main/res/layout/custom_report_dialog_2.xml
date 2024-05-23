@@ -47,7 +47,7 @@
                     android:layout_gravity="center_vertical"
                     android:autofillHints="password"
                     android:background="@android:color/transparent"
-                    android:hint="Enter your feedback or report"
+                    android:hint="What is your reason to report this song?"
                     android:padding="10dp"
                     android:textColorHint="#A7A7A7" />
 

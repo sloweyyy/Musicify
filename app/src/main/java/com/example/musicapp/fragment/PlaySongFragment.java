@@ -2,8 +2,11 @@ package com.example.musicapp.fragment;
 
 import android.annotation.SuppressLint;
 import android.app.AlertDialog;
+import android.app.Dialog;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
+import android.graphics.Color;
 import android.net.Uri;
 import android.os.Bundle;
 import android.os.Handler;
@@ -23,7 +26,6 @@ import android.widget.Toast;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
-import androidx.recyclerview.widget.RecyclerView;
 
 import com.bumptech.glide.Glide;
 import com.example.musicapp.R;
@@ -31,20 +33,25 @@ import com.example.musicapp.adapter.FetchAccessToken;
 import com.example.musicapp.adapter.SongAdapter;
 import com.example.musicapp.manager.MediaPlayerManager;
 import com.example.musicapp.manager.OnSongSelectedListener;
-import com.example.musicapp.model.AlbumSimplified;
-import com.example.musicapp.model.Artist;
-import com.example.musicapp.model.BottomAppBarListener;
 import com.example.musicapp.model.Song;
+import com.google.android.gms.tasks.OnFailureListener;
+import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment;
 import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.database.collection.LLRBNode;
+import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FieldValue;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.gson.annotations.SerializedName;
 
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
+import jp.wasabeef.blurry.Blurry;
 import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
@@ -64,7 +71,7 @@ public class PlaySongFragment extends BottomSheetDialogFragment implements Fetch
 
     private String albumId;
     private MediaPlayerManager mediaPlayerManager;
-    private String songnameValue, artistnameValue, avataValue, played_value, total_value, urlAudioValue;
+    private String songnameValue, artistnameValue, avataValue, played_value, total_value, urlAudioValue, artistId;
     private TextView songname, artistname, duration_played, duration_total, lyric;
     private ImageView cover_art, threeDots;
     private ImageButton repeateBtn, previousBtn, pauseBtn, nextBtn, shuffleBtn, show_lyricBtn;
@@ -82,6 +89,7 @@ public class PlaySongFragment extends BottomSheetDialogFragment implements Fetch
     private ImageView heartBtn;
     private String songId, previousSongId, nextSongId;
 
+    private ImageView miniPlayerPlayPauseButton;
 
     private SongAdapter songAdapter; // Add SongAdapter here
 
@@ -106,8 +114,8 @@ public class PlaySongFragment extends BottomSheetDialogFragment implements Fetch
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         view = inflater.inflate(R.layout.play_song, container, false);
         // hide bottom navigation bar
-        ((BottomAppBarListener) requireActivity()).hideBottomAppBar();
         fetchAccessToken = new FetchAccessToken();
+
         fetchAccessToken.getTokenFromSpotify(this);
         mediaPlayerManager = MediaPlayerManager.getInstance();
         initializeViews();
@@ -117,6 +125,32 @@ public class PlaySongFragment extends BottomSheetDialogFragment implements Fetch
             previousSongId = getArguments().getString("previousSongId");
             nextSongId = getArguments().getString("nextSongId");
         }
+
+        // get recentlyplayed from firebase
+        if (songList == null) {
+            songList = new ArrayList<>();
+        }
+        FirebaseAuth mAuth = FirebaseAuth.getInstance();
+        String userId = mAuth.getCurrentUser().getUid();
+        FirebaseFirestore db = FirebaseFirestore.getInstance();
+        db.collection("users").document(userId).get().addOnSuccessListener(documentSnapshot -> {
+            if (documentSnapshot.exists()) {
+                List<String> recentlyPlayed = (List<String>) documentSnapshot.get("recentlyplayed");
+                if (recentlyPlayed != null) {
+                    for (String songId : recentlyPlayed) {
+                        db.collection("songs").document(songId).get().addOnSuccessListener(documentSnapshot1 -> {
+                            if (documentSnapshot1.exists()) {
+                                Song song = documentSnapshot1.toObject(Song.class);
+                                songList.add(song);
+                            }
+                        });
+                    }
+                }
+            }
+        });
+
+
+        setCurrentSongList(songList, songId);
         if (getActivity() instanceof OnPlayingStateChangeListener) {
             playingStateChangeListener = (OnPlayingStateChangeListener) getActivity();
         }
@@ -198,7 +232,10 @@ public class PlaySongFragment extends BottomSheetDialogFragment implements Fetch
                 Log.d("PlaySongFragment", "onClick: Three dots clicked" + songId);
             }
         });
-
+        miniPlayerPlayPauseButton = requireActivity().findViewById(R.id.mini_player_play_pause_button);
+        MiniPlayerListener miniPlayerListener = (MiniPlayerListener) requireActivity();
+        miniPlayerListener.updateMiniPlayer(songList, getCurrentSongIndex(songId));
+        miniPlayerListener.showMiniPlayer();
         return view;
     }
 
@@ -212,7 +249,6 @@ public class PlaySongFragment extends BottomSheetDialogFragment implements Fetch
 
         LinearLayout addToPlaylist = dialogView.findViewById(R.id.addToPlaylist);
         LinearLayout album = dialogView.findViewById(R.id.album);
-        LinearLayout download = dialogView.findViewById(R.id.download);
         LinearLayout share = dialogView.findViewById(R.id.share);
         LinearLayout report = dialogView.findViewById(R.id.report);
         Button cancel = dialogView.findViewById(R.id.cancel);
@@ -222,7 +258,80 @@ public class PlaySongFragment extends BottomSheetDialogFragment implements Fetch
         report.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                Dialog dialogReport = new Dialog(getActivity());
+                dialogReport.setContentView(R.layout.custom_report_dialog_2);
+                if(getActivity() != null) {
+                    int width = (int)(getResources().getDisplayMetrics().widthPixels*0.90);
+                    dialogReport.getWindow().setLayout(width, ViewGroup.LayoutParams.WRAP_CONTENT);
+                }
+                dialogReport.setCancelable(false);
+                Button btnCancel = dialogReport.findViewById(R.id.btnCancel);
+                Button btnReportSend = dialogReport.findViewById(R.id.btnReportSend);
+                TextView inputReport = dialogReport.findViewById(R.id.inputReport);
+                TextView reportSucess = dialogReport.findViewById(R.id.reportSucess);
+                String reportContent = inputReport.getText().toString();
 
+                //Blurry.with(getContext()).radius(10).sampling(2).onto((ViewGroup)view);
+                dialogReport.show();
+                btnCancel.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        dialogReport.dismiss();
+
+                    }
+                });
+                btnReportSend.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        if (reportContent.isEmpty()) {
+                            reportSucess.setText("Please give us feedback.");
+                            reportSucess.setTextColor(Color.RED);
+                            reportSucess.setVisibility(View.VISIBLE);
+                            inputReport.requestFocus();
+                            new Handler().postDelayed(new Runnable() {
+                                @Override
+                                public void run() {
+                                    reportSucess.setVisibility(View.GONE);
+                                }
+                            }, 6000);
+                        }
+                        else{
+                            Map<String, Object> updates = new HashMap<>();
+                            String subject = "Thanks for sending us Feedback&Error report";
+                            updates.put("reportContent", reportContent);
+                            FirebaseFirestore db = FirebaseFirestore.getInstance();
+                            db.collection("reports_1")
+                                    .add(updates)
+                                    .addOnSuccessListener(new OnSuccessListener<DocumentReference>() {
+                                        @Override
+                                        public void onSuccess(DocumentReference documentReference) {
+                                            Log.d("saveErrorReport", "DocumentSnapshot added with ID: " + documentReference.getId());
+                                        }
+                                    })
+                                    .addOnFailureListener(new OnFailureListener() {
+                                        @Override
+                                        public void onFailure(@NonNull Exception e) {
+
+                                        }
+                                    });
+                            dialog.setOnDismissListener(new DialogInterface.OnDismissListener() {
+                                @Override
+                                public void onDismiss(DialogInterface dialog) {
+                                    //Blurry.delete((ViewGroup)view);
+                                }
+                            });
+                        }
+                        reportSucess.setVisibility(View.VISIBLE);
+                        reportSucess.setText("Thanks for giving us report! We hope you decide again");
+                        dialogReport.dismiss();
+                        new Handler().postDelayed(new Runnable() {
+                            @Override
+                            public void run() {
+                                dialogReport.dismiss();
+                            }
+                        },3000);
+                    }
+                });
             }
         });
         share.setOnClickListener(new View.OnClickListener() {
@@ -250,7 +359,6 @@ public class PlaySongFragment extends BottomSheetDialogFragment implements Fetch
                 dialog.dismiss();
             }
         });
-
         addToPlaylist.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -260,7 +368,7 @@ public class PlaySongFragment extends BottomSheetDialogFragment implements Fetch
                 addToPlayListFragment.setArguments(bundle);
                 addToPlayListFragment.show(getChildFragmentManager(), "AddToPlayListFragment");
 
-                dialog.dismiss(); // Dismiss your previous dialog if needed
+                dialog.dismiss();
             }
         });
     }
@@ -280,7 +388,6 @@ public class PlaySongFragment extends BottomSheetDialogFragment implements Fetch
     }
 
     public void PlayPreviousSong() {
-        ((BottomAppBarListener) requireActivity()).hideBottomAppBar();
         int currentIndex = getCurrentSongIndex(songId);
         String previousSongId = "";
         if (currentIndex > 0) {
@@ -289,10 +396,11 @@ public class PlaySongFragment extends BottomSheetDialogFragment implements Fetch
             previousSongId = songList.get(songList.size() - 1).getId();
         }
         updateCurrentSong(previousSongId);
+        MiniPlayerListener miniPlayerListener = (MiniPlayerListener) requireActivity();
+        miniPlayerListener.updateMiniPlayer(songList, getCurrentSongIndex(songId));
     }
 
-    private void PlayNextSong() {
-        ((BottomAppBarListener) requireActivity()).hideBottomAppBar();
+    public void PlayNextSong() {
         int currentIndex = getCurrentSongIndex(songId);
         String nextSongId = "";
         if (currentIndex < songList.size() - 1) {
@@ -301,23 +409,28 @@ public class PlaySongFragment extends BottomSheetDialogFragment implements Fetch
             nextSongId = songList.get(0).getId();
         }
         updateCurrentSong(nextSongId);
+        MiniPlayerListener miniPlayerListener = (MiniPlayerListener) requireActivity();
+        miniPlayerListener.updateMiniPlayer(songList, getCurrentSongIndex(songId));
     }
 
     private void PlayRandomSong() {
-        ((BottomAppBarListener) requireActivity()).hideBottomAppBar();
         int randomIndex = (int) (Math.random() * songList.size());
         String nextSongId = songList.get(randomIndex).getId();
         updateCurrentSong(nextSongId);
     }
 
     private Song getSongById(String songId) {
-        for (Song song : songList) {
-            if (song.getId().equals(songId)) {
-                return song;
+        if (songList != null) {
+            for (Song song : songList) {
+                if (song.getId().equals(songId)) {
+                    return song;
+                }
             }
         }
-        throw new IllegalArgumentException("Song with ID " + songId + " not found.");
+        Log.e("PlaySongFragment", "Song with ID " + songId + " not found.");
+        return null;
     }
+
 
     private void ShowLyric() {
         LyricFragment lyricFragment = new LyricFragment();
@@ -332,19 +445,21 @@ public class PlaySongFragment extends BottomSheetDialogFragment implements Fetch
         args.putString("songName", songnameValue);
         args.putString("artistName", artistnameValue);
         args.putString("avata", avataValue);
-
+        args.putString("albumId", albumId);
+        args.putString("urlAudio", urlAudioValue);
         args.putString("playedDuration", played_value);
         args.putString("totalDuration", total_value);
+        args.putString("artistId", artistId);
 
         lyricFragment.setArguments(args);
-        ((AppCompatActivity) requireContext()).getSupportFragmentManager().beginTransaction().replace(R.id.frame_layout, lyricFragment, "LyricFragment").addToBackStack("LyricFragment").commit();
+        ((AppCompatActivity) requireContext())
+                .getSupportFragmentManager()
+                .beginTransaction()
+                .replace(R.id.frame_layout, lyricFragment, "LyricFragment")
+                .addToBackStack("LyricFragment")
+                .commit();
     }
 
-    @Override
-    public void onDestroyView() {
-        super.onDestroyView();
-        ((BottomAppBarListener) requireActivity()).showBottomAppBar();
-    }
 
     public void setSongId(String songId) {
         this.songId = songId;
@@ -396,6 +511,12 @@ public class PlaySongFragment extends BottomSheetDialogFragment implements Fetch
                         }
                     }
                 });
+            }
+        });
+        threeDots.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                showMoreOptionsDialog(getContext());
             }
         });
 
@@ -506,7 +627,7 @@ public class PlaySongFragment extends BottomSheetDialogFragment implements Fetch
         artistnameValue = artistName;
         avataValue = imageUrl;
         urlAudioValue = playUrl;
-
+        artistId = track.artists.get(0).getId();
         setupMediaPlayer(playUrl);
         setupSeekBar();
         setupPauseButton();
@@ -517,13 +638,18 @@ public class PlaySongFragment extends BottomSheetDialogFragment implements Fetch
                 view.setVisibility(View.GONE);
             }
         });
-
+        MiniPlayerListener miniPlayerListener = (MiniPlayerListener) requireActivity();
+        Log.d("Song list", songList.toString() + " " + getCurrentSongIndex(songId));
+        miniPlayerListener.updateMiniPlayer(songList, getCurrentSongIndex(songId));
+        miniPlayerListener.showMiniPlayer();
     }
+
 
     @Override
     public void onPause() {
         super.onPause();
         if (mediaPlayerManager.getMediaPlayer() != null) {
+            mediaPlayerManager.setLastPlaybackPosition(mediaPlayerManager.getMediaPlayer().getCurrentPosition());
         }
     }
 
@@ -537,7 +663,8 @@ public class PlaySongFragment extends BottomSheetDialogFragment implements Fetch
             mediaPlayerManager.setMediaSource(playUrl);
             mediaPlayerManager.setIsPlaying(true);
             if (mediaPlayerManager.getIsPlaying()) {
-                mediaPlayerManager.getMediaPlayer().seekTo(mediaPlayerManager.getCurrentPosition());
+//                mediaPlayerManager.getMediaPlayer().seekTo(mediaPlayerManager.getCurrentPosition());
+                mediaPlayerManager.getMediaPlayer().seekTo(mediaPlayerManager.getLastPlaybackPosition());
                 mediaPlayerManager.getMediaPlayer().start();
             }
             seekBar.setMax((int) (mediaPlayerManager.getMediaPlayer().getDuration() / 1000));
@@ -584,21 +711,29 @@ public class PlaySongFragment extends BottomSheetDialogFragment implements Fetch
     }
 
     public void setupPauseButton() {
+            mediaPlayerManager.setIsPlaying(true);
+            isPlaying = true;
+            if (playingStateChangeListener != null) {
+                playingStateChangeListener.onPlayingStateChanged(isPlaying);
+            }
         pauseBtn.setOnClickListener(v -> {
             if (mediaPlayerManager.getIsPlaying() == true) {
                 if (mediaPlayerManager.getMediaPlayer() != null) { // Check if mediaPlayer is initialized
+                    //currentPosition = mediaPlayerManager.getMediaPlayer().getCurrentPosition();
                     mediaPlayerManager.getMediaPlayer().pause();
+
                 }
                 mediaPlayerManager.setIsPlaying(false);
+                isPlaying = false;
                 if (playingStateChangeListener != null) {
                     playingStateChangeListener.onPlayingStateChanged(isPlaying);
                 }
-                pauseBtn.setBackgroundResource(R.drawable.play);
+                pauseBtn.setBackgroundResource(R.drawable.ic_play);
             } else {
                 if (mediaPlayerManager.getMediaPlayer() != null) {
                     mediaPlayerManager.getMediaPlayer().start();
                 }
-                pauseBtn.setBackgroundResource(R.drawable.pause);
+                pauseBtn.setBackgroundResource(R.drawable.ic_pause);
                 mediaPlayerManager.setIsPlaying(true);
                 isPlaying = true;
                 if (playingStateChangeListener != null) {
@@ -609,25 +744,21 @@ public class PlaySongFragment extends BottomSheetDialogFragment implements Fetch
         });
     }
 
-    public void MoveToArtistDetail (String artistId)
-    {
-            ArtistDetailFragment artistDetailFragment = new ArtistDetailFragment();
-            artistDetailFragment.setArtistId(artistId);
-            Bundle args = new Bundle();
-            args.putString("artistId", artistId);
-            artistDetailFragment.setArguments(args);
-            ((AppCompatActivity)getContext()).getSupportFragmentManager()
-                    .beginTransaction()
-                    .replace(R.id.frame_layout, artistDetailFragment)
-                    .addToBackStack(null)
-                    .commit();
+    public void MoveToArtistDetail(String artistId) {
+        ArtistDetailFragment artistDetailFragment = new ArtistDetailFragment();
+        artistDetailFragment.setArtistId(artistId);
+        Bundle args = new Bundle();
+        args.putString("artistId", artistId);
+        artistDetailFragment.setArguments(args);
+        ((AppCompatActivity) getContext()).getSupportFragmentManager().beginTransaction().replace(R.id.frame_layout, artistDetailFragment).addToBackStack(null).commit();
 
     }
-    public void MoveToAlbumDetail(String albumId){
-        AlbumDetailFragment likedAlbumDetailFragment= new AlbumDetailFragment();
+
+    public void MoveToAlbumDetail(String albumId) {
+        AlbumDetailFragment likedAlbumDetailFragment = new AlbumDetailFragment();
         likedAlbumDetailFragment.setAlbumId(albumId);
         Bundle args = new Bundle();
-        args.putString("albumId",albumId);
+        args.putString("albumId", albumId);
         likedAlbumDetailFragment.setArguments(args);
         // Add the Fragment to the Activity
         ((AppCompatActivity)getContext()).getSupportFragmentManager()
@@ -635,7 +766,7 @@ public class PlaySongFragment extends BottomSheetDialogFragment implements Fetch
                 .replace(R.id.frame_layout, likedAlbumDetailFragment)
                 .addToBackStack(null)
                 .commit();
-    }
+    } 
     public void showError(Response<TrackModel> response) {
         try {
             assert response.errorBody() != null;
@@ -767,6 +898,7 @@ public class PlaySongFragment extends BottomSheetDialogFragment implements Fetch
             private List<ImageModel> images;
             @SerializedName("id")
             private String id;
+
             public String getId() {
                 return id;
             }
@@ -782,8 +914,34 @@ public class PlaySongFragment extends BottomSheetDialogFragment implements Fetch
         }
     }
 
+    public void updatePlayPauseButton() {
+        if (mediaPlayerManager.getIsPlaying()) {
+            miniPlayerPlayPauseButton.setImageResource(R.drawable.ic_pause);
+        } else {
+            miniPlayerPlayPauseButton.setImageResource(R.drawable.ic_play);
+        }
+    }
+
+    public void playPause() {
+        if (mediaPlayerManager.getIsPlaying()) {
+            mediaPlayerManager.getMediaPlayer().pause();
+        } else {
+            mediaPlayerManager.getMediaPlayer().start();
+        }
+        mediaPlayerManager.setIsPlaying(!mediaPlayerManager.getIsPlaying());
+        updatePlayPauseButton();
+    }
+
     public interface OnPreviousSongClickListener {
         void onPreviousSongClick(String previousSongId);
+    }
+
+    public interface MiniPlayerListener {
+        void updateMiniPlayer(List<Song> songList, int currentPosition);
+
+        void showMiniPlayer();
+
+        void hideMiniPlayer();
     }
 
 }

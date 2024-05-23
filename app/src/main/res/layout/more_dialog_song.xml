@@ -3,9 +3,9 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="@dimen/_250sdp"
-    android:layout_height="@dimen/_270sdp"
+    android:layout_height="@dimen/_240sdp"
     android:layout_margin="8dp"
-    app:cardCornerRadius="8dp"
+    app:cardCornerRadius="10dp"
     android:layout_gravity="center"
     app:cardElevation="4dp">
     <LinearLayout
@@ -61,28 +61,6 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="Album"
-                android:textStyle="normal"
-                android:textSize="@dimen/_16sdp"
-                android:layout_marginLeft="@dimen/_10sdp"
-                android:textColor="@color/white"/>
-        </LinearLayout>
-        <LinearLayout
-            android:id="@+id/download"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginVertical="@dimen/_7sdp"
-            android:layout_marginLeft="@dimen/_10sdp"
-            android:gravity="center_vertical">
-            <ImageButton
-                android:layout_width="25dp"
-                android:contentDescription="report Infor"
-                android:layout_height="25dp"
-                android:background="@drawable/download"
-                android:backgroundTint="@color/white"/>
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="Download"
                 android:textStyle="normal"
                 android:textSize="@dimen/_16sdp"
                 android:layout_marginLeft="@dimen/_10sdp"
