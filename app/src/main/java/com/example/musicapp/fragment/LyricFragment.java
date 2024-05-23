@@ -237,6 +237,7 @@ public class LyricFragment extends Fragment implements FetchAccessToken.AccessTo
                 }
                 pauseBtn.setBackgroundResource(R.drawable.pause);
                 mediaPlayerManager.setIsPlaying(true);
+                handler.postDelayed(updateSeekBarRunnable, 0);
             }
         });
 
