@@ -195,7 +195,7 @@ public class ArtistDetailFragment extends Fragment implements FetchAccessToken.A
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         view = inflater.inflate(R.layout.fragment_artist_detail, container, false);
-        ((BottomAppBarListener) requireActivity()).hideBottomAppBar();
+        ((BottomAppBarListener) requireActivity()).showBottomAppBar();
         recyclerViewAlbums = view.findViewById(R.id.recyclerView_Albums);
         recyclerViewSongs = view.findViewById(R.id.recyclerView_Songs);
         artistName = view.findViewById(R.id.artistName);
