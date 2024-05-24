@@ -4,14 +4,14 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="#1c1b1b">
+    android:background="#1c1b1b"
+    android:layout_marginTop="@dimen/_30sdp">
 
     <androidx.cardview.widget.CardView
         android:id="@+id/buttonSearchExplore"
         android:layout_width="match_parent"
         android:layout_height="48dp"
         android:layout_marginHorizontal="@dimen/_20sdp"
-        android:layout_marginTop="36dp"
         app:cardCornerRadius="20dp"
         app:cardBackgroundColor="#D9D9D9"
         app:cardElevation="0dp"

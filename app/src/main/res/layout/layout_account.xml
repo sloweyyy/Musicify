@@ -18,7 +18,7 @@
         <ImageView
             android:id="@+id/backgroundAvatar"
             android:layout_width="match_parent"
-            android:layout_height="@dimen/_150sdp"
+            android:layout_height="@dimen/_170sdp"
             android:background="@drawable/bg_avatar_corners"
             android:scaleType="fitXY" />
 
