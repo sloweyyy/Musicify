@@ -16,14 +16,14 @@
         android:orientation="horizontal">
 
         <LinearLayout
-            android:id="@+id/backButtonLayout"
+            android:id="@+id/iconBackPlayingLayout"
             android:layout_width="@dimen/_30sdp"
             android:layout_height="@dimen/_30sdp"
             android:layout_weight="0"
             android:background="@drawable/back_btn_custom"
             android:gravity="center"
             android:orientation="horizontal"
-            android:visibility="invisible">
+            >
 
             <Button
                 android:id="@+id/iconBackPlaying"
@@ -46,7 +46,7 @@
             android:textSize="24sp">
         </TextView>
         <LinearLayout
-
+            android:id="@+id/threeDotsLayout"
             android:layout_width="@dimen/_30sdp"
             android:layout_height="@dimen/_30sdp"
             android:background="@drawable/back_btn_custom"
