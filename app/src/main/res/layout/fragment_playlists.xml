@@ -47,7 +47,7 @@
                         android:clickable="true"
                         android:focusable="true"
                         android:src="@drawable/add"
-                        app:tint="@color/caribbean_current" />
+                        app:tint="@color/dark_caribbean_current" />
 
                     <!-- Text for add new playlist -->
                     <TextView
@@ -91,7 +91,7 @@
                         android:clickable="true"
                         android:focusable="true"
                         android:src="@drawable/liked"
-                        app:tint="@color/caribbean_current"
+                        app:tint="@color/dark_caribbean_current"
 
                         />
 
@@ -135,7 +135,7 @@
                     android:layout_gravity="center_vertical"
                     android:layout_marginStart="15dp"
                     android:text="Recently played"
-                    android:textColor="@color/caribbean_current"
+                    android:textColor="@color/dark_caribbean_current"
                     android:textSize="18sp" />
             </LinearLayout>
         </LinearLayout>
