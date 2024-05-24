@@ -627,6 +627,7 @@ public class PlaySongFragment extends BottomSheetDialogFragment implements Fetch
         urlAudioValue = playUrl;
         artistId = track.artists.get(0).getId();
         setupMediaPlayer(playUrl);
+        mediaPlayerManager.getMediaPlayer().seekTo(0);
         setupSeekBar();
         setupPauseButton();
         artistname.setOnClickListener(new View.OnClickListener() {
