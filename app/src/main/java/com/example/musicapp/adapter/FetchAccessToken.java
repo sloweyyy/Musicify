@@ -63,7 +63,7 @@ public class FetchAccessToken
 
         SpotifyAuthService authService = retrofit.create(SpotifyAuthService.class);
         AccessTokenWrapper accessTokenWrapper = new AccessTokenWrapper();
-        String credentials = "19380ddfc0344af29cb61de3c6655fda:1b0bf947882f4b89a1705cc65443ae9c";
+        String credentials = "b5f0a6c3766c4b289bcf0fb3e6e94242:f24468c86f82426baac220142d3e0451";
         String authoToken = Base64.getEncoder().encodeToString(credentials.getBytes());
         String authorization = "Basic " + authoToken;
         String grantType = "client_credentials";
