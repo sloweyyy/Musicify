@@ -14,8 +14,11 @@
             android:id="@+id/recentSongTitle"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:padding="16dp"
+            android:textSize="@dimen/_14sdp"
+            android:padding="@dimen/_8sdp"
             android:text="New release songs"
+            android:textStyle="bold"
+            android:textColor="#479C75"
             android:textAppearance="?android:attr/textAppearanceMedium" />
 
         <androidx.recyclerview.widget.RecyclerView
@@ -29,8 +32,11 @@
             android:id="@+id/sectionTitle"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:padding="16dp"
+            android:textSize="@dimen/_14sdp"
+            android:padding="@dimen/_8sdp"
+            android:textStyle="bold"
             android:text="Playlists"
+            android:textColor="#479C75"
             android:textAppearance="?android:attr/textAppearanceMedium" />
 
         <androidx.recyclerview.widget.RecyclerView

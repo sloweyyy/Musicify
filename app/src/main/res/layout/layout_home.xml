@@ -36,7 +36,8 @@
                     android:textStyle="bold"
                     android:background="@null"
                     android:text="Recently listening"
-                    android:textSize="24dp" />
+                    android:textSize="@dimen/_20sdp"
+                    android:textColor="@color/dark_caribbean_current"/>
 
                 <TextView
                     android:id="@+id/recentSongName"

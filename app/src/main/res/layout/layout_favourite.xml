@@ -15,7 +15,8 @@
             android:layout_weight="1"
             android:gravity="center"
             android:textSize="@dimen/_20sdp"
-            android:textColor="@color/btnColor"/>
+            android:textStyle="bold"
+            android:textColor="@color/dark_caribbean_current"/>
     </LinearLayout>
 
     <com.google.android.material.tabs.TabLayout

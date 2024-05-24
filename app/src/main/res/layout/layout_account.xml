@@ -99,7 +99,7 @@
                 android:layout_marginTop="@dimen/_15sdp"
                 android:layout_marginBottom="@dimen/_10sdp"
                 android:text="Settings"
-                android:textColor="@color/textSettingsColor"
+                android:textColor="@color/dark_caribbean_current"
                 android:textSize="@dimen/_18sdp" />
             <LinearLayout
                 android:id="@+id/linearLayout2"
@@ -131,7 +131,7 @@
                 android:layout_marginTop="@dimen/_15sdp"
                 android:layout_marginBottom="@dimen/_10sdp"
                 android:text="Options"
-                android:textColor="@color/textSettingsColor"
+                android:textColor="@color/dark_caribbean_current"
                 android:textSize="@dimen/_18sdp" />
 
 
