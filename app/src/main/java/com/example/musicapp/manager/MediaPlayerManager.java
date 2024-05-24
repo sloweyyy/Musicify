@@ -10,6 +10,14 @@ public class MediaPlayerManager {
     private static boolean isPlaying;
     private MediaPlayer mediaPlayer;
     private int currentPosition;
+    private int lastPlaybackPosition = 0;
+    public int getLastPlaybackPosition() {
+        return lastPlaybackPosition;
+    }
+
+    public void setLastPlaybackPosition(int position) {
+        this.lastPlaybackPosition = position;
+    }
 
     public int getCurrentPosition() {
         return currentPosition;

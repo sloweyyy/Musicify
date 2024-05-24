@@ -30,19 +30,21 @@ public class SongAdapter extends RecyclerView.Adapter<SongAdapter.ViewHolder> {
 
     private Context context;
     private List<Song> songList;
+
     public interface OnSongSelectedListener {
         void onSongSelected(Song song);
     }
 
-    private  OnSongSelectedListener listener;
+    private OnSongSelectedListener listener;
 
 
-    public SongAdapter(Context context, List<Song> songList ,  OnSongSelectedListener listener) {
+    public SongAdapter(Context context, List<Song> songList, OnSongSelectedListener listener) {
         this.context = context;
         this.songList = songList;
         this.listener = listener;
     }
-    public SongAdapter(Context context, List<Song> songList ) {
+
+    public SongAdapter(Context context, List<Song> songList) {
         this.context = context;
         this.songList = songList;
     }
@@ -65,6 +67,7 @@ public class SongAdapter extends RecyclerView.Adapter<SongAdapter.ViewHolder> {
         });
         notifyDataSetChanged();
     }
+
     public interface OnItemClickListener {
         void onItemClick(PlaylistAPI playlist);
     }
@@ -149,6 +152,7 @@ public class SongAdapter extends RecyclerView.Adapter<SongAdapter.ViewHolder> {
     public int getItemCount() {
         return (songList != null) ? songList.size() : 0;
     }
+
     public class ViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener {
 
         TextView songTitle;
@@ -206,8 +210,8 @@ public class SongAdapter extends RecyclerView.Adapter<SongAdapter.ViewHolder> {
             }
         }
     }
-    public void PlayFirstSong()
-    {
+
+    public void PlayFirstSong() {
         int position = 0;
         if (position != RecyclerView.NO_POSITION) {
             Song selected = songList.get(position);
@@ -222,13 +226,14 @@ public class SongAdapter extends RecyclerView.Adapter<SongAdapter.ViewHolder> {
             args.putString("previousSongId", preId);
             args.putString("nextSongId", nextId);
             fragment.setArguments(args);
-            ((AppCompatActivity)context).getSupportFragmentManager()
+            ((AppCompatActivity) context).getSupportFragmentManager()
                     .beginTransaction()
                     .replace(R.id.frame_layout, fragment)
                     .addToBackStack(null)
                     .commit();
         }
     }
+
     private void removeSongFromLikedSongs(String songId) {
         FirebaseAuth mAuth = FirebaseAuth.getInstance();
         String userId = mAuth.getCurrentUser().getUid();

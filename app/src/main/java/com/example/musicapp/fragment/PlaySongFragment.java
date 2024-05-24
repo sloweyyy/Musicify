@@ -26,7 +26,6 @@ import android.widget.Toast;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
-import androidx.recyclerview.widget.RecyclerView;
 
 import com.bumptech.glide.Glide;
 import com.example.musicapp.R;
@@ -34,9 +33,6 @@ import com.example.musicapp.adapter.FetchAccessToken;
 import com.example.musicapp.adapter.SongAdapter;
 import com.example.musicapp.manager.MediaPlayerManager;
 import com.example.musicapp.manager.OnSongSelectedListener;
-import com.example.musicapp.model.AlbumSimplified;
-import com.example.musicapp.model.Artist;
-import com.example.musicapp.model.BottomAppBarListener;
 import com.example.musicapp.model.Song;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
@@ -50,6 +46,7 @@ import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.gson.annotations.SerializedName;
 
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -92,6 +89,7 @@ public class PlaySongFragment extends BottomSheetDialogFragment implements Fetch
     private ImageView heartBtn;
     private String songId, previousSongId, nextSongId;
 
+    private ImageView miniPlayerPlayPauseButton;
 
     private SongAdapter songAdapter; // Add SongAdapter here
 
@@ -116,8 +114,8 @@ public class PlaySongFragment extends BottomSheetDialogFragment implements Fetch
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         view = inflater.inflate(R.layout.play_song, container, false);
         // hide bottom navigation bar
-        ((BottomAppBarListener) requireActivity()).hideBottomAppBar();
         fetchAccessToken = new FetchAccessToken();
+
         fetchAccessToken.getTokenFromSpotify(this);
         mediaPlayerManager = MediaPlayerManager.getInstance();
         initializeViews();
@@ -127,6 +125,32 @@ public class PlaySongFragment extends BottomSheetDialogFragment implements Fetch
             previousSongId = getArguments().getString("previousSongId");
             nextSongId = getArguments().getString("nextSongId");
         }
+
+        // get recentlyplayed from firebase
+        if (songList == null) {
+            songList = new ArrayList<>();
+        }
+        FirebaseAuth mAuth = FirebaseAuth.getInstance();
+        String userId = mAuth.getCurrentUser().getUid();
+        FirebaseFirestore db = FirebaseFirestore.getInstance();
+        db.collection("users").document(userId).get().addOnSuccessListener(documentSnapshot -> {
+            if (documentSnapshot.exists()) {
+                List<String> recentlyPlayed = (List<String>) documentSnapshot.get("recentlyplayed");
+                if (recentlyPlayed != null) {
+                    for (String songId : recentlyPlayed) {
+                        db.collection("songs").document(songId).get().addOnSuccessListener(documentSnapshot1 -> {
+                            if (documentSnapshot1.exists()) {
+                                Song song = documentSnapshot1.toObject(Song.class);
+                                songList.add(song);
+                            }
+                        });
+                    }
+                }
+            }
+        });
+
+
+        setCurrentSongList(songList, songId);
         if (getActivity() instanceof OnPlayingStateChangeListener) {
             playingStateChangeListener = (OnPlayingStateChangeListener) getActivity();
         }
@@ -201,8 +225,17 @@ public class PlaySongFragment extends BottomSheetDialogFragment implements Fetch
             }
         });
 
-
-
+        threeDots.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                showMoreOptionsDialog(getContext());
+                Log.d("PlaySongFragment", "onClick: Three dots clicked" + songId);
+            }
+        });
+        miniPlayerPlayPauseButton = requireActivity().findViewById(R.id.mini_player_play_pause_button);
+        MiniPlayerListener miniPlayerListener = (MiniPlayerListener) requireActivity();
+        miniPlayerListener.updateMiniPlayer(songList, getCurrentSongIndex(songId));
+        miniPlayerListener.showMiniPlayer();
         return view;
     }
 
@@ -335,7 +368,7 @@ public class PlaySongFragment extends BottomSheetDialogFragment implements Fetch
                 addToPlayListFragment.setArguments(bundle);
                 addToPlayListFragment.show(getChildFragmentManager(), "AddToPlayListFragment");
 
-                dialog.dismiss(); // Dismiss your previous dialog if needed
+                dialog.dismiss();
             }
         });
     }
@@ -355,7 +388,6 @@ public class PlaySongFragment extends BottomSheetDialogFragment implements Fetch
     }
 
     public void PlayPreviousSong() {
-        ((BottomAppBarListener) requireActivity()).hideBottomAppBar();
         int currentIndex = getCurrentSongIndex(songId);
         String previousSongId = "";
         if (currentIndex > 0) {
@@ -364,10 +396,11 @@ public class PlaySongFragment extends BottomSheetDialogFragment implements Fetch
             previousSongId = songList.get(songList.size() - 1).getId();
         }
         updateCurrentSong(previousSongId);
+        MiniPlayerListener miniPlayerListener = (MiniPlayerListener) requireActivity();
+        miniPlayerListener.updateMiniPlayer(songList, getCurrentSongIndex(songId));
     }
 
-    private void PlayNextSong() {
-        ((BottomAppBarListener) requireActivity()).hideBottomAppBar();
+    public void PlayNextSong() {
         int currentIndex = getCurrentSongIndex(songId);
         String nextSongId = "";
         if (currentIndex < songList.size() - 1) {
@@ -376,23 +409,28 @@ public class PlaySongFragment extends BottomSheetDialogFragment implements Fetch
             nextSongId = songList.get(0).getId();
         }
         updateCurrentSong(nextSongId);
+        MiniPlayerListener miniPlayerListener = (MiniPlayerListener) requireActivity();
+        miniPlayerListener.updateMiniPlayer(songList, getCurrentSongIndex(songId));
     }
 
     private void PlayRandomSong() {
-        ((BottomAppBarListener) requireActivity()).hideBottomAppBar();
         int randomIndex = (int) (Math.random() * songList.size());
         String nextSongId = songList.get(randomIndex).getId();
         updateCurrentSong(nextSongId);
     }
 
     private Song getSongById(String songId) {
-        for (Song song : songList) {
-            if (song.getId().equals(songId)) {
-                return song;
+        if (songList != null) {
+            for (Song song : songList) {
+                if (song.getId().equals(songId)) {
+                    return song;
+                }
             }
         }
-        throw new IllegalArgumentException("Song with ID " + songId + " not found.");
+        Log.e("PlaySongFragment", "Song with ID " + songId + " not found.");
+        return null;
     }
+
 
     private void ShowLyric() {
         LyricFragment lyricFragment = new LyricFragment();
@@ -422,11 +460,6 @@ public class PlaySongFragment extends BottomSheetDialogFragment implements Fetch
                 .commit();
     }
 
-    @Override
-    public void onDestroyView() {
-        super.onDestroyView();
-        ((BottomAppBarListener) requireActivity()).showBottomAppBar();
-    }
 
     public void setSongId(String songId) {
         this.songId = songId;
@@ -605,13 +638,18 @@ public class PlaySongFragment extends BottomSheetDialogFragment implements Fetch
                 view.setVisibility(View.GONE);
             }
         });
-
+        MiniPlayerListener miniPlayerListener = (MiniPlayerListener) requireActivity();
+        Log.d("Song list", songList.toString() + " " + getCurrentSongIndex(songId));
+        miniPlayerListener.updateMiniPlayer(songList, getCurrentSongIndex(songId));
+        miniPlayerListener.showMiniPlayer();
     }
+
 
     @Override
     public void onPause() {
         super.onPause();
         if (mediaPlayerManager.getMediaPlayer() != null) {
+            mediaPlayerManager.setLastPlaybackPosition(mediaPlayerManager.getMediaPlayer().getCurrentPosition());
         }
     }
 
@@ -625,7 +663,8 @@ public class PlaySongFragment extends BottomSheetDialogFragment implements Fetch
             mediaPlayerManager.setMediaSource(playUrl);
             mediaPlayerManager.setIsPlaying(true);
             if (mediaPlayerManager.getIsPlaying()) {
-                mediaPlayerManager.getMediaPlayer().seekTo(0);
+//                mediaPlayerManager.getMediaPlayer().seekTo(mediaPlayerManager.getCurrentPosition());
+                mediaPlayerManager.getMediaPlayer().seekTo(mediaPlayerManager.getLastPlaybackPosition());
                 mediaPlayerManager.getMediaPlayer().start();
             }
             seekBar.setMax((int) (mediaPlayerManager.getMediaPlayer().getDuration() / 1000));
@@ -682,18 +721,19 @@ public class PlaySongFragment extends BottomSheetDialogFragment implements Fetch
                 if (mediaPlayerManager.getMediaPlayer() != null) { // Check if mediaPlayer is initialized
                     //currentPosition = mediaPlayerManager.getMediaPlayer().getCurrentPosition();
                     mediaPlayerManager.getMediaPlayer().pause();
+
                 }
                 mediaPlayerManager.setIsPlaying(false);
                 isPlaying = false;
                 if (playingStateChangeListener != null) {
                     playingStateChangeListener.onPlayingStateChanged(isPlaying);
                 }
-                pauseBtn.setBackgroundResource(R.drawable.play);
+                pauseBtn.setBackgroundResource(R.drawable.ic_play);
             } else {
                 if (mediaPlayerManager.getMediaPlayer() != null) {
                     mediaPlayerManager.getMediaPlayer().start();
                 }
-                pauseBtn.setBackgroundResource(R.drawable.pause);
+                pauseBtn.setBackgroundResource(R.drawable.ic_pause);
                 mediaPlayerManager.setIsPlaying(true);
                 isPlaying = true;
                 if (playingStateChangeListener != null) {
@@ -704,25 +744,21 @@ public class PlaySongFragment extends BottomSheetDialogFragment implements Fetch
         });
     }
 
-    public void MoveToArtistDetail (String artistId)
-    {
-            ArtistDetailFragment artistDetailFragment = new ArtistDetailFragment();
-            artistDetailFragment.setArtistId(artistId);
-            Bundle args = new Bundle();
-            args.putString("artistId", artistId);
-            artistDetailFragment.setArguments(args);
-            ((AppCompatActivity)getContext()).getSupportFragmentManager()
-                    .beginTransaction()
-                    .replace(R.id.frame_layout, artistDetailFragment)
-                    .addToBackStack(null)
-                    .commit();
+    public void MoveToArtistDetail(String artistId) {
+        ArtistDetailFragment artistDetailFragment = new ArtistDetailFragment();
+        artistDetailFragment.setArtistId(artistId);
+        Bundle args = new Bundle();
+        args.putString("artistId", artistId);
+        artistDetailFragment.setArguments(args);
+        ((AppCompatActivity) getContext()).getSupportFragmentManager().beginTransaction().replace(R.id.frame_layout, artistDetailFragment).addToBackStack(null).commit();
 
     }
-    public void MoveToAlbumDetail(String albumId){
-        AlbumDetailFragment likedAlbumDetailFragment= new AlbumDetailFragment();
+
+    public void MoveToAlbumDetail(String albumId) {
+        AlbumDetailFragment likedAlbumDetailFragment = new AlbumDetailFragment();
         likedAlbumDetailFragment.setAlbumId(albumId);
         Bundle args = new Bundle();
-        args.putString("albumId",albumId);
+        args.putString("albumId", albumId);
         likedAlbumDetailFragment.setArguments(args);
         // Add the Fragment to the Activity
         ((AppCompatActivity)getContext()).getSupportFragmentManager()
@@ -862,6 +898,7 @@ public class PlaySongFragment extends BottomSheetDialogFragment implements Fetch
             private List<ImageModel> images;
             @SerializedName("id")
             private String id;
+
             public String getId() {
                 return id;
             }
@@ -877,8 +914,34 @@ public class PlaySongFragment extends BottomSheetDialogFragment implements Fetch
         }
     }
 
+    public void updatePlayPauseButton() {
+        if (mediaPlayerManager.getIsPlaying()) {
+            miniPlayerPlayPauseButton.setImageResource(R.drawable.ic_pause);
+        } else {
+            miniPlayerPlayPauseButton.setImageResource(R.drawable.ic_play);
+        }
+    }
+
+    public void playPause() {
+        if (mediaPlayerManager.getIsPlaying()) {
+            mediaPlayerManager.getMediaPlayer().pause();
+        } else {
+            mediaPlayerManager.getMediaPlayer().start();
+        }
+        mediaPlayerManager.setIsPlaying(!mediaPlayerManager.getIsPlaying());
+        updatePlayPauseButton();
+    }
+
     public interface OnPreviousSongClickListener {
         void onPreviousSongClick(String previousSongId);
+    }
+
+    public interface MiniPlayerListener {
+        void updateMiniPlayer(List<Song> songList, int currentPosition);
+
+        void showMiniPlayer();
+
+        void hideMiniPlayer();
     }
 
 }
