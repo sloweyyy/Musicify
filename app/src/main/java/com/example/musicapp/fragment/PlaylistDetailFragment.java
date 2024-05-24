@@ -110,6 +110,7 @@ public class PlaylistDetailFragment extends Fragment implements FetchAccessToken
         fetchAccessToken = new FetchAccessToken();
         fetchAccessToken.getTokenFromSpotify((FetchAccessToken.AccessTokenCallback) this);
         threeDotsButton = view.findViewById(R.id.threeDots);
+        backButton = getView().findViewById(R.id.iconBack);
         descriptionTextView.setVisibility(View.GONE);
 
         storage = FirebaseStorage.getInstance();
@@ -159,8 +160,14 @@ public class PlaylistDetailFragment extends Fragment implements FetchAccessToken
     }
 
     private void setupBackButton() {
-        backButton = getView().findViewById(R.id.iconBack);
-        backButton.setOnClickListener(v -> requireActivity().onBackPressed());
+        backButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                if (getActivity() != null && getActivity().getSupportFragmentManager() != null) {
+                    getActivity().getSupportFragmentManager().popBackStack();
+                }
+            }
+        });
 
     }
 
