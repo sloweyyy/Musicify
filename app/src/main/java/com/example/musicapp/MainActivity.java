@@ -99,6 +99,14 @@ public class MainActivity extends AppCompatActivity implements BottomAppBarListe
         miniPlayerNextButton.setVisibility(View.GONE);
         miniPlayerPreviousButton.setVisibility(View.GONE);
 
+        miniPlayerImage.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Log.d("handler intent", "start");
+                handleIntent(getIntent());
+            }
+        });
+
         miniPlayerNextButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {

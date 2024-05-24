@@ -101,8 +101,7 @@ public class exploreAdapter extends RecyclerView.Adapter<exploreAdapter.myViewHo
 
         if (position % 2 == 0) {
             ViewGroup.MarginLayoutParams layoutParams = (ViewGroup.MarginLayoutParams) holder.cardView.getLayoutParams();
-            layoutParams.setMarginStart(0);
-            holder.cardView.setLayoutParams(layoutParams);
+                       holder.cardView.setLayoutParams(layoutParams);
         } else {
             ViewGroup.MarginLayoutParams layoutParams = (ViewGroup.MarginLayoutParams) holder.cardView.getLayoutParams();
             layoutParams.setMarginEnd(0);
