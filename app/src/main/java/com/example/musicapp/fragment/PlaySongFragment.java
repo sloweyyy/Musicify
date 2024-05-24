@@ -32,6 +32,7 @@ import com.example.musicapp.adapter.FetchAccessToken;
 import com.example.musicapp.adapter.SongAdapter;
 import com.example.musicapp.manager.MediaPlayerManager;
 import com.example.musicapp.manager.OnSongSelectedListener;
+import com.example.musicapp.model.BottomAppBarListener;
 import com.example.musicapp.model.Song;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
@@ -429,6 +430,7 @@ public class PlaySongFragment extends BottomSheetDialogFragment implements Fetch
 
 
     private void ShowLyric() {
+        ((BottomAppBarListener) requireActivity()).hideBottomAppBar();
         LyricFragment lyricFragment = new LyricFragment();
         lyricFragment.setSongName(songnameValue);
         lyricFragment.setArtistName(artistnameValue);
