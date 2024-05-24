@@ -129,6 +129,12 @@ public class MainActivity extends AppCompatActivity implements BottomAppBarListe
                 }
             }
         });
+        miniPlayerImage.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+
+            }
+        });
 
         miniPlayerPreviousButton.setOnClickListener(new View.OnClickListener() {
             @Override
