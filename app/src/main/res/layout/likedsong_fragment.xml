@@ -12,9 +12,8 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="horizontal"
-        android:layout_marginLeft="@dimen/_15sdp"
-        android:layout_marginRight="@dimen/_15sdp"
-        android:layout_marginTop="@dimen/_20sdp"
+        android:layout_marginHorizontal="@dimen/_10sdp"
+        android:layout_marginTop="@dimen/_30sdp"
         >
         <LinearLayout
             android:id="@+id/backButtonLayout"
@@ -58,9 +57,8 @@
         android:id="@+id/buttonSearch"
         android:layout_width="match_parent"
         android:layout_height="48dp"
-        android:layout_marginStart="@dimen/_15sdp"
+        android:layout_marginHorizontal="@dimen/_10sdp"
         android:layout_marginTop="@dimen/_10sdp"
-        android:layout_marginEnd="@dimen/_15sdp"
         app:cardCornerRadius="20dp"
         app:cardBackgroundColor="#19FFFFFF"
         app:cardElevation="0dp"
