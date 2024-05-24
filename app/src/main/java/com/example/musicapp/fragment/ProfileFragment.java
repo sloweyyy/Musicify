@@ -55,6 +55,8 @@ import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
 
+import org.w3c.dom.Text;
+
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -78,7 +80,7 @@ import jp.wasabeef.blurry.Blurry;
 
 public class ProfileFragment extends Fragment {
     View view;
-    ImageButton iconBack, modifyName;
+    ImageButton  modifyName;
     ImageView backgroundAvatar;
     CircleImageView avatar;
     Button logout;
@@ -117,7 +119,6 @@ public class ProfileFragment extends Fragment {
         Name = view.findViewById(R.id.Name);
         backgroundAvatar = view.findViewById(R.id.backgroundAvatar);
         avatar = view.findViewById(R.id.avatarImage);
-        iconBack = view.findViewById(R.id.iconBack);
         mAuth = FirebaseAuth.getInstance();
         db = FirebaseFirestore.getInstance();
         storage = FirebaseStorage.getInstance();
