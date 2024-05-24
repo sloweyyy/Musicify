@@ -11,9 +11,11 @@ import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.os.Build;
 import android.os.Bundle;
+import android.os.Parcelable;
 import android.util.Log;
 import android.view.View;
 import android.view.WindowManager;
+import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
@@ -48,12 +50,13 @@ import com.google.firebase.firestore.EventListener;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.FirebaseFirestoreException;
 
+import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 
 public class MainActivity extends AppCompatActivity implements BottomAppBarListener, PlaySongFragment.OnPlayingStateChangeListener, PlaySongFragment.MiniPlayerListener {
     private boolean isPlayingMusic;
-
     private static final String MUSIC_NOTIFICATION_CHANNEL_ID = "Musicify";
     private static final int NOTIFICATION_ID = 1001;
     ActivityMainBinding binding;
@@ -67,6 +70,7 @@ public class MainActivity extends AppCompatActivity implements BottomAppBarListe
     private ImageView miniPlayerImage;
     private LinearLayout miniPlayerLayout;
     private int currentSongIndex = 0;
+    ImageButton resumeBtn;
     private List<Song> songList;
 
 
@@ -136,6 +140,7 @@ public class MainActivity extends AppCompatActivity implements BottomAppBarListe
             }
         });
 
+
         miniPlayerPreviousButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -160,7 +165,34 @@ public class MainActivity extends AppCompatActivity implements BottomAppBarListe
 //                    Log.e("MainActivity", "Cannot update mini player: songList not ready or invalid index");
 //                    return;
 //                }
-                return;
+//                return;
+//                if (songList != null && !songList.isEmpty()) {
+//                    // Every time this executes, a new instance of PlaySongFragment is created and shown
+//                    PlaySongFragment newPlaySongFragment = new PlaySongFragment();
+//                    Bundle args = new Bundle();
+//                    args.putString("songId", songId);
+//                    // Assuming songList is a Parcelable list for simplicity. Adjust as necessary based on actual type.
+//                    args.putParcelableArrayList("songList", new ArrayList<Parcelable>((Collection<? extends Parcelable>) songList));
+//                    args.putInt("currentSongIndex", currentSongIndex);
+//
+//                    newPlaySongFragment.setArguments(args);
+//
+//                    getSupportFragmentManager().beginTransaction()
+//                            .replace(R.id.frame_layout, newPlaySongFragment, "PlaySongFragment")
+//                            .addToBackStack(null)
+//                            .commit();
+//                } else {
+//                    Log.e("MainActivity", "Cannot show PlaySongFragment: songList not ready or invalid index");
+//                }
+//            }
+                PlaySongFragment fragment = new PlaySongFragment();
+                fragment.setSongId(songId);
+                fragment.setCurrentSongList(songList, songId);
+                Bundle args = new Bundle();
+                args.putString("songId", songId);
+                fragment.setArguments(args);
+
+                fragment.show(((AppCompatActivity) v.getContext()).getSupportFragmentManager(), "PlaySongFragment");
             }
         });
 
@@ -187,7 +219,27 @@ public class MainActivity extends AppCompatActivity implements BottomAppBarListe
         handleIntent(getIntent());
     }
 
-    public void showPlaySongFragment(String songId, List<Song> songList) {
+    public void showPlaySongFragment(String songId, List<Song> songList,int currentSongIndex) {
+//        PlaySongFragment playSongFragment = (PlaySongFragment) getSupportFragmentManager().findFragmentByTag("PlaySongFragment");
+//
+//        if (playSongFragment != null) {
+//            if (!playSongFragment.isVisible()) {
+//                getSupportFragmentManager().beginTransaction()
+//                        .show(playSongFragment)
+//                        .commit();
+//            }
+//        } else {
+//            playSongFragment = new PlaySongFragment();
+//            Bundle args = new Bundle();
+//            args.putString("songId", songId);
+////            args.putParcelableArrayList("songList", (ArrayList<? extends Parcelable>) songList);
+//            args.putInt("currentSongIndex", currentSongIndex);
+//            playSongFragment.setArguments(args);
+//            getSupportFragmentManager().beginTransaction()
+//                    .replace(R.id.frame_layout, playSongFragment, "PlaySongFragment")
+//                    .addToBackStack(null)
+//                    .commit();
+//        }
         PlaySongFragment playSongFragment = new PlaySongFragment();
         Bundle args = new Bundle();
         args.putString("songId", songId);
@@ -219,7 +271,38 @@ public class MainActivity extends AppCompatActivity implements BottomAppBarListe
     public void hideMiniPlayer() {
         miniPlayerLayout.setVisibility(View.GONE);
     }
+    public void handleResumeButtonClick() {
+        FirebaseFirestore db = FirebaseFirestore.getInstance();
+        db.collection("users").document(currentUser.getUid()).addSnapshotListener(new EventListener<DocumentSnapshot>() {
+            @Override
+            public void onEvent(@Nullable DocumentSnapshot value, @Nullable FirebaseFirestoreException error) {
+                if (error != null) {
+                    Log.e("Firestore", "Listen failed.", error);
+                    return;
+                }
+                if (value != null && value.exists()) {
+                    Log.d("Firestore", "Current data: " + value.getData());
+                    if (value.contains("recentListeningSong")) {
+                        Map<String, Object> recentSongData = (Map<String, Object>) value.get("recentListeningSong");
+                        if (recentSongData != null) {
+                            miniPlayerSongTitle.setText(recentSongData.get("songName").toString());
+                            miniPlayerArtistName.setText(recentSongData.get("artistName").toString());
+//                                    if (isAdded() && getActivity() != null) {
+//                                        if (recentSongData.get("imageURL") != null) {
+////                                            Glide.with(requireContext()).load(recentSongData.get("imageURL")).apply(RequestOptions.circleCropTransform()).into(miniPlayerArtistName);
+//                                            Glide.with(this).load(recentSongData.get("imageURL").into(miniPlayerImage);
+//                                        }
+//                                    }
+                            Glide.with(MainActivity.this).load(recentSongData.get("imageURL")).into(miniPlayerImage);
+//                            resumeBtn.setVisibility(View.VISIBLE);
+                            songId = recentSongData.get("songId").toString();
+                        }
+                    }
+                }
 
+            }
+        });
+    }
 
     @Override
     protected void onNewIntent(Intent intent) {

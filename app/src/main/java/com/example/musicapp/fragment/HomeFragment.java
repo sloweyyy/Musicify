@@ -20,6 +20,7 @@ import androidx.viewpager2.widget.ViewPager2;
 
 import com.bumptech.glide.Glide;
 import com.bumptech.glide.request.RequestOptions;
+import com.example.musicapp.MainActivity;
 import com.example.musicapp.R;
 import com.example.musicapp.activities.LoginActivity;
 import com.example.musicapp.adapter.HomeFragmentAdapter;
@@ -52,7 +53,13 @@ public class HomeFragment extends Fragment  implements SongHomeAdapter.OnSongSel
     FirebaseUser user;
     FirebaseAuth mAuth;
     ImageButton resumeBtn;
+    HomeFragment homeFragment;
     private HomeFragmentAdapter homeFragmentAdapter;
+    private MainActivity mainActivity;
+
+    public void setMainActivityReference(MainActivity activity) {
+        mainActivity = activity;
+    }
 
     @Nullable
     @Override
@@ -69,6 +76,11 @@ public class HomeFragment extends Fragment  implements SongHomeAdapter.OnSongSel
         viewPager2.setAdapter(homeFragmentAdapter);
         mAuth = FirebaseAuth.getInstance();
         user = mAuth.getCurrentUser();
+        homeFragment = new HomeFragment();
+        if (getActivity() instanceof MainActivity) {
+            mainActivity = (MainActivity) getActivity();
+            homeFragment.setMainActivityReference(mainActivity);
+        }
 
         if (user == null) {
             // User not logged in, navigate to login screen
@@ -120,6 +132,10 @@ public class HomeFragment extends Fragment  implements SongHomeAdapter.OnSongSel
                 } else {
                     Toast.makeText(getContext(), "No recent song to resume", Toast.LENGTH_SHORT).show();
                 }
+                if (mainActivity != null) {
+                    mainActivity.handleResumeButtonClick();
+                }
+
             }
         });
         FirebaseFirestore db = FirebaseFirestore.getInstance();
