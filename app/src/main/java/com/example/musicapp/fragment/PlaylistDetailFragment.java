@@ -2,6 +2,7 @@ package com.example.musicapp.fragment;
 
 import static android.app.Activity.RESULT_OK;
 
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
@@ -17,6 +18,7 @@ import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.appcompat.app.AlertDialog;
 import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
@@ -129,14 +131,13 @@ public class PlaylistDetailFragment extends Fragment implements FetchAccessToken
 
         recyclerView = view.findViewById(R.id.recyclerViewSongDetail);
         if (recyclerView != null) {
-            setupRecyclerView(); // Call setupRecyclerView() first
+            setupRecyclerView();
             if (mPlaylistId != null) {
                 fetchPlaylistSongs(mPlaylistId);
             } else {
                 Log.e("PlaylistDetailFragment", "Playlist ID is null");
             }
         } else {
-            // Handle the case where the RecyclerView isn't found
         }
         setupBackButton();
 
@@ -175,7 +176,6 @@ public class PlaylistDetailFragment extends Fragment implements FetchAccessToken
     private void setupRecyclerView() {
         songList = new ArrayList<>();
         adapter = new SongAdapter(getContext(), songList, song -> {
-            // Handle song selection here (e.g., play the song)
         });
         recyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
         recyclerView.setAdapter(adapter);
@@ -187,17 +187,13 @@ public class PlaylistDetailFragment extends Fragment implements FetchAccessToken
             if (documentSnapshot.exists()) {
                 Playlist playlist = documentSnapshot.toObject(Playlist.class);
 
-                // Get Spotify song IDs from playlist (assuming the field is named 'spotifySongIds')
                 assert playlist != null;
                 spotifySongIds = playlist.getSongs();
 
                 if (spotifySongIds != null && !spotifySongIds.isEmpty()) {
-                    // Fetch Spotify tracks using the IDs
                     fetchSpotifyTracks(spotifySongIds);
                 } else {
-                    // Handle the case where there are no Spotify songs in the playlist
                     Log.d("PlaylistDetailFragment", "No Spotify songs found in the playlist");
-                    // You might want to display a message to the user or fetch songs from your "songs" collection
                 }
             } else {
                 Log.d("PlaylistDetailFragment", "No playlist found with ID: " + playlistId);
@@ -220,8 +216,8 @@ public class PlaylistDetailFragment extends Fragment implements FetchAccessToken
                 @Override
                 public void onResponse(Call<SimplifiedTrack> call, Response<SimplifiedTrack> response) {
                     if (response.isSuccessful()) {
-                        SimplifiedTrack simplifiedTrack = response.body(); // Get SimplifiedTrack
-                        Song song = Song.fromSimplifiedTrack(simplifiedTrack); // Convert to Song
+                        SimplifiedTrack simplifiedTrack = response.body();
+                        Song song = Song.fromSimplifiedTrack(simplifiedTrack);
                         fetchedSongs.add(song);
 
                         if (fetchedSongs.size() == trackIds.size()) {
@@ -232,14 +228,12 @@ public class PlaylistDetailFragment extends Fragment implements FetchAccessToken
 
                     } else {
                         Log.e("PlaylistDetailFragment", "Error fetching Spotify track: " + response.code());
-                        // Handle API errors
                     }
                 }
 
                 @Override
                 public void onFailure(Call<SimplifiedTrack> call, Throwable t) {
                     Log.e("PlaylistDetailFragment", "Error fetching Spotify track", t);
-                    // Handle network errors
                 }
             });
         }
@@ -248,11 +242,11 @@ public class PlaylistDetailFragment extends Fragment implements FetchAccessToken
 
     private void fetchSongDetails(String songId) {
         FirebaseFirestore db = FirebaseFirestore.getInstance();
-        db.collection("songs") // Assuming your songs are in a "songs" collection
+        db.collection("songs")
                 .document(songId).get().addOnSuccessListener(documentSnapshot -> {
                     if (documentSnapshot.exists()) {
                         Song song = documentSnapshot.toObject(Song.class);
-                        adapter.addSong(song); // Add the song to the adapter
+                        adapter.addSong(song);
                     } else {
                         Log.d("PlaylistDetailFragment", "No song found with ID: " + songId);
                     }
@@ -275,9 +269,10 @@ public class PlaylistDetailFragment extends Fragment implements FetchAccessToken
         EditText playlistNameEditText = sheetView.findViewById(R.id.playListName);
         ImageView playlistImage = sheetView.findViewById(R.id.playlistImage);
         Button updateButton = sheetView.findViewById(R.id.createPlaylist);
-        Button cancelButton = sheetView.findViewById(R.id.cancelCreatePlaylist);
+        Button deleteButton = sheetView.findViewById(R.id.cancelCreatePlaylist);
         titleTextView.setText("Edit Playlist");
         updateButton.setText("Update");
+        deleteButton.setText("Delete");
 
         playlistNameEditText.setText(playlist.getName());
         if (playlist.getImageURL() != null) {
@@ -286,7 +281,6 @@ public class PlaylistDetailFragment extends Fragment implements FetchAccessToken
         } else {
             playlistImage.setImageResource(R.drawable.image_up);
         }
-
 
         updateButton.setOnClickListener(v -> {
             String newName = playlistNameEditText.getText().toString();
@@ -308,8 +302,17 @@ public class PlaylistDetailFragment extends Fragment implements FetchAccessToken
             }
         });
 
-        cancelButton.setOnClickListener(v -> editPlaylistDialog.dismiss());
-
+        deleteButton.setOnClickListener(v -> {
+            new AlertDialog.Builder(requireContext())
+                    .setTitle("Delete Playlist")
+                    .setMessage("Are you sure you want to delete this playlist?")
+                    .setPositiveButton("Yes", (dialog, which) -> {
+                        deletePlaylist(playlist);
+                        editPlaylistDialog.dismiss();
+                    })
+                    .setNegativeButton("No", null)
+                    .show();
+        });
 
         playlistImage.setOnClickListener(v -> {
             Intent intent = new Intent(Intent.ACTION_PICK);
@@ -368,6 +371,19 @@ public class PlaylistDetailFragment extends Fragment implements FetchAccessToken
         });
     }
 
+    private void deletePlaylist(Playlist playlist) {
+        FirebaseFirestore db = FirebaseFirestore.getInstance();
+        db.collection("playlists").document(playlist.getId()).delete().addOnSuccessListener(aVoid -> {
+            Toast.makeText(requireContext(), "Playlist deleted successfully", Toast.LENGTH_SHORT).show();
+            if (getActivity() != null && getActivity().getSupportFragmentManager() != null) {
+                getActivity().getSupportFragmentManager().popBackStack();
+            }
+        }).addOnFailureListener(e -> {
+            Toast.makeText(requireContext(), "Failed to delete playlist", Toast.LENGTH_SHORT).show();
+            Log.e("PlaylistDetailFragment", "Error deleting playlist", e);
+        });
+    }
+
     public void getPlaylistById(String playlistId, OnCompleteListener<DocumentSnapshot> listener) {
         FirebaseFirestore db = FirebaseFirestore.getInstance();
         db.collection("playlists").document(playlistId).get().addOnCompleteListener(listener);
@@ -381,13 +397,10 @@ public class PlaylistDetailFragment extends Fragment implements FetchAccessToken
     @Override
     public void onTokenReceived(String accessToken) {
         this.accessToken = accessToken;
-        // Initiate the fetching of Spotify tracks
         if (mPlaylistId != null) {
             fetchPlaylistSongs(mPlaylistId);
         } else {
             Log.e("PlaylistDetailFragment", "Playlist ID is null");
         }
     }
-
-
 }
