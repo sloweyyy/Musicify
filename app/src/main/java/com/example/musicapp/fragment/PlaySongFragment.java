@@ -7,7 +7,6 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.graphics.Color;
-import android.net.Uri;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Looper;
@@ -33,12 +32,12 @@ import com.example.musicapp.adapter.FetchAccessToken;
 import com.example.musicapp.adapter.SongAdapter;
 import com.example.musicapp.manager.MediaPlayerManager;
 import com.example.musicapp.manager.OnSongSelectedListener;
+import com.example.musicapp.model.BottomAppBarListener;
 import com.example.musicapp.model.Song;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment;
 import com.google.firebase.auth.FirebaseAuth;
-import com.google.firebase.database.collection.LLRBNode;
 import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FieldValue;
@@ -51,7 +50,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import jp.wasabeef.blurry.Blurry;
 import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
@@ -260,8 +258,8 @@ public class PlaySongFragment extends BottomSheetDialogFragment implements Fetch
             public void onClick(View v) {
                 Dialog dialogReport = new Dialog(getActivity());
                 dialogReport.setContentView(R.layout.custom_report_dialog_2);
-                if(getActivity() != null) {
-                    int width = (int)(getResources().getDisplayMetrics().widthPixels*0.90);
+                if (getActivity() != null) {
+                    int width = (int) (getResources().getDisplayMetrics().widthPixels * 0.90);
                     dialogReport.getWindow().setLayout(width, ViewGroup.LayoutParams.WRAP_CONTENT);
                 }
                 dialogReport.setCancelable(false);
@@ -294,8 +292,7 @@ public class PlaySongFragment extends BottomSheetDialogFragment implements Fetch
                                     reportSucess.setVisibility(View.GONE);
                                 }
                             }, 6000);
-                        }
-                        else{
+                        } else {
                             Map<String, Object> updates = new HashMap<>();
                             String subject = "Thanks for sending us Feedback&Error report";
                             updates.put("reportContent", reportContent);
@@ -329,7 +326,7 @@ public class PlaySongFragment extends BottomSheetDialogFragment implements Fetch
                             public void run() {
                                 dialogReport.dismiss();
                             }
-                        },3000);
+                        }, 3000);
                     }
                 });
             }
@@ -433,6 +430,7 @@ public class PlaySongFragment extends BottomSheetDialogFragment implements Fetch
 
 
     private void ShowLyric() {
+        ((BottomAppBarListener) requireActivity()).hideBottomAppBar();
         LyricFragment lyricFragment = new LyricFragment();
         lyricFragment.setSongName(songnameValue);
         lyricFragment.setArtistName(artistnameValue);
@@ -629,6 +627,7 @@ public class PlaySongFragment extends BottomSheetDialogFragment implements Fetch
         urlAudioValue = playUrl;
         artistId = track.artists.get(0).getId();
         setupMediaPlayer(playUrl);
+        mediaPlayerManager.getMediaPlayer().seekTo(0);
         setupSeekBar();
         setupPauseButton();
         artistname.setOnClickListener(new View.OnClickListener() {
@@ -663,8 +662,8 @@ public class PlaySongFragment extends BottomSheetDialogFragment implements Fetch
             mediaPlayerManager.setMediaSource(playUrl);
             mediaPlayerManager.setIsPlaying(true);
             if (mediaPlayerManager.getIsPlaying()) {
-//                mediaPlayerManager.getMediaPlayer().seekTo(mediaPlayerManager.getCurrentPosition());
-                mediaPlayerManager.getMediaPlayer().seekTo(mediaPlayerManager.getLastPlaybackPosition());
+                mediaPlayerManager.getMediaPlayer().seekTo(mediaPlayerManager.getCurrentPosition());
+//                mediaPlayerManager.getMediaPlayer().seekTo(mediaPlayerManager.getLastPlaybackPosition());
                 mediaPlayerManager.getMediaPlayer().start();
             }
             seekBar.setMax((int) (mediaPlayerManager.getMediaPlayer().getDuration() / 1000));
@@ -711,11 +710,11 @@ public class PlaySongFragment extends BottomSheetDialogFragment implements Fetch
     }
 
     public void setupPauseButton() {
-            mediaPlayerManager.setIsPlaying(true);
-            isPlaying = true;
-            if (playingStateChangeListener != null) {
-                playingStateChangeListener.onPlayingStateChanged(isPlaying);
-            }
+        mediaPlayerManager.setIsPlaying(true);
+        isPlaying = true;
+        if (playingStateChangeListener != null) {
+            playingStateChangeListener.onPlayingStateChanged(isPlaying);
+        }
         pauseBtn.setOnClickListener(v -> {
             if (mediaPlayerManager.getIsPlaying() == true) {
                 if (mediaPlayerManager.getMediaPlayer() != null) { // Check if mediaPlayer is initialized
@@ -761,12 +760,13 @@ public class PlaySongFragment extends BottomSheetDialogFragment implements Fetch
         args.putString("albumId", albumId);
         likedAlbumDetailFragment.setArguments(args);
         // Add the Fragment to the Activity
-        ((AppCompatActivity)getContext()).getSupportFragmentManager()
+        ((AppCompatActivity) getContext()).getSupportFragmentManager()
                 .beginTransaction()
                 .replace(R.id.frame_layout, likedAlbumDetailFragment)
                 .addToBackStack(null)
                 .commit();
-    } 
+    }
+
     public void showError(Response<TrackModel> response) {
         try {
             assert response.errorBody() != null;

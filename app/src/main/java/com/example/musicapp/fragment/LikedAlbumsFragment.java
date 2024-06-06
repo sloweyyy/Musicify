@@ -1,6 +1,7 @@
 package com.example.musicapp.fragment;
 
 import android.app.AlertDialog;
+import android.graphics.Color;
 import android.net.Uri;
 import android.os.Bundle;
 
@@ -55,17 +56,14 @@ public class LikedAlbumsFragment extends Fragment implements FetchAccessToken.Ac
     private View view;
     private RecyclerView recyclerView;
     private LikedAlbumAdapter adapter;
-//  List<AlbumSimplified> albumList = new ArrayList<>();
-    private Map<AlbumSimplified, LocalDateTime> likedAlbums= new HashMap<>(); ;
+    List<AlbumSimplified> albumList = new ArrayList<>();
     private FetchAccessToken fetchAccessToken;
     private String accessToken;
-    private enum SortState {
-        DEFAULT, BY_NAME, BY_PRIVACY
-    }
-    private SortState currentSortState = SortState.DEFAULT;
     private FirebaseStorage storage;
     private static final int PICK_IMAGE_REQUEST = 1;
     private Uri selectedImageUri;
+
+
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
@@ -77,11 +75,9 @@ public class LikedAlbumsFragment extends Fragment implements FetchAccessToken.Ac
         storage = FirebaseStorage.getInstance();
         fetchAccessToken = new FetchAccessToken();
         fetchAccessToken.getTokenFromSpotify(this);
-//        String userId = FirebaseAuth.getInstance().getCurrentUser().getUid();
 
-
-        ImageView recentlyAddedIcon = view.findViewById(R.id.iconRecentlyAdded);
-        TextView recentlyAddedText = view.findViewById(R.id.textRecentlyAdded);
+        ImageView sortIcon = view.findViewById(R.id.sortIcon);
+        TextView sortText = view.findViewById(R.id.sortText);
         final boolean[] isRecentlyAdded = {false};
 
         View.OnClickListener recentlyAddedClickListener = new View.OnClickListener() {
@@ -89,19 +85,18 @@ public class LikedAlbumsFragment extends Fragment implements FetchAccessToken.Ac
             public void onClick(View v) {
                 isRecentlyAdded[0] = !isRecentlyAdded[0];
                 if (isRecentlyAdded[0]) {
-                    //recentlyAddedIcon.setImageResource(R.drawable.down_arrow);
-                    recentlyAddedText.setText("Name A-Z");
+                    sortIcon.setImageResource(R.drawable.down_arrow);
+                    sortText.setText("Name A-Z");
                     adapter.sortAlbumByName();
                 } else {
-                    //recentlyAddedIcon.setImageResource(R.drawable.up_arrow);
-                    recentlyAddedText.setText("Recently Added");
-                    adapter.sortAlbumByRecentlyAdded();
+                    sortIcon.setImageResource(R.drawable.up_arrow);
+                    sortText.setText("Name Z-A");
+                    adapter.sortAlbumByName();
                 }
             }
         };
-        recentlyAddedIcon.setOnClickListener(recentlyAddedClickListener);
-        recentlyAddedText.setOnClickListener(recentlyAddedClickListener);
-
+        sortIcon.setOnClickListener(recentlyAddedClickListener);
+        sortText.setOnClickListener(recentlyAddedClickListener);
         return view;
     }
 
@@ -118,12 +113,12 @@ public class LikedAlbumsFragment extends Fragment implements FetchAccessToken.Ac
                 for (String id : albumids){
                     getAlbum(accessToken,id);
                 }
-//                adapter = new LikedAlbumAdapter(getContext(), albumList);
-                adapter = new LikedAlbumAdapter(getContext(), likedAlbums);
+                adapter = new LikedAlbumAdapter(getContext(), albumList);
                 recyclerView.setAdapter(adapter);
             }
         }).addOnFailureListener(e -> {});
     }
+
     public interface SpotifyApi {
         @GET("v1/albums/{albumId}")
         Call<AlbumSimplified> getAlbum(@Header("Authorization") String authorization, @Path("albumId") String albumId);
@@ -139,8 +134,8 @@ public class LikedAlbumsFragment extends Fragment implements FetchAccessToken.Ac
             public void onResponse(@NonNull Call<AlbumSimplified> call, @NonNull Response<AlbumSimplified> response) {
                 if (response.isSuccessful()) {
                     AlbumSimplified album = response.body();
-                    likedAlbums.put(album, LocalDateTime.now());
-                    adapter.notifyItemInserted(likedAlbums.size() - 1);
+                    albumList.add(album);
+                    adapter.notifyItemInserted(albumList.size() - 1);
                 }
             }
 
@@ -150,4 +145,5 @@ public class LikedAlbumsFragment extends Fragment implements FetchAccessToken.Ac
             }
         });
     }
+
 }

@@ -5,7 +5,7 @@
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:layout_gravity="center"
-    android:layout_margin="8dp"
+    android:layout_margin="@dimen/_1sdp"
     app:cardCornerRadius="8dp"
     app:cardElevation="4dp">
 
@@ -13,7 +13,7 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="vertical"
-        android:paddingHorizontal="30dp"
+        android:paddingHorizontal="@dimen/_15sdp"
         android:paddingVertical="@dimen/_10sdp">
 
         <TextView

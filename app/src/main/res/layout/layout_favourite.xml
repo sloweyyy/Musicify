@@ -7,7 +7,7 @@
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="@dimen/_25sdp"
-        android:layout_marginTop="@dimen/_15sdp">
+        android:layout_marginTop="@dimen/_30sdp">
         <TextView
             android:id="@+id/textView"
             android:layout_width="326dp"
@@ -15,7 +15,8 @@
             android:layout_weight="1"
             android:gravity="center"
             android:textSize="@dimen/_20sdp"
-            android:textColor="@color/btnColor"/>
+            android:textStyle="bold"
+            android:textColor="@color/dark_caribbean_current"/>
     </LinearLayout>
 
     <com.google.android.material.tabs.TabLayout

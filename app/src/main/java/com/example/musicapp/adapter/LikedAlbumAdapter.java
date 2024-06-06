@@ -19,6 +19,7 @@ import com.bumptech.glide.Glide;
 import com.example.musicapp.R;
 import com.example.musicapp.fragment.AlbumDetailFragment;
 import com.example.musicapp.model.AlbumSimplified;
+import com.example.musicapp.model.Artist;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FieldValue;
@@ -37,11 +38,12 @@ import java.util.stream.Collectors;
 
 public class LikedAlbumAdapter extends RecyclerView.Adapter<LikedAlbumAdapter.ViewHolder>{
     private Context context;
-    private Map<AlbumSimplified, LocalDateTime> likedAlbums ;
+    private List<AlbumSimplified> likedAlbumsList;
+    private boolean isAscending = false;
 
-    public LikedAlbumAdapter(Context context, Map<AlbumSimplified, LocalDateTime> likedAlbums ) {
+    public LikedAlbumAdapter(Context context, List<AlbumSimplified> likedAlbumsList) {
         this.context = context;
-        this.likedAlbums  = likedAlbums ;
+        this.likedAlbumsList  = likedAlbumsList ;
     }
 
     @NonNull
@@ -53,7 +55,7 @@ public class LikedAlbumAdapter extends RecyclerView.Adapter<LikedAlbumAdapter.Vi
 
     @Override
     public void onBindViewHolder(@NonNull ViewHolder holder, int position) {
-        AlbumSimplified album = (AlbumSimplified) likedAlbums.keySet().toArray()[position];
+        AlbumSimplified album = likedAlbumsList.get(position);
         String songName = album.getName();
         String artistName = album.getArtists().get(0).getName();
         String imageUrl = album.getImages().get(0).getUrl();
@@ -66,7 +68,7 @@ public class LikedAlbumAdapter extends RecyclerView.Adapter<LikedAlbumAdapter.Vi
                 if (isLiked) {
                     holder.heartBtn.setImageResource(R.drawable.favourite_filled);
                 } else {
-                    holder.heartBtn.setImageResource(R.drawable.favourite_outline);
+                    holder.heartBtn.setImageResource(R.drawable.heart_green_ouline);
                 }
             }
         });
@@ -82,8 +84,8 @@ public class LikedAlbumAdapter extends RecyclerView.Adapter<LikedAlbumAdapter.Vi
                 .addOnSuccessListener(queryDocumentSnapshots -> {
                     if (!queryDocumentSnapshots.isEmpty()) {
                         DocumentSnapshot userDoc = queryDocumentSnapshots.getDocuments().get(0);
-                        List<String> likedAlbums = (List<String>) userDoc.get("likedAlbums");
-                        onIsLikedCallback.onResult(likedAlbums.contains(id));
+                        List<String> likedAlbumsList = (List<String>) userDoc.get("likedAlbums");
+                        onIsLikedCallback.onResult(likedAlbumsList.contains(id));
                     }
                 })
                 .addOnFailureListener(e -> {
@@ -102,7 +104,7 @@ public class LikedAlbumAdapter extends RecyclerView.Adapter<LikedAlbumAdapter.Vi
 
     @Override
     public int getItemCount() {
-        return likedAlbums .size();
+        return likedAlbumsList.size();
     }
 
     public class ViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener{
@@ -127,13 +129,13 @@ public class LikedAlbumAdapter extends RecyclerView.Adapter<LikedAlbumAdapter.Vi
                 public void onClick(View v) {
                     int position = getAbsoluteAdapterPosition();
                     if (position != RecyclerView.NO_POSITION) {
-                        AlbumSimplified albumSimplified = (AlbumSimplified) likedAlbums.keySet().toArray()[position];
+                        AlbumSimplified albumSimplified = likedAlbumsList.get(position);
                         checkIsLiked(albumSimplified.getId(), new OnIsLikedCallback() {
                             @Override
                             public void onResult(boolean isLiked) {
                                 if (isLiked) {
                                     unlikeAlbum(albumSimplified.getId());
-                                    heartBtn.setImageResource(R.drawable.favourite_outline);
+                                    heartBtn.setImageResource(R.drawable.heart_green_ouline);
                                 } else {
                                     addAlbumToLikedAlbums(albumSimplified.getId());
                                     heartBtn.setImageResource(R.drawable.favourite_filled);
@@ -145,15 +147,6 @@ public class LikedAlbumAdapter extends RecyclerView.Adapter<LikedAlbumAdapter.Vi
             });
         }
 
-//        public void bind(AlbumSimplified album) {
-//            String songName = album.getName();
-//            String artistName = album.getArtists().get(0).getName();
-//            String imageUrl = album.getImages().get(0).getUrl();
-//
-//            albumName.setText(songName);
-//            albumArtist.setText(artistName);
-//            Glide.with(context).load(imageUrl).into(albumImage);
-//        }
 
         @Override
         public void onClick(View v) {
@@ -161,7 +154,7 @@ public class LikedAlbumAdapter extends RecyclerView.Adapter<LikedAlbumAdapter.Vi
             int position = getAbsoluteAdapterPosition();
             if (position != RecyclerView.NO_POSITION) {
 //                AlbumSimplified selected = likedAlbums.get(position);
-                AlbumSimplified selected = (AlbumSimplified) likedAlbums.keySet().toArray()[position];
+                AlbumSimplified selected = likedAlbumsList.get(position);
                 AlbumDetailFragment likedAlbumDetailFragment= new AlbumDetailFragment();
                 likedAlbumDetailFragment.setAlbumId(selected.getId());
                 Bundle args = new Bundle();
@@ -181,109 +174,79 @@ public class LikedAlbumAdapter extends RecyclerView.Adapter<LikedAlbumAdapter.Vi
     }
 
     // Method to update the likedAlbum list
-    public void updateLikedAlbumList(Map<AlbumSimplified, LocalDateTime> albums) {
-        likedAlbums.clear();
-        likedAlbums.putAll(albums);
-        notifyDataSetChanged();
-    }
+//    public void clearLikedAlbumList() {
+//        likedAlbumsList.clear();
+//        likedAlbumsList.addAll()
+//        notifyDataSetChanged();
+//    }
 
     // Method to sort the album list by name
     public void sortAlbumByName() {
-        List<Map.Entry<AlbumSimplified, LocalDateTime>> entryList = new ArrayList<>(likedAlbums.entrySet());
-
-        entryList.sort((entry1, entry2) -> {
-            String name1 = entry1.getKey().getName();
-            String name2 = entry2.getKey().getName();
-
-            // Check for null before comparing
-            if (name1 == null && name2 == null) {
-                return 0; // Both are null, no difference
-            } else if (name1 == null) {
-                return -1; // album1 is null, sort it before album2
-            } else if (name2 == null) {
-                return 1; // album2 is null, sort it before album1
-            } else {
-                // Both are not null, sort normally
-                return name1.compareTo(name2);
-            }
-        });
-        likedAlbums.clear();
-        for (Map.Entry<AlbumSimplified, LocalDateTime> entry : entryList) {
-            likedAlbums.put(entry.getKey(), entry.getValue());
-        }
-
-        notifyDataSetChanged();
-    }
-
-    public void sortAlbumByRecentlyAdded() {
-        List<Map.Entry<AlbumSimplified, LocalDateTime>> sortedEntries = new ArrayList<>(likedAlbums.entrySet());
-        Collections.sort(sortedEntries, new Comparator<Map.Entry<AlbumSimplified, LocalDateTime>>() {
+        Collections.sort(likedAlbumsList, new Comparator<AlbumSimplified>() {
             @Override
-            public int compare(Map.Entry<AlbumSimplified, LocalDateTime> entry1, Map.Entry<AlbumSimplified, LocalDateTime> entry2) {
-                return entry2.getValue().compareTo(entry1.getValue());
+            public int compare(AlbumSimplified a1, AlbumSimplified a2) {
+                if (isAscending) {
+                    return a2.getName().compareToIgnoreCase(a1.getName());
+                } else {
+                    return a1.getName().compareToIgnoreCase(a2.getName());
+                }
             }
         });
-
-        likedAlbums.clear();
-        for (Map.Entry<AlbumSimplified, LocalDateTime> entry : sortedEntries) {
-            likedAlbums.put(entry.getKey(), entry.getValue());
-        }
-
+        isAscending = !isAscending;
         notifyDataSetChanged();
     }
 
+        // Method to delete a liked album from Firestore
+        public void unlikeAlbum(String albumId) {
+            String userId = FirebaseAuth.getInstance().getCurrentUser().getUid();
+            FirebaseFirestore db = FirebaseFirestore.getInstance();
 
-    // Method to delete a liked album from Firestore
-    public void unlikeAlbum(String albumId) {
-        String userId = FirebaseAuth.getInstance().getCurrentUser().getUid();
-        FirebaseFirestore db = FirebaseFirestore.getInstance();
-
-        db.collection("users")
-                .whereEqualTo("id", userId)
-                .get()
-                .addOnSuccessListener(queryDocumentSnapshots -> {
-                    if (!queryDocumentSnapshots.isEmpty()) {
-                        DocumentSnapshot userDoc = queryDocumentSnapshots.getDocuments().get(0);
-                        userDoc.getReference().update("likedAlbums", FieldValue.arrayRemove(albumId))
-                                .addOnSuccessListener(aVoid -> {
-                                    Toast.makeText(context, "Removed from liked albums successfully", Toast.LENGTH_SHORT).show();
-
-                                })
-                                .addOnFailureListener(e -> {
-                                    Log.e("LikedAlbumAdapter", "Failed to remove album from liked albums: " + e.getMessage());
-                                });
-                    } else {
-                        Log.e("LikedAlbumAdapter", "No user document found with userId: " + userId);
-                    }
-                })
-                .addOnFailureListener(e -> {
-                    Log.e("LikedAlbumAdapter", "Failed to retrieve user document: " + e.getMessage());
-                });
-    }
-    public void addAlbumToLikedAlbums(String albumId) {
-        String userId = FirebaseAuth.getInstance().getCurrentUser().getUid();
-        FirebaseFirestore db = FirebaseFirestore.getInstance();
-        db.collection("users")
-                .whereEqualTo("id", userId)
-                .get()
-                .addOnSuccessListener(queryDocumentSnapshots -> {
-                    if (!queryDocumentSnapshots.isEmpty()) {
-                        DocumentSnapshot userDoc = queryDocumentSnapshots.getDocuments().get(0);
-                        userDoc.getReference().update("likedAlbums", FieldValue.arrayUnion(albumId))
-                                .addOnSuccessListener(aVoid -> {
-                                    Toast.makeText(context, "Add to liked albums successfully", Toast.LENGTH_SHORT).show();
-                                    notifyDataSetChanged();
-                                })
-                                .addOnFailureListener(e -> {
-                                    // Handle the error
-                                    Log.e("LikedAlbumAdapter", "Failed to add album to liked albums: " + e.getMessage());
-                                });
-                    } else {
-                        Log.e("LikedAlbumAdapter", "No user document found with userId: " + userId);
-                    }
-                })
-                .addOnFailureListener(e -> {
-                    Log.e("LikedAlbumAdapter", "Failed to retrieve user document: " + e.getMessage());
-                });
-    }
+            db.collection("users")
+                    .whereEqualTo("id", userId)
+                    .get()
+                    .addOnSuccessListener(queryDocumentSnapshots -> {
+                        if (!queryDocumentSnapshots.isEmpty()) {
+                            DocumentSnapshot userDoc = queryDocumentSnapshots.getDocuments().get(0);
+                            userDoc.getReference().update("likedAlbums", FieldValue.arrayRemove(albumId))
+                                    .addOnSuccessListener(aVoid -> {
+                                        Toast.makeText(context, "Removed from liked albums successfully", Toast.LENGTH_SHORT).show();
+                                        notifyDataSetChanged();
+                                    })
+                                    .addOnFailureListener(e -> {
+                                        Log.e("LikedAlbumAdapter", "Failed to remove album from liked albums: " + e.getMessage());
+                                    });
+                        } else {
+                            Log.e("LikedAlbumAdapter", "No user document found with userId: " + userId);
+                        }
+                    })
+                    .addOnFailureListener(e -> {
+                        Log.e("LikedAlbumAdapter", "Failed to retrieve user document: " + e.getMessage());
+                    });
+        }
+        public void addAlbumToLikedAlbums(String albumId) {
+            String userId = FirebaseAuth.getInstance().getCurrentUser().getUid();
+            FirebaseFirestore db = FirebaseFirestore.getInstance();
+            db.collection("users")
+                    .whereEqualTo("id", userId)
+                    .get()
+                    .addOnSuccessListener(queryDocumentSnapshots -> {
+                        if (!queryDocumentSnapshots.isEmpty()) {
+                            DocumentSnapshot userDoc = queryDocumentSnapshots.getDocuments().get(0);
+                            userDoc.getReference().update("likedAlbums", FieldValue.arrayUnion(albumId))
+                                    .addOnSuccessListener(aVoid -> {
+                                        Toast.makeText(context, "Add to liked albums successfully", Toast.LENGTH_SHORT).show();
+                                        notifyDataSetChanged();
+                                    })
+                                    .addOnFailureListener(e -> {
+                                        // Handle the error
+                                        Log.e("LikedAlbumAdapter", "Failed to add album to liked albums: " + e.getMessage());
+                                    });
+                        } else {
+                            Log.e("LikedAlbumAdapter", "No user document found with userId: " + userId);
+                        }
+                    })
+                    .addOnFailureListener(e -> {
+                        Log.e("LikedAlbumAdapter", "Failed to retrieve user document: " + e.getMessage());
+                    });
+        }
 }

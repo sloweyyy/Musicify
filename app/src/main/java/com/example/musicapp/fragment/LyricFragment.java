@@ -118,6 +118,7 @@ public class LyricFragment extends Fragment implements FetchAccessToken.AccessTo
             @Override
             public void onClick(View v) {
                 mediaPlayerManager.setCurrentPosition(0);
+                ((BottomAppBarListener) requireActivity()).showBottomAppBar();
                 FragmentManager fragmentManager = getParentFragmentManager();
                 fragmentManager.popBackStack();
             }
@@ -127,8 +128,10 @@ public class LyricFragment extends Fragment implements FetchAccessToken.AccessTo
             @Override
             public void onClick(View v) {
                 mediaPlayerManager.setCurrentPosition(0);
+                ((BottomAppBarListener) requireActivity()).showBottomAppBar();
                 FragmentManager fragmentManager = getParentFragmentManager();
                 fragmentManager.popBackStack();
+
             }
         });
 
@@ -144,6 +147,7 @@ public class LyricFragment extends Fragment implements FetchAccessToken.AccessTo
                 mediaPlayerManager.getMediaPlayer().pause();
                 mediaPlayerManager.setCurrentPosition(0);
                 mediaPlayerManager.getMediaPlayer().seekTo(0);
+                ((BottomAppBarListener) requireActivity()).showBottomAppBar();
                 FragmentManager fragmentManager = getParentFragmentManager();
                 fragmentManager.popBackStack();
                 PlayPreviousSong();
@@ -155,6 +159,7 @@ public class LyricFragment extends Fragment implements FetchAccessToken.AccessTo
                 mediaPlayerManager.getMediaPlayer().pause();
                 mediaPlayerManager.setCurrentPosition(0);
                 mediaPlayerManager.getMediaPlayer().seekTo(0);
+                ((BottomAppBarListener) requireActivity()).showBottomAppBar();
                 FragmentManager fragmentManager = getParentFragmentManager();
                 fragmentManager.popBackStack();
                 PlayNextSong();
@@ -167,6 +172,7 @@ public class LyricFragment extends Fragment implements FetchAccessToken.AccessTo
                 mediaPlayerManager.getMediaPlayer().pause();
                 mediaPlayerManager.setCurrentPosition(0);
                 mediaPlayerManager.getMediaPlayer().seekTo(0);
+                ((BottomAppBarListener) requireActivity()).showBottomAppBar();
                 FragmentManager fragmentManager = getParentFragmentManager();
                 fragmentManager.popBackStack();
                 PlayRandomSong();
@@ -386,7 +392,7 @@ public class LyricFragment extends Fragment implements FetchAccessToken.AccessTo
                 if (isLiked) {
                     heartBtn.setImageResource(R.drawable.favourite_filled);
                 } else {
-                    heartBtn.setImageResource(R.drawable.favourite_outline);
+                    heartBtn.setImageResource(R.drawable.heart_green_ouline);
                 }
             }
         });
@@ -459,6 +465,7 @@ public class LyricFragment extends Fragment implements FetchAccessToken.AccessTo
                         mediaPlayerManager.getMediaPlayer().pause();
                         mediaPlayerManager.setCurrentPosition(0);
                         mediaPlayerManager.getMediaPlayer().seekTo(0);
+                        ((BottomAppBarListener) requireActivity()).showBottomAppBar();
                         FragmentManager fragmentManager = getParentFragmentManager();
                         fragmentManager.popBackStack();
                         PlayNextSong();// Update every 500 milliseconds

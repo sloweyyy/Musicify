@@ -3,7 +3,7 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:layout_marginTop="30dp">
+    android:layout_marginTop="@dimen/_30sdp">
     <androidx.cardview.widget.CardView
         android:id="@+id/cardView"
         android:layout_width="0dp"
@@ -36,7 +36,8 @@
                     android:textStyle="bold"
                     android:background="@null"
                     android:text="Recently listening"
-                    android:textSize="24dp" />
+                    android:textSize="@dimen/_20sdp"
+                    android:textColor="@color/dark_caribbean_current"/>
 
                 <TextView
                     android:id="@+id/recentSongName"

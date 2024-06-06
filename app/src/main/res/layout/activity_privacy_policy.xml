@@ -24,8 +24,10 @@
     <TextView
         android:id="@+id/thankyou"
         android:layout_width="match_parent"
-        android:text="Cám ơn bạn đã sử dụng Ứng dụng Âm nhạc của chúng tôi. Chính sách bảo mật này giải thích cách chúng tôi thu thập, sử dụng, tiết lộ và bảo vệ thông tin cá nhân của bạn khi bạn sử dụng Ứng dụng Âm nhạc của chúng tôi. Bằng cách truy cập hoặc sử dụng Ứng dụng Âm nhạc của chúng tôi, bạn đồng ý với những thực tiễn được mô tả trong Chính sách bảo mật này."
-        android:layout_height="wrap_content"/>
+        android:text="Cảm ơn bạn đã sử dụng Ứng dụng Âm nhạc của chúng tôi. Chính sách bảo mật này giải thích cách chúng tôi thu thập, sử dụng, tiết lộ và bảo vệ thông tin cá nhân của bạn khi bạn sử dụng Ứng dụng Âm nhạc của chúng tôi. Bằng cách truy cập hoặc sử dụng Ứng dụng Âm nhạc của chúng tôi, bạn đồng ý với những thực tiễn được mô tả trong Chính sách bảo mật này."
+        android:layout_height="wrap_content"
+        android:textSize="@dimen/_12sdp"
+        android:textColor="@color/white"/>
 
     <com.google.android.material.card.MaterialCardView
         android:layout_width="match_parent"
@@ -47,13 +49,16 @@
                 android:layout_gravity="center_vertical"
                 android:text="Chính sách bảo mật cho Ứng dụng Âm nhạc"
                 android:textStyle="bold"
-                android:layout_marginLeft="10dp"/>
+                android:textColor="@color/dark_caribbean_current"
+                android:textSize="@dimen/_15sdp"
+                android:layout_marginHorizontal="@dimen/_5sdp"/>
 
             <ImageButton
                 android:id="@+id/imageButton_toggle"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginEnd="10dp"
+                android:tint="@color/btnColor"
                 android:background="?attr/selectableItemBackground"
                 android:src="@drawable/expand_circle_right_24dp_fill0_wght400_grad0_opsz24" />
         </LinearLayout>
@@ -77,6 +82,7 @@
                 android:layout_height="wrap_content"
                 android:text="Thu thập thông tin cá nhân"
                 android:textSize="20sp"
+                android:textColor="@color/dark_caribbean_current"
                 android:textStyle="bold"
                 android:layout_marginBottom="16dp"/>
 
@@ -86,6 +92,7 @@
                 android:layout_height="wrap_content"
                 android:text="Chúng tôi có thể thu thập các thông tin cá nhân của bạn như tên, địa chỉ email và thông tin đăng nhập khi bạn tạo tài khoản trong ứng dụng. Chúng tôi cũng có thể thu thập thông tin về sở thích âm nhạc và hoạt động sử dụng ứng dụng để cải thiện trải nghiệm người dùng."
                 android:textSize="16sp"
+                android:textColor="@color/white"
                 android:lineSpacingExtra="8dp"/>
 
             <TextView
@@ -93,6 +100,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:text="Sử dụng thông tin cá nhân"
+                android:textColor="@color/dark_caribbean_current"
                 android:textSize="20sp"
                 android:textStyle="bold"
                 android:layout_marginTop="16dp"
@@ -104,6 +112,7 @@
                 android:layout_height="wrap_content"
                 android:text="Chúng tôi sử dụng thông tin cá nhân của bạn để cung cấp các dịch vụ và tính năng trong ứng dụng. Thông tin cá nhân cũng có thể được sử dụng để liên hệ với bạn, cung cấp thông tin về cập nhật sản phẩm, sự kiện và khuyến mãi đặc biệt."
                 android:textSize="16sp"
+                android:textColor="@color/white"
                 android:lineSpacingExtra="8dp"/>
 
             <TextView
@@ -111,6 +120,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:text="Bảo mật thông tin cá nhân"
+                android:textColor="@color/dark_caribbean_current"
                 android:textSize="20sp"
                 android:textStyle="bold"
                 android:layout_marginTop="16dp"
@@ -121,11 +131,13 @@
                 android:layout_height="wrap_content"
                 android:text="Chúng tôi cam kết bảo vệ thông tin cá nhân của bạn và áp dụng các biện pháp an ninh thích hợp để ngăn chặn truy cập trái phép, mất mát dữ liệu và sử dụng sai mục đích. Chúng tôi chỉ cho phép nhân viên có nhu cầu công việc truy cập thông tin cá nhân và yêu cầu họ tuân thủ các quy định bảo mật."
                 android:textSize="16sp"
+                android:textColor="@color/white"
                 android:lineSpacingExtra="8dp"/>
             <TextView
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:text="Chia sẻ thông tin cá nhân"
+                android:textColor="@color/dark_caribbean_current"
                 android:textSize="20sp"
                 android:textStyle="bold"
                 android:layout_marginTop="16dp"
@@ -135,6 +147,7 @@
                 android:layout_height="wrap_content"
                 android:text="Chúng tôi không chia sẻ thông tin cá nhân của bạn với bên thứ ba trừ khi có sự đồng ý của bạn hoặc theo yêu cầu của pháp luật. Chúng tôi có thể chia sẻ thông tin với các nhà cung cấp dịch vụ đáng tin cậy để hỗ trợ chúng tôi trong việc cung cấp ứng dụng và các chức năng liên quan."
                 android:textSize="16sp"
+                android:textColor="@color/white"
                 android:lineSpacingExtra="8dp"/>
 
         </LinearLayout>

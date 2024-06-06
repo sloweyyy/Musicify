@@ -4,6 +4,7 @@ import android.app.AlertDialog;
 import android.os.Bundle;
 import android.text.Editable;
 import android.text.TextWatcher;
+import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -68,6 +69,7 @@ public class ExploreFragment extends Fragment implements FetchAccessToken.Access
         int spanCount = 2;
         GridLayoutManager layoutManager = new GridLayoutManager(getActivity(), spanCount);
         recyclerView.setLayoutManager(layoutManager);
+        recyclerView.addItemDecoration(new CenterSpaceItemDecoration(2, 90)); // 2 columns, 16dp spacing
         fetchAccessToken = new FetchAccessToken();
         fetchAccessToken.getTokenFromSpotify(this);
         searchEditText = view.findViewById(R.id.searchExplore);

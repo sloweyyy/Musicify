@@ -1,63 +1,68 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<com.google.android.material.card.MaterialCardView xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
-    android:layout_height="105dp"
-    android:layout_margin="10dp"
-    xmlns:tools="http://schemas.android.com/tools"
-    android:orientation="horizontal"
-    android:layout_marginHorizontal="10dp"
-    android:layout_marginVertical="7dp"
-    android:background="@drawable/image_view_rounded_bg"
-    android:padding="10dp">
-
-    <ImageButton
-        android:id="@+id/playButton"
-        android:layout_width="60dp"
-        android:layout_height="64dp"
-        android:layout_gravity="center_vertical"
-        android:layout_marginLeft="19dp"
-        android:background="@drawable/image_button_round_bg"
-        android:src="@drawable/play_arrow_24dp_fill0_wght400_grad0_opsz24" />
+    android:layout_height="wrap_content"
+    android:layout_margin="@dimen/_5sdp"
+    app:cardCornerRadius="8dp"
+    app:cardElevation="4dp">
 
     <LinearLayout
-        android:layout_width="wrap_content"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_gravity="center_vertical"
-        android:layout_marginLeft="10dp"
-        android:layout_weight="1"
-        android:orientation="vertical">
-
-        <TextView
-            android:id="@+id/playlistName"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
+        android:padding="@dimen/_9sdp">
+        <ImageButton
+            android:id="@+id/playButton"
+            android:layout_width="60dp"
+            android:layout_height="64dp"
             android:layout_gravity="center_vertical"
-            android:ellipsize="end"
-            android:maxLines="1"
-            android:text="Bill Gate"
-            android:textSize="20dp"
-            android:textStyle="bold" />
+            android:layout_marginLeft="19dp"
+            android:background="@drawable/image_button_round_bg"
+            android:src="@drawable/play_arrow_24dp_fill0_wght400_grad0_opsz24" />
 
-        <TextView
-            android:id="@+id/totalTracks"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
+        <androidx.constraintlayout.widget.ConstraintLayout
+            android:layout_width="0dp"
+            android:layout_height="64dp"
+            android:layout_marginHorizontal="@dimen/_5sdp"
+            android:layout_weight="1">
+
+            <TextView
+                android:id="@+id/playlistName"
+                android:layout_width="wrap_content"
+                android:layout_height="@dimen/_25sdp"
+                android:ellipsize="end"
+                android:maxLines="1"
+                android:text="Bill Gate"
+                android:textSize="20dp"
+                android:textStyle="bold"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent"/>
+
+            <TextView
+                android:id="@+id/totalTracks"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:drawableLeft="@drawable/music_note_24dp_fill0_wght400_grad0_opsz24"
+                android:drawablePadding="5dp"
+                android:text="200"
+                android:textSize="18dp"
+                android:textStyle="bold"
+                android:ellipsize="end"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent"
+                app:layout_constraintTop_toBottomOf="@id/playlistName"
+                app:layout_constraintVertical_bias="1.0"/>
+        </androidx.constraintlayout.widget.ConstraintLayout>
+
+        <ImageView
+            android:id="@+id/heartBtn"
+            android:layout_width="25dp"
+            android:layout_height="64dp"
             android:layout_gravity="center_vertical"
-            android:drawableLeft="@drawable/music_note_24dp_fill0_wght400_grad0_opsz24"
-            android:drawablePadding="5dp"
-            android:text="200"
-            android:textSize="18dp"
-            android:textStyle="bold" />
+            android:layout_marginRight="10dp"
+            android:contentDescription="addToLikedSong"
+            android:src="@drawable/heart_green_ouline"
+            app:tint="@color/btnPressed"/>
     </LinearLayout>
-
-    <ImageView
-        android:id="@+id/heartBtn"
-        android:layout_width="25dp"
-        android:layout_height="64dp"
-        android:layout_gravity="center_vertical"
-        android:layout_marginRight="10dp"
-        android:contentDescription="addToLikedSong"
-        android:src="@drawable/heart_green_ouline"
-        app:tint="@color/btnPressed"/>
-</LinearLayout>
+</com.google.android.material.card.MaterialCardView>

@@ -21,14 +21,33 @@
         android:layout_marginRight="@dimen/_15sdp"
         android:layout_marginTop="@dimen/_20sdp"
         >
+<!--        <LinearLayout-->
+<!--            android:id="@+id/backButtonLayout"-->
+<!--            android:layout_width="@dimen/_30sdp"-->
+<!--            android:layout_height="@dimen/_30sdp"-->
+<!--            android:layout_weight="0"-->
+<!--            android:background="@drawable/back_btn_custom"-->
+<!--            android:gravity="center"-->
+<!--            android:orientation="horizontal">-->
+
+<!--            <Button-->
+<!--                android:id="@+id/iconBack"-->
+<!--                android:layout_width="@dimen/_20sdp"-->
+<!--                android:layout_height="@dimen/_20sdp"-->
+<!--                android:layout_marginLeft="@dimen/_10sdp"-->
+<!--                android:background="@drawable/arrow_back"-->
+<!--                app:backgroundTint="#B7B7B7"-->
+<!--                android:contentDescription="Go back"/>-->
+<!--            -->
+<!--        </LinearLayout>-->
         <LinearLayout
             android:id="@+id/backButtonLayout"
             android:layout_width="@dimen/_30sdp"
             android:layout_height="@dimen/_30sdp"
-            android:layout_weight="0"
             android:background="@drawable/back_btn_custom"
             android:gravity="center"
-            android:orientation="horizontal">
+            android:orientation="horizontal"
+            android:layout_alignParentStart="true">
 
             <Button
                 android:id="@+id/iconBack"
@@ -36,30 +55,37 @@
                 android:layout_height="@dimen/_20sdp"
                 android:layout_marginLeft="@dimen/_10sdp"
                 android:background="@drawable/arrow_back"
-                android:paddingLeft="28dp"
-                app:backgroundTint="#B7B7B7"
+                app:backgroundTint="@android:color/white"
                 android:contentDescription="Go back"/>
         </LinearLayout>
 
         <TextView
             android:id="@+id/header"
-            android:textColor="#B7B7B7"
+            android:textColor="@color/white"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:gravity="center"
+            android:layout_gravity="center"
             android:text="Now Playing"
-            android:textSize="24sp"
+            android:textSize="@dimen/_20sdp"
             android:layout_weight="1">
 
         </TextView>
 
-        <ImageView
-            android:id="@+id/threeDots"
-            android:layout_width="@dimen/_25sdp"
-            android:layout_height="@dimen/_25sdp"
-            android:layout_marginStart="@dimen/_10sdp"
-            android:src="@drawable/three_dots"
-            app:tint="#B7B7B7" />
+        <LinearLayout
+            android:layout_width="@dimen/_30sdp"
+            android:layout_height="@dimen/_30sdp"
+            android:background="@drawable/back_btn_custom"
+            android:gravity="center">
+
+            <ImageView
+                android:id="@+id/threeDots"
+                android:layout_width="25sp"
+                android:layout_height="25sp"
+                android:background="@drawable/more_vert_btn"
+                android:paddingLeft="28sp"
+                app:backgroundTint="@android:color/white" />
+        </LinearLayout>
     </LinearLayout>
     <ScrollView
         android:layout_width="match_parent"
@@ -75,7 +101,7 @@
             android:layout_height="wrap_content"
             android:text=""
             android:textColor="#fff"
-            android:textSize="24sp" />
+            android:textSize="@dimen/_18sdp" />
 
     </ScrollView>
     <RelativeLayout
