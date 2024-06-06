@@ -226,11 +226,8 @@ public class SongAdapter extends RecyclerView.Adapter<SongAdapter.ViewHolder> {
             args.putString("previousSongId", preId);
             args.putString("nextSongId", nextId);
             fragment.setArguments(args);
-            ((AppCompatActivity) context).getSupportFragmentManager()
-                    .beginTransaction()
-                    .replace(R.id.frame_layout, fragment)
-                    .addToBackStack(null)
-                    .commit();
+            // show the bottom sheet
+            fragment.show(((AppCompatActivity) context).getSupportFragmentManager(), "PlaySongFragment");
         }
     }
 

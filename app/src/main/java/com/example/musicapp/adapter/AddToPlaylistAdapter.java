@@ -13,6 +13,7 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.bumptech.glide.Glide;
 import com.example.musicapp.R;
+import com.example.musicapp.fragment.AddToPlayListFragment;
 import com.example.musicapp.model.Playlist;
 import com.google.firebase.firestore.FieldValue;
 import com.google.firebase.firestore.FirebaseFirestore;
@@ -25,12 +26,14 @@ public class AddToPlaylistAdapter extends RecyclerView.Adapter<AddToPlaylistAdap
     private List<Playlist> playlistList;
     private String userId;
     private String songId;
+    private AddToPlayListFragment fragment;
 
-    public AddToPlaylistAdapter(Context context, List<Playlist> playlistList, String userId, String songId) {
+    public AddToPlaylistAdapter(Context context, List<Playlist> playlistList, String userId, String songId, AddToPlayListFragment fragment) {
         this.context = context;
         this.playlistList = playlistList;
         this.userId = userId;
         this.songId = songId;
+        this.fragment = fragment;
     }
 
     @NonNull
@@ -47,10 +50,13 @@ public class AddToPlaylistAdapter extends RecyclerView.Adapter<AddToPlaylistAdap
 
         holder.itemView.setOnClickListener(v -> {
             String playlistId = playlist.getId();
-            addSongToPlaylist(songId, playlistId, position); // Pass position here
+            if (!playlist.getSongs().contains(songId)) {
+                addSongToPlaylist(songId, playlistId, position);
+            } else {
+                Toast.makeText(context, "Song already in playlist", Toast.LENGTH_SHORT).show();
+            }
         });
     }
-
 
     @Override
     public int getItemCount() {
@@ -92,10 +98,12 @@ public class AddToPlaylistAdapter extends RecyclerView.Adapter<AddToPlaylistAdap
                     Playlist updatedPlaylist = playlistList.get(position);
                     updatedPlaylist.getSongs().add(songId);
                     notifyItemChanged(position);
+
+                    // Dismiss the dialog
+                    fragment.dismissDialog();
                 })
                 .addOnFailureListener(e -> {
                     Toast.makeText(context, "Error adding to playlist", Toast.LENGTH_SHORT).show();
                 });
     }
-
 }
