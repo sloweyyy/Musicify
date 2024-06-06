@@ -1,5 +1,5 @@
 package com.example.musicapp.fragment;
- 
+
 import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
@@ -24,7 +24,6 @@ import com.example.musicapp.MainActivity;
 import com.example.musicapp.R;
 import com.example.musicapp.activities.LoginActivity;
 import com.example.musicapp.adapter.HomeFragmentAdapter;
-import com.example.musicapp.adapter.PlaylistHomeAdapter;
 import com.example.musicapp.adapter.SongAdapter;
 import com.example.musicapp.adapter.SongHomeAdapter;
 import com.example.musicapp.model.Song;
@@ -41,7 +40,7 @@ import com.google.firebase.firestore.FirebaseFirestoreException;
 import java.util.HashMap;
 import java.util.Map;
 
-public class HomeFragment extends Fragment  implements SongHomeAdapter.OnSongSelectedListener , SongAdapter.OnSongSelectedListener {
+public class HomeFragment extends Fragment implements SongHomeAdapter.OnSongSelectedListener, SongAdapter.OnSongSelectedListener {
 
     private View view;
     private TabLayout tabLayout;
@@ -87,7 +86,7 @@ public class HomeFragment extends Fragment  implements SongHomeAdapter.OnSongSel
             Intent intent = new Intent(getActivity(), LoginActivity.class);
             startActivity(intent);
             getActivity().finish();
-            return null;  
+            return null;
         }
 
         userId = user.getUid();
@@ -159,12 +158,12 @@ public class HomeFragment extends Fragment  implements SongHomeAdapter.OnSongSel
                                 }
                             }
                             resumeBtn.setVisibility(View.VISIBLE);
-                           songId = recentSongData.get("songId").toString();
+                            songId = recentSongData.get("songId").toString();
                         }
                     } else {
                         recentSongName.setText("Select song to listen");
                         recentSongArtist.setText("");
-                        if((isAdded() && getActivity() != null))
+                        if ((isAdded() && getActivity() != null))
                             Glide.with(getContext()).load(R.drawable.playlist_image).apply(RequestOptions.circleCropTransform()).into(artistImage);
                     }
                 } else {
@@ -179,10 +178,12 @@ public class HomeFragment extends Fragment  implements SongHomeAdapter.OnSongSel
 
         return view;
     }
+
     @Override
     public void onAttach(@NonNull Context context) {
         super.onAttach(context);
     }
+
     private void updateRecentSong(Song song) {
         FirebaseAuth mAuth = FirebaseAuth.getInstance();
         FirebaseUser user = mAuth.getCurrentUser();
