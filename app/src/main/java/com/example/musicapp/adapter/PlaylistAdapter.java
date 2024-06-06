@@ -105,6 +105,7 @@ public class PlaylistAdapter extends RecyclerView.Adapter<PlaylistAdapter.ViewHo
         notifyDataSetChanged();
     }
 
+
     public void fetchPlaylists() {
         FirebaseFirestore db = FirebaseFirestore.getInstance();
         db.collection("playlists")

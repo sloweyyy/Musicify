@@ -1,146 +1,112 @@
 package com.example.musicapp.viewmodel;
 
+import android.net.Uri;
 import android.util.Log;
 
+import androidx.annotation.NonNull;
 import androidx.lifecycle.LiveData;
 import androidx.lifecycle.MutableLiveData;
 import androidx.lifecycle.ViewModel;
 
 import com.example.musicapp.model.Playlist;
+import com.google.android.gms.tasks.OnFailureListener;
+import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.firebase.auth.FirebaseAuth;
-import com.google.firebase.firestore.FieldValue;
 import com.google.firebase.firestore.FirebaseFirestore;
-import com.google.firebase.firestore.QueryDocumentSnapshot;
-import com.google.firebase.firestore.QuerySnapshot;
+import com.google.firebase.storage.FirebaseStorage;
+import com.google.firebase.storage.StorageReference;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
+import java.util.UUID;
 
 public class PlaylistViewModel extends ViewModel {
-    private MutableLiveData<List<Playlist>> playlists = new MutableLiveData<>();
-    private FirebaseFirestore db = FirebaseFirestore.getInstance();
-    private String userId;
+    private final MutableLiveData<List<Playlist>> playlists = new MutableLiveData<>(new ArrayList<>());
+    private final FirebaseStorage storage;
+    private final FirebaseFirestore db;
 
     public PlaylistViewModel() {
-        userId = FirebaseAuth.getInstance().getCurrentUser().getUid();
+        storage = FirebaseStorage.getInstance();
+        db = FirebaseFirestore.getInstance();
     }
 
     public LiveData<List<Playlist>> getPlaylists() {
         return playlists;
     }
 
-    public void fetchPlaylists() {
+    public void fetchPlaylists(String userId) {
         db.collection("playlists")
                 .whereEqualTo("userId", userId)
                 .get()
                 .addOnSuccessListener(queryDocumentSnapshots -> {
                     List<Playlist> fetchedPlaylists = new ArrayList<>();
-                    for (QueryDocumentSnapshot document : queryDocumentSnapshots) {
+                    queryDocumentSnapshots.forEach(document -> {
                         Playlist playlist = document.toObject(Playlist.class);
                         playlist.setId(document.getId());
-                        playlist.setSongs((List<String>) document.get("songs"));
+                        List<String> songs = (List<String>) document.get("songs");
+                        playlist.setSongs(songs != null ? songs : new ArrayList<>());
                         fetchedPlaylists.add(playlist);
-                    }
+                    });
                     playlists.setValue(fetchedPlaylists);
                 })
-                .addOnFailureListener(e -> {
-                    // Handle error (e.g., display a message to the user)
-                    Log.e("PlaylistViewModel", "Error fetching playlists", e);
-                });
+                .addOnFailureListener(e -> Log.e("PlaylistViewModel", "Failed to fetch playlists", e));
     }
 
-    public void createPlaylist(String playlistName, String description, String imageURL, String privacy) {
-        Playlist newPlaylist = new Playlist(userId, playlistName, description, imageURL, privacy);
+    public void savePlaylistToFirestore(Playlist newPlaylist, OnSuccessListener<Boolean> onSuccessListener) {
         db.collection("playlists")
                 .add(newPlaylist)
                 .addOnSuccessListener(documentReference -> {
-                    String playlistId = documentReference.getId();
-                    newPlaylist.setId(playlistId);
-                    // Update the document with the ID
+                    newPlaylist.setId(documentReference.getId());
                     documentReference.set(newPlaylist)
-                            .addOnSuccessListener(aVoid -> {
-                                // Playlist created successfully (e.g., refresh the UI)
-                            })
-                            .addOnFailureListener(e -> {
-                                // Handle error (e.g., display a message to the user)
-                                Log.e("PlaylistViewModel", "Error updating playlist", e);
-                            });
+                            .addOnSuccessListener(aVoid -> onSuccessListener.onSuccess(true))
+                            .addOnFailureListener(e -> onSuccessListener.onSuccess(false));
                 })
-                .addOnFailureListener(e -> {
-                    // Handle error (e.g., display a message to the user)
-                    Log.e("PlaylistViewModel", "Error creating playlist", e);
-                });
+                .addOnFailureListener(e -> onSuccessListener.onSuccess(false));
     }
 
-    public void deletePlaylist(Playlist playlist) {
-        db.collection("playlists").document(playlist.getId())
-                .delete()
-                .addOnSuccessListener(aVoid -> {
-                    // Playlist deleted successfully (e.g., refresh the UI)
-                })
-                .addOnFailureListener(e -> {
-                    // Handle error (e.g., display a message to the user)
-                    Log.e("PlaylistViewModel", "Error deleting playlist", e);
-                });
+    public void uploadImage(Uri selectedImageUri, OnSuccessListener<Uri> onSuccessListener) {
+        StorageReference storageRef = storage.getReference().child("playlist/" + UUID.randomUUID().toString());
+        storageRef.putFile(selectedImageUri)
+                .addOnSuccessListener(taskSnapshot -> storageRef.getDownloadUrl().addOnSuccessListener(onSuccessListener))
+                .addOnFailureListener(e -> Log.e("PlaylistViewModel", "Error uploading image", e));
     }
 
-    public void updatePlaylistPrivacy(Playlist playlist) {
-        db.collection("playlists").document(playlist.getId())
-                .update("privacy", playlist.getPrivacy())
-                .addOnSuccessListener(aVoid -> {
-                    // Playlist privacy updated successfully (e.g., refresh the UI)
-                })
-                .addOnFailureListener(e -> {
-                    // Handle error (e.g., display a message to the user)
-                    Log.e("PlaylistViewModel", "Error updating playlist privacy", e);
-                });
+    public void sortPlaylistsByName() {
+        List<Playlist> sortedPlaylists = new ArrayList<>(playlists.getValue());
+        sortedPlaylists.sort((playlist1, playlist2) -> {
+            String name1 = playlist1.getName();
+            String name2 = playlist2.getName();
+            return name1 != null && name2 != null ? name1.compareTo(name2) : 0;
+        });
+        playlists.setValue(sortedPlaylists);
     }
 
-    public void updatePlaylistName(Playlist playlist) {
-        db.collection("playlists").document(playlist.getId())
-                .update("name", playlist.getName())
-                .addOnSuccessListener(aVoid -> {
-                    // Playlist name updated successfully (e.g., refresh the UI)
-                })
-                .addOnFailureListener(e -> {
-                    // Handle error (e.g., display a message to the user)
-                    Log.e("PlaylistViewModel", "Error updating playlist name", e);
-                });
+    public void sortPlaylistsByPrivacy() {
+        List<Playlist> sortedPlaylists = new ArrayList<>(playlists.getValue());
+        sortedPlaylists.sort((playlist1, playlist2) -> {
+            String privacy1 = playlist1.getPrivacy();
+            String privacy2 = playlist2.getPrivacy();
+            return privacy1 != null && privacy2 != null ? privacy1.compareTo(privacy2) : 0;
+        });
+        playlists.setValue(sortedPlaylists);
     }
 
-    public void updatePlaylistSongCount(Playlist playlist) {
-        db.collection("playlists").document(playlist.getId())
-                .update("songCount", playlist.getSongCount())
-                .addOnSuccessListener(aVoid -> {
-                    // Playlist song count updated successfully (e.g., refresh the UI)
-                })
-                .addOnFailureListener(e -> {
-                    // Handle error (e.g., display a message to the user)
-                    Log.e("PlaylistViewModel", "Error updating playlist song count", e);
-                });
-    }
-
-    public void updatePlaylistImage(Playlist playlist) {
-        db.collection("playlists").document(playlist.getId())
-                .update("imageURL", playlist.getImageURL()) // Assuming "imageURL" is the field name
-                .addOnSuccessListener(aVoid -> {
-                    // Playlist image updated successfully (e.g., refresh the UI)
-                })
-                .addOnFailureListener(e -> {
-                    // Handle error (e.g., display a message to the user)
-                    Log.e("PlaylistViewModel", "Error updating playlist image", e);
-                });
-    }
-
-    public void updatePlaylist(Playlist playlist) {
-        db.collection("playlists").document(playlist.getId())
-                .set(playlist)
-                .addOnSuccessListener(aVoid -> {
-                    // Playlist updated successfully
-                })
-                .addOnFailureListener(e -> {
-                    // Handle error
-                    Log.e("PlaylistViewModel", "Error updating playlist", e);
-                });
+    public void createPlaylist(String playlistName, Uri imageUri, OnSuccessListener<Boolean> onSuccessListener) {
+        String userId = FirebaseAuth.getInstance().getCurrentUser().getUid();
+        if (imageUri != null) {
+            StorageReference storageRef = storage.getReference().child("playlist_images/" + UUID.randomUUID().toString());
+            storageRef.putFile(imageUri)
+                    .addOnSuccessListener(taskSnapshot -> storageRef.getDownloadUrl().addOnSuccessListener(uri -> {
+                        String imageURL = uri.toString();
+                        savePlaylistToFirestore(new Playlist(userId, playlistName, "Description", imageURL), onSuccessListener);
+                    }))
+                    .addOnFailureListener(e -> {
+                        Log.e("PlaylistViewModel", "Failed to upload image", e);
+                        onSuccessListener.onSuccess(false);
+                    });
+        } else {
+            savePlaylistToFirestore(new Playlist(userId, playlistName, "Description", null), onSuccessListener);
+        }
     }
 }
