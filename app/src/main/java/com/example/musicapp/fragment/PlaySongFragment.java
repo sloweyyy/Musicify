@@ -71,8 +71,8 @@ public class PlaySongFragment extends BottomSheetDialogFragment implements Fetch
     private MediaPlayerManager mediaPlayerManager;
     private String songnameValue, artistnameValue, avataValue, played_value, total_value, urlAudioValue, artistId;
     private TextView songname, artistname, duration_played, duration_total, lyric;
-    private ImageView cover_art, threeDots;
-    private ImageButton repeateBtn, previousBtn, pauseBtn, nextBtn, shuffleBtn, show_lyricBtn;
+    private ImageView cover_art, threeDots, repeateBtn;
+    private ImageButton previousBtn, pauseBtn, nextBtn, shuffleBtn, show_lyricBtn;
 
     private LinearLayout backButtonLayout, lyricLayout;
 
@@ -194,8 +194,19 @@ public class PlaySongFragment extends BottomSheetDialogFragment implements Fetch
         repeateBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                mediaPlayerManager.setCurrentPosition(0);
-                mediaPlayerManager.getMediaPlayer().seekTo(0);
+//                mediaPlayerManager.setCurrentPosition(0);
+//                mediaPlayerManager.getMediaPlayer().seekTo(0);
+                mediaPlayerManager.setIsRepeat(!mediaPlayerManager.getIsRepeat());
+                checkIsRepeat(new OnRepeatCallback() {
+                    @Override
+                    public void onResult(boolean isRepeat) {
+                        if (isRepeat){
+                            repeateBtn.setImageResource(R.drawable.repeate_green);
+                        } else {
+                            repeateBtn.setImageResource(R.drawable.repeate);
+                        }
+                    }
+                });
             }
         });
 
@@ -483,6 +494,16 @@ public class PlaySongFragment extends BottomSheetDialogFragment implements Fetch
         lyricLayout = view.findViewById(R.id.lyricLayout);
         lyric = view.findViewById(R.id.lyric);
 
+        checkIsRepeat(new OnRepeatCallback() {
+            @Override
+            public void onResult(boolean isRepeat) {
+                if (isRepeat)
+                    repeateBtn.setImageResource(R.drawable.repeate_green);
+                else
+                    repeateBtn.setImageResource(R.drawable.repeate);
+            }
+        });
+
         checkIsLiked(songId, new OnIsLikedCallback() {
             @Override
             public void onResult(boolean isLiked) {
@@ -520,6 +541,7 @@ public class PlaySongFragment extends BottomSheetDialogFragment implements Fetch
 
     }
 
+
     private void checkIsLiked(String id, OnIsLikedCallback callback) {
         FirebaseAuth mAuth = FirebaseAuth.getInstance();
         String userId = mAuth.getCurrentUser().getUid();
@@ -539,6 +561,14 @@ public class PlaySongFragment extends BottomSheetDialogFragment implements Fetch
             Log.e("SongAdapter", "Failed to retrieve user document: " + e.getMessage());
             callback.onResult(false);
         });
+    }
+
+    private void checkIsRepeat(OnRepeatCallback callback)
+    {
+        if (mediaPlayerManager.getIsRepeat() == true)
+            callback.onResult(true);
+        else
+            callback.onResult(false);
     }
 
     private void removeSongFromLikedSongs(String songId) {
@@ -676,7 +706,12 @@ public class PlaySongFragment extends BottomSheetDialogFragment implements Fetch
                         seekBar.setProgress(CurrentPosition);
                         duration_played.setText(formattedTime(CurrentPosition));
                         if (CurrentPosition == mediaPlayerManager.getMediaPlayer().getDuration() / 1000) {
-                            PlayNextSong();
+                            if (mediaPlayerManager.getIsRepeat()) {
+                                mediaPlayerManager.getMediaPlayer().seekTo(0);
+                                mediaPlayerManager.setCurrentPosition(0);
+                            }
+                            else
+                                PlayNextSong();
                         }
                         handler.postDelayed(this, 500); // Update every 500 milliseconds
                     }
@@ -843,6 +878,10 @@ public class PlaySongFragment extends BottomSheetDialogFragment implements Fetch
 
     private interface OnIsLikedCallback {
         void onResult(boolean isLiked);
+    }
+
+    private interface OnRepeatCallback {
+        void onResult(boolean isRepeat);
     }
 
     public interface SpotifyApi {
