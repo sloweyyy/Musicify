@@ -2,6 +2,7 @@
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:id="@+id/play_song"
+    android:layout_weight="1"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="@color/black">
@@ -17,6 +18,7 @@
 
         <LinearLayout
             android:id="@+id/backButtonLayout"
+            android:layout_gravity="center"
             android:layout_width="@dimen/_30sdp"
             android:layout_height="@dimen/_30sdp"
             android:layout_weight="0"
@@ -174,22 +176,24 @@
     <LinearLayout
         android:id="@+id/bottomHeader"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
+        android:layout_height="match_parent"
         android:layout_below="@+id/seekbarCon"
+    android:layout_above="@+id/lyricLayout"
         android:layout_marginLeft="@dimen/_20sdp"
         android:layout_marginTop="@dimen/_5sdp"
         android:layout_marginRight="@dimen/_20sdp"
         android:layout_weight="4"
+        android:layout_gravity="center"
         android:gravity="center_horizontal|center_vertical"
         android:orientation="horizontal"
 
         >
 
-        <ImageButton
+        <ImageView
             android:id="@+id/repeateBtn"
+            android:background = "@drawable/repeate"
             android:layout_width="@dimen/_24sdp"
             android:layout_height="@dimen/_24sdp"
-            android:background="@drawable/repeate"
             android:contentDescription="Repeate" />
 
         <Space
@@ -248,6 +252,7 @@
             android:background="@drawable/shuffle"
             android:contentDescription="Shuffe" />
     </LinearLayout>
+
 
     <LinearLayout
         android:id="@+id/lyricLayout"
