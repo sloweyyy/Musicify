@@ -18,6 +18,7 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentManager;
+import androidx.lifecycle.ViewModelProvider;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 import com.example.musicapp.R;
@@ -25,6 +26,7 @@ import com.example.musicapp.adapter.FetchAccessToken;
 import com.example.musicapp.adapter.SongAdapter;
 import com.example.musicapp.model.SimplifiedTrack;
 import com.example.musicapp.model.Song;
+import com.example.musicapp.viewmodel.LikedSongViewModel;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
@@ -56,27 +58,12 @@ public class LikedSongFragment extends Fragment implements FetchAccessToken.Acce
     private EditText search;
     private Button backBtn, sortBtn;
     private SongAdapter songAdapter;
+    private LikedSongViewModel viewModel;
 
     @Override
     public void onTokenReceived(String accessToken) {
         this.accessToken = accessToken;
-        FirebaseAuth auth = FirebaseAuth.getInstance();
-        String userId = auth.getCurrentUser().getUid();
-        FirebaseFirestore db = FirebaseFirestore.getInstance();
-        db.collection("users").whereEqualTo("id", userId).get().addOnSuccessListener(queryDocumentSnapshots ->
-        {
-            if (!queryDocumentSnapshots.isEmpty()) {
-                DocumentSnapshot documentSnapshot = queryDocumentSnapshots.getDocuments().get(0);
-                ArrayList<String> songIds = (ArrayList<String>) documentSnapshot.get("likedsong");
-                if (songAdapter != null) {
-                    songAdapter.clearSongs();
-                }
-                for (String id : songIds) {
-                    getTrack(accessToken, id);
-                }
-            }
-        }).addOnFailureListener(e -> {
-        });
+      viewModel.fetchLikedSongs(accessToken);
     }
 
     private enum SortState {
@@ -92,6 +79,7 @@ public class LikedSongFragment extends Fragment implements FetchAccessToken.Acce
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         view = inflater.inflate(R.layout.likedsong_fragment, container, false);
+        viewModel = new ViewModelProvider(this).get(LikedSongViewModel.class);
         recyclerView = view.findViewById(R.id.recyclerView);
         LinearLayoutManager layoutManager = new LinearLayoutManager(getActivity());
         recyclerView.setLayoutManager(layoutManager);
@@ -172,6 +160,8 @@ public class LikedSongFragment extends Fragment implements FetchAccessToken.Acce
                 songAdapter.PlayFirstSong();
             }
         });
+        setupSearchEditText();
+        setupObservers();
         return view;
     }
 
@@ -200,37 +190,34 @@ public class LikedSongFragment extends Fragment implements FetchAccessToken.Acce
 
     }
 
-    private void getTrack(String accessToken, String songId) {
-        if (!songAdapter.hasSong(songId)) {
-            Retrofit retrofit = new Retrofit.Builder()
-                    .baseUrl("https://api.spotify.com/")
-                    .addConverterFactory(GsonConverterFactory.create())
-                    .build();
-
-            SpotifyApi apiService = retrofit.create(SpotifyApi.class);
-            String authorization = "Bearer " + accessToken;
-
-            Call<SimplifiedTrack> call = apiService.getTrack(authorization, songId);
-            call.enqueue(new Callback<SimplifiedTrack>() {
-                @Override
-                public void onResponse(Call<SimplifiedTrack> call, Response<SimplifiedTrack> response) {
-                    if (response.isSuccessful()) {
-                        SimplifiedTrack track = response.body();
-                        if (songAdapter != null) {
-                            songAdapter.addSong(Song.fromSimplifiedTrack(track));
-                            songCount.setText(songAdapter.getItemCount() + " songs");
-                        }
-                    } else {
-                        // ... (Error handling) ...
-                    }
-                }
-
-                @Override
-                public void onFailure(Call<SimplifiedTrack> call, Throwable throwable) {
-                }
-            });
-        }
+    private void setupObservers() {
+        viewModel.songs.observe(getViewLifecycleOwner(), songs -> {
+            songAdapter.setSongs(songs);
+            songCount.setText(songs.size() + " songs");
+        });
     }
+
+    private void setupSearchEditText() {
+        search.addTextChangedListener(new TextWatcher() {
+            @Override
+            public void beforeTextChanged(CharSequence s, int start, int count, int after) {
+                // Not used
+            }
+
+            @Override
+            public void onTextChanged(CharSequence s, int start, int before, int count) {
+                String query = s.toString();
+                searchSongs(query);
+            }
+
+            @Override
+            public void afterTextChanged(Editable s) {
+                // Not used
+            }
+        });
+    }
+
+
 
     public interface SpotifyApi {
         @GET("v1/tracks/{songId}")

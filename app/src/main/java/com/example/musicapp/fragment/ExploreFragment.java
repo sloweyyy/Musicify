@@ -14,6 +14,7 @@ import android.widget.Toast;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
+import androidx.lifecycle.ViewModelProvider;
 import androidx.recyclerview.widget.GridLayoutManager;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
@@ -26,6 +27,7 @@ import com.example.musicapp.model.Category;
 import com.example.musicapp.model.SearchResult;
 import com.example.musicapp.model.SimplifiedTrack;
 import com.example.musicapp.model.Song;
+import com.example.musicapp.viewmodel.ExploreViewModel;
 import com.google.gson.Gson;
 
 import java.io.IOException;
@@ -53,10 +55,11 @@ public class ExploreFragment extends Fragment implements FetchAccessToken.Access
     private exploreAdapter exploreAdapter; // Adapter for categories
     private RecyclerView recyclerViewSongs;
 
+    private ExploreViewModel viewModel;
     @Override
     public void onTokenReceived(String accessToken) {
         this.accessToken = accessToken;
-        fetchCategories(accessToken);
+        viewModel.fetchCategories(accessToken);
     }
 
     @Nullable
@@ -66,6 +69,7 @@ public class ExploreFragment extends Fragment implements FetchAccessToken.Access
         recyclerView = view.findViewById(R.id.recyclerViewExplore);
         recyclerViewSongs = view.findViewById(R.id.recyclerViewSongs);
         recyclerViewSongs.setLayoutManager(new LinearLayoutManager(getContext()));
+        viewModel = new ViewModelProvider(this).get(ExploreViewModel.class);
         int spanCount = 2;
         GridLayoutManager layoutManager = new GridLayoutManager(getActivity(), spanCount);
         recyclerView.setLayoutManager(layoutManager);
@@ -73,119 +77,133 @@ public class ExploreFragment extends Fragment implements FetchAccessToken.Access
         fetchAccessToken = new FetchAccessToken();
         fetchAccessToken.getTokenFromSpotify(this);
         searchEditText = view.findViewById(R.id.searchExplore);
+        setupSearchEditText();
+        setupObservers();
+        return view;
+    }
+
+    private void setupObservers() {
+        viewModel.categories.observe(getViewLifecycleOwner(), categories -> {
+            showCategories(categories);
+        });
+
+        viewModel.searchResults.observe(getViewLifecycleOwner(), songs -> {
+            updateSearchResults(songs);
+        });
+    }
+
+    private void setupSearchEditText() {
         searchEditText.addTextChangedListener(new TextWatcher() {
             @Override
             public void beforeTextChanged(CharSequence s, int start, int count, int after) {
-                // Not used
+
             }
 
             @Override
             public void onTextChanged(CharSequence s, int start, int before, int count) {
                 String query = s.toString();
-                searchSongs(query);
+                viewModel.searchSongs(query);
             }
 
             @Override
             public void afterTextChanged(Editable s) {
-                // Not used
-            }
-        });
 
-        return view;
+            }
+
+        });
     }
+
 
     // Method to search for songs
-    private void searchSongs(String query) {
-        if (accessToken == null || query.isEmpty()) {
-            // Hide songs RecyclerView, show categories RecyclerView
-            recyclerViewSongs.setVisibility(View.GONE);
-            recyclerView.setVisibility(View.VISIBLE);
-            return;
-        }
+//    private void searchSongs(String query) {
+//        if (accessToken == null || query.isEmpty()) {
+//            // Hide songs RecyclerView, show categories RecyclerView
+//            recyclerViewSongs.setVisibility(View.GONE);
+//            recyclerView.setVisibility(View.VISIBLE);
+//            return;
+//        }
+//
+//        Retrofit retrofit = new Retrofit.Builder()
+//                .baseUrl("https://api.spotify.com/")
+//                .addConverterFactory(GsonConverterFactory.create())
+//                .build();
+//
+//        SpotifyApiService apiService = retrofit.create(SpotifyApiService.class);
+//
+//        Call<SearchResult> call = apiService.searchTracks("Bearer " + accessToken, query, "track");
+//        call.enqueue(new Callback<SearchResult>() {
+//            @Override
+//            public void onResponse(Call<SearchResult> call, Response<SearchResult> response) {
+//                if (response.isSuccessful()) {
+//                    SearchResult searchResult = response.body();
+//                    if (searchResult != null && searchResult.getTracks() != null) {
+//                        List<SimplifiedTrack> tracks = searchResult.getTracks().getItems();
+//                        List<Song> songs = new ArrayList<>();
+//                        for (SimplifiedTrack track : tracks) {
+//                            songs.add(Song.fromSimplifiedTrack(track));
+//                        }
+//                        // Update the RecyclerView with search results
+//                        songAdapter = new SongAdapter(getContext(), songs);
+//                        recyclerViewSongs.setAdapter(songAdapter);
+//
+//                        // Hide categories RecyclerView, show songs RecyclerView
+//                        recyclerView.setVisibility(View.GONE);
+//                        recyclerViewSongs.setVisibility(View.VISIBLE);
+//                    } else {
+//                        // Handle case where search results are empty or null
+//                        recyclerView.setAdapter(null); // Clear the RecyclerView
+//                        Toast.makeText(getContext(), "No results found", Toast.LENGTH_SHORT).show();
+//                    }
+//                } else {
+//                    // Handle error
+//                    Toast.makeText(getContext(), "Failed to search tracks", Toast.LENGTH_SHORT).show();
+//                }
+//            }
+//
+//            @Override
+//            public void onFailure(Call<SearchResult> call, Throwable t) {
+//                // Handle failure
+//                Toast.makeText(getContext(), "Network error", Toast.LENGTH_SHORT).show();
+//            }
+//        });
+//    }
 
-        Retrofit retrofit = new Retrofit.Builder()
-                .baseUrl("https://api.spotify.com/")
-                .addConverterFactory(GsonConverterFactory.create())
-                .build();
-
-        SpotifyApiService apiService = retrofit.create(SpotifyApiService.class);
-
-        Call<SearchResult> call = apiService.searchTracks("Bearer " + accessToken, query, "track");
-        call.enqueue(new Callback<SearchResult>() {
-            @Override
-            public void onResponse(Call<SearchResult> call, Response<SearchResult> response) {
-                if (response.isSuccessful()) {
-                    SearchResult searchResult = response.body();
-                    if (searchResult != null && searchResult.getTracks() != null) {
-                        List<SimplifiedTrack> tracks = searchResult.getTracks().getItems();
-                        List<Song> songs = new ArrayList<>();
-                        for (SimplifiedTrack track : tracks) {
-                            songs.add(Song.fromSimplifiedTrack(track));
-                        }
-                        // Update the RecyclerView with search results
-                        songAdapter = new SongAdapter(getContext(), songs);
-                        recyclerViewSongs.setAdapter(songAdapter);
-
-                        // Hide categories RecyclerView, show songs RecyclerView
-                        recyclerView.setVisibility(View.GONE);
-                        recyclerViewSongs.setVisibility(View.VISIBLE);
-                    } else {
-                        // Handle case where search results are empty or null
-                        recyclerView.setAdapter(null); // Clear the RecyclerView
-                        Toast.makeText(getContext(), "No results found", Toast.LENGTH_SHORT).show();
-                    }
-                } else {
-                    // Handle error
-                    Toast.makeText(getContext(), "Failed to search tracks", Toast.LENGTH_SHORT).show();
-                }
-            }
-
-            @Override
-            public void onFailure(Call<SearchResult> call, Throwable t) {
-                // Handle failure
-                Toast.makeText(getContext(), "Network error", Toast.LENGTH_SHORT).show();
-            }
-        });
-    }
-
-    // Method to fetch categories
-    public void fetchCategories(String accessToken) {
-        Retrofit retrofit = new Retrofit.Builder()
-                .baseUrl("https://api.spotify.com/")
-                .addConverterFactory(GsonConverterFactory.create())
-                .build();
-
-        SpotifyApiService apiService = retrofit.create(SpotifyApiService.class);
-        Call<CategoryResponse> call = apiService.getCategories("Bearer " + accessToken);
-        call.enqueue(new Callback<CategoryResponse>() {
-            @Override
-            public void onResponse(Call<CategoryResponse> call, Response<CategoryResponse> response) {
-                if (response.isSuccessful()) {
-                    Gson gson = new Gson();
-                    String jsonResponse = gson.toJson(response.body());
-                    CategoryResponse categoryResponse = gson.fromJson(jsonResponse, CategoryResponse.class);
-                    List<Category> items = categoryResponse.getCategories().getItems();
-                    showCategories(items);
-                } else {
-                    try {
-                        String errorBody = response.errorBody().string();
-                        AlertDialog.Builder builder = new AlertDialog.Builder(getContext());
-                        builder.setTitle("API call fail").setMessage(errorBody).setPositiveButton("OK", null).show();
-                    } catch (IOException e) {
-                        e.printStackTrace();
-                    }
-                }
-            }
-
-            @Override
-            public void onFailure(Call<CategoryResponse> call, Throwable t) {
-                String errorMessage = t.getMessage();
-                AlertDialog.Builder builder = new AlertDialog.Builder(getContext());
-                builder.setTitle("API call failed").setMessage(errorMessage).setPositiveButton("OK", null).show();
-            }
-        });
-    }
-
+//    public void fetchCategories(String accessToken) {
+//        Retrofit retrofit = new Retrofit.Builder()
+//                .baseUrl("https://api.spotify.com/")
+//                .addConverterFactory(GsonConverterFactory.create())
+//                .build();
+//
+//        SpotifyApiService apiService = retrofit.create(SpotifyApiService.class);
+//        Call<CategoryResponse> call = apiService.getCategories("Bearer " + accessToken);
+//        call.enqueue(new Callback<CategoryResponse>() {
+//            @Override
+//            public void onResponse(Call<CategoryResponse> call, Response<CategoryResponse> response) {
+//                if (response.isSuccessful()) {
+//                    Gson gson = new Gson();
+//                    String jsonResponse = gson.toJson(response.body());
+//                    CategoryResponse categoryResponse = gson.fromJson(jsonResponse, CategoryResponse.class);
+//                    List<Category> items = categoryResponse.getCategories().getItems();
+//                    showCategories(items);
+//                } else {
+//                    try {
+//                        String errorBody = response.errorBody().string();
+//                        AlertDialog.Builder builder = new AlertDialog.Builder(getContext());
+//                        builder.setTitle("API call fail").setMessage(errorBody).setPositiveButton("OK", null).show();
+//                    } catch (IOException e) {
+//                        e.printStackTrace();
+//                    }
+//                }
+//            }
+//
+//            @Override
+//            public void onFailure(Call<CategoryResponse> call, Throwable t) {
+//                String errorMessage = t.getMessage();
+//                AlertDialog.Builder builder = new AlertDialog.Builder(getContext());
+//                builder.setTitle("API call failed").setMessage(errorMessage).setPositiveButton("OK", null).show();
+//            }
+//        });
+//    }
 
     // Method to show categories in the RecyclerView
     public void showCategories(List<Category> categories) {
@@ -196,6 +214,15 @@ public class ExploreFragment extends Fragment implements FetchAccessToken.Access
             Toast.makeText(getContext(), "Không có danh sách categories", Toast.LENGTH_SHORT).show();
         }
     }
+
+    private void updateSearchResults(List<Song> songs) {
+        if (songs != null) {
+            songAdapter = new SongAdapter(getContext(), songs);
+            recyclerViewSongs.setAdapter(songAdapter);
+        }
+    }
+
+
 
     // SpotifyApiService interface
     public interface SpotifyApiService {
