@@ -10,16 +10,12 @@ import android.graphics.Color;
 import android.net.Uri;
 import android.os.Bundle;
 import android.os.Handler;
-import android.os.Looper;
-import android.util.Log;
-import android.view.KeyEvent;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.Button;
 import android.widget.EditText;
-import android.widget.FrameLayout;
 import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
@@ -33,47 +29,18 @@ import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.content.ContextCompat;
 import androidx.fragment.app.Fragment;
+import androidx.lifecycle.ViewModelProvider;
 
 import com.bumptech.glide.Glide;
 import com.example.musicapp.R;
 import com.example.musicapp.activities.LoginActivity;
 import com.example.musicapp.activities.PrivacyPolicyActivity;
 import com.example.musicapp.activities.TermsConditionActivity;
-import com.google.android.gms.tasks.OnCompleteListener;
-import com.google.android.gms.tasks.OnFailureListener;
-import com.google.android.gms.tasks.OnSuccessListener;
-import com.google.android.gms.tasks.Task;
-import com.google.android.material.card.MaterialCardView;
+import com.example.musicapp.viewmodel.ProfileViewModel;
 import com.google.android.material.textfield.TextInputEditText;
 import com.google.firebase.auth.AuthCredential;
 import com.google.firebase.auth.AuthResult;
 import com.google.firebase.auth.FirebaseAuth;
-import com.google.firebase.auth.FirebaseUser;
-import com.google.firebase.firestore.DocumentReference;
-import com.google.firebase.firestore.DocumentSnapshot;
-import com.google.firebase.firestore.FirebaseFirestore;
-import com.google.firebase.storage.FirebaseStorage;
-import com.google.firebase.storage.StorageReference;
-
-import org.w3c.dom.Text;
-
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Properties;
-import java.util.UUID;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
-
-import javax.mail.Authenticator;
-import javax.mail.Message;
-import javax.mail.MessagingException;
-import javax.mail.PasswordAuthentication;
-import javax.mail.Session;
-import javax.mail.Transport;
-import javax.mail.internet.InternetAddress;
-import javax.mail.internet.MimeMessage;
 
 import de.hdodenhof.circleimageview.CircleImageView;
 import jp.wasabeef.blurry.Blurry;
@@ -85,25 +52,15 @@ public class ProfileFragment extends Fragment {
     CircleImageView avatar;
     Button logout;
     EditText Name;
-    private FirebaseAuth.AuthStateListener mAuthListener;
-
-    TextView counterView;
-    private FirebaseStorage storage;
-    StorageReference storageReference;
     private static final int PICK_IMAGE_REQUEST = 1;
     private static final int PICK_AVATAR_IMAGE_REQUEST = 2;
     Uri selectedAvatarUri = null;
-    int notificationCount;
     Uri selectedImageUri = null;
-    FirebaseAuth mAuth;
-    String data = "";
-    FirebaseUser user;
-    FirebaseFirestore db;
+    private ProfileViewModel profileViewModel;
+
     TextView privacyPolicy;
-    TextView notification;
     TextView modifyPassword;
     TextView termsAndConditions,update,feedbackError;
-    List<String> notifications = new ArrayList<>();
     Dialog dialog1,dialog2;
     Button btnLogoutCancel, btnDialogLogout;
     Button btnReportCancel, btnReportSend;
@@ -111,7 +68,6 @@ public class ProfileFragment extends Fragment {
     TextView reportSucess;
     String email;
     String name;
-
     @Nullable
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
@@ -119,14 +75,18 @@ public class ProfileFragment extends Fragment {
         Name = view.findViewById(R.id.Name);
         backgroundAvatar = view.findViewById(R.id.backgroundAvatar);
         avatar = view.findViewById(R.id.avatarImage);
-        mAuth = FirebaseAuth.getInstance();
-        db = FirebaseFirestore.getInstance();
-        storage = FirebaseStorage.getInstance();
+        // Initialize your ViewModel here
+        profileViewModel = new ViewModelProvider(this).get(ProfileViewModel.class);
+
+
+//        mAuth = FirebaseAuth.getInstance();
+//        db = FirebaseFirestore.getInstance();
+//        storage = FirebaseStorage.getInstance();
         privacyPolicy = view.findViewById(R.id.privacyPolicy);
         logout = view.findViewById(R.id.btnLogout);
         modifyName = view.findViewById(R.id.modifyName);
         modifyPassword = view.findViewById(R.id.modifyPassword);
-        user = mAuth.getCurrentUser();
+//        user = mAuth.getCurrentUser();
         termsAndConditions = view.findViewById(R.id.termsAndConditions);
         update = view.findViewById(R.id.update);
         feedbackError = view.findViewById(R.id.feedbackError);
@@ -151,6 +111,8 @@ public class ProfileFragment extends Fragment {
         inputReport = dialog1.findViewById(R.id.inputReport);
         reportSucess = dialog1.findViewById(R.id.reportSucess);
         inputReport = dialog1.findViewById(R.id.inputReport);
+        setupObservers();
+        setupListeners();
         btnLogoutCancel.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -179,7 +141,8 @@ public class ProfileFragment extends Fragment {
                         }
                     }, 6000);
                 } else {
-                    saveErrorReport(reportContent,email);
+//                    saveErrorReport(reportContent,email);
+                    profileViewModel.saveErrorReport(reportContent,email);
                     reportSucess.setText("Thanks for giving us feedback!");
                     reportSucess.setVisibility(View.VISIBLE);
 
@@ -212,44 +175,6 @@ public class ProfileFragment extends Fragment {
                 getActivity().finish();
             }
         });
-
-        if (user != null) {
-            DocumentReference docRef = db.collection("users").document(user.getUid());
-            docRef.get().addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
-                @Override
-                public void onComplete(@NonNull Task<DocumentSnapshot> task) {
-                    if (task.isSuccessful()) {
-                        DocumentSnapshot document = task.getResult();
-                        if (document != null && document.exists()) {
-
-                            if (document.contains("Name")) {
-                                name = document.getString("Name");
-                                email = document.getString("email");
-                                Name.setText(name);
-                            }
-
-                            if (document.contains("backgroundImageUrl")) {
-                                String backgroundImageUrl = document.getString("backgroundImageUrl");
-                                if (backgroundImageUrl != null && !backgroundImageUrl.isEmpty()) {
-                                    Glide.with(view.getContext()).load(backgroundImageUrl).into(backgroundAvatar);
-                                }
-                            }
-
-                            if (document.contains("avatarUrl")) {
-                                String avatarUrl = document.getString("avatarUrl");
-                                if (avatarUrl != null && !avatarUrl.isEmpty()) {
-                                    Glide.with(view.getContext()).load(avatarUrl).circleCrop().into(avatar);
-                                }
-                            }
-                        } else {
-                            Log.d("TAG", "No such document");
-                        }
-                    } else {
-                        Log.d("TAG", "get failed with ", task.getException());
-                    }
-                }
-            });
-        }
         feedbackError.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -297,8 +222,6 @@ public class ProfileFragment extends Fragment {
 
             }
         });
-
-
         termsAndConditions.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -312,7 +235,6 @@ public class ProfileFragment extends Fragment {
         modifyPassword.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-//                toggleTextViewAppearance(modifyPassword, R.drawable.admin_panel_settings_24dp_fill1_wght400_grad0_opsz24, R.drawable.admin_panel_settings_24dp_fill0_wght400_grad0_opsz24);
                 PasswordSettingFragment fragment = new PasswordSettingFragment();
                 ((AppCompatActivity) v.getContext()).getSupportFragmentManager()
                         .beginTransaction()
@@ -335,152 +257,55 @@ public class ProfileFragment extends Fragment {
 
             }
         });
-        modifyName.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                Name.requestFocus();
-                InputMethodManager imm = (InputMethodManager) getActivity().getSystemService(Context.INPUT_METHOD_SERVICE);
-                imm.showSoftInput(Name, InputMethodManager.SHOW_IMPLICIT);
-            }
-        });
-        Name.setOnEditorActionListener(new TextView.OnEditorActionListener() {
-            @Override
-            public boolean onEditorAction(TextView v, int actionId, KeyEvent event) {
-                if (event.getKeyCode() == KeyEvent.KEYCODE_ENTER) {
-                    saveNameChanges();
-                    Name.setCursorVisible(false);
-                    return true;
-                }
-                return false;
-            }
-        });
-        Name.setOnFocusChangeListener(new View.OnFocusChangeListener() {
-            @Override
-            public void onFocusChange(View v, boolean hasFocus) {
-                if (!hasFocus) {
-                    saveNameChanges();
-                    Name.setCursorVisible(false);
-                }
-            }
-        });
-        avatar.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                Intent intent = new Intent(Intent.ACTION_PICK);
-                intent.setType("image/*");
-                startActivityForResult(intent, PICK_AVATAR_IMAGE_REQUEST);
-            }
-        });
-        backgroundAvatar.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                Intent intent = new Intent(Intent.ACTION_PICK);
-                intent.setType("image/*");
-                startActivityForResult(intent, PICK_IMAGE_REQUEST);
-            }
-        });
+
         return view;
     }
-    private void saveErrorReport(  String reportContent,String recipientEmail) {
-        Map<String, Object> updates = new HashMap<>();
-        String subject = "Thanks for sending us Feedback&Error report";
-        updates.put("email", email);
-        updates.put("reportContent", reportContent);
-        db.collection("reports")
-                .add(updates)
-                .addOnSuccessListener(new OnSuccessListener<DocumentReference>() {
-                    @Override
-                    public void onSuccess(DocumentReference documentReference) {
-                        Log.d("saveErrorReport", "DocumentSnapshot added with ID: " + documentReference.getId());
-                    }
-                })
-                .addOnFailureListener(new OnFailureListener() {
-                    @Override
-                    public void onFailure(@NonNull Exception e) {
-
-                    }
-                });
-        ExecutorService emailExecutor = Executors.newSingleThreadExecutor();
-        Handler handler = new Handler(Looper.getMainLooper());
-
-        emailExecutor.execute(new Runnable() {
-            @Override
-            public void run() {
-                final String username = "musicifya@gmail.com";
-                final String password = "kyza gvnf kcwg mijp";
-                String bodyTemplate = "Dear [{Name}],\n\n"
-                        + "We have received your feedback regarding our app. Thank you for taking the time to share your thoughts and experiences with us. "
-                        + "Your input is invaluable as it helps us to continuously improve our service.\n\n"
-                        + "Our team will review your feedback and take the necessary actions. We will contact you directly if we require any additional information. "
-                        + "We are committed to providing you with the best possible experience, and your feedback is a key part of that effort.\n\n"
-                        + "Thank you once again for your contribution.\n\n"
-                        + "Best regards,\n"
-                        + "[Nguyen Thi Bich Gau - Manager Of Fake App]\n"
-                        + "[Musicify]";
-                String body = bodyTemplate.replace("[{Name}]", name);
-                Properties prop = new Properties();
-                prop.put("mail.smtp.host", "smtp.gmail.com");
-                prop.put("mail.smtp.port", "587");
-                prop.put("mail.smtp.auth", "true");
-                prop.put("mail.smtp.starttls.enable", "true");
-
-                Session session = Session.getInstance(prop,
-                        new javax.mail.Authenticator() {
-                            protected PasswordAuthentication getPasswordAuthentication() {
-                                return new PasswordAuthentication(username, password);
-                            }
-                        });
-
-                try {
-                    Message message = new MimeMessage(session);
-                    message.setFrom(new InternetAddress("musicifya@gmail.com"));
-                    message.setRecipients(
-                            Message.RecipientType.TO,
-                            InternetAddress.parse(recipientEmail)
-                    );
-                    message.setSubject(subject);
-                    message.setText(body);
-
-                    Transport.send(message);
-
-                    handler.post(new Runnable() {
-                        @Override
-                        public void run() {
-                            System.out.println("Email sent successfully");
-                        }
-                    });
-
-                } catch (MessagingException e) {
-                    e.printStackTrace();
-                    handler.post(new Runnable() {
-                        @Override
-                        public void run() {
-                            System.out.println("Failed to send email");
-                        }
-                    });
+    @Override
+    public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
+        super.onViewCreated(view, savedInstanceState);
+        profileViewModel.fetchCurrentUserProfile();
+    }
+    private void setupObservers() {
+        profileViewModel.getUserProfileLiveData().observe(getViewLifecycleOwner(), userProfile -> {
+            if (userProfile != null) {
+                email = userProfile.getEmail();
+                Name.setText(userProfile.getName());
+                if (userProfile.getBackgroundImageUrl() != null && !userProfile.getBackgroundImageUrl().isEmpty()) {
+                    Glide.with(view.getContext()).load(userProfile.getBackgroundImageUrl()).into(backgroundAvatar);
+                }
+                if (userProfile.getAvatarUrl() != null && !userProfile.getAvatarUrl().isEmpty()) {
+                    Glide.with(view.getContext()).load(userProfile.getAvatarUrl()).circleCrop().into(avatar);
                 }
             }
         });
-
-
     }
+    private void setupListeners() {
+        // Example: Listener for modifyName button
+        modifyName.setOnClickListener(v -> {
+            String newName = Name.getText().toString();
+            profileViewModel.updateUserName(newName);
+            // Hide keyboard and clear focus as before
+            hideKeyboardAndClearFocus(Name);
 
-    private void saveNameChanges() {
-        String newName = Name.getText().toString();
-        updateNameInFirestore(newName);
-        InputMethodManager imm = (InputMethodManager) getActivity().getSystemService(Context.INPUT_METHOD_SERVICE);
-        imm.hideSoftInputFromWindow(Name.getWindowToken(), 0);
+        });
+
+        avatar.setOnClickListener(v -> {
+            // Trigger image selection for avatar
+            Intent intent = new Intent(Intent.ACTION_PICK);
+            intent.setType("image/*");
+            startActivityForResult(intent, PICK_AVATAR_IMAGE_REQUEST);
+        });
+
+        // Listener for background image click
+        backgroundAvatar.setOnClickListener(v -> {
+            // Trigger image selection for background
+            Intent intent = new Intent(Intent.ACTION_PICK);
+            intent.setType("image/*");
+            startActivityForResult(intent, PICK_IMAGE_REQUEST);
+        });
+
+        // Similar setup for other interactive elements...
     }
-
-    private void updateNameInFirestore(String newName) {
-        Map<String, Object> updates = new HashMap<>();
-        updates.put("Name", newName);
-        updateDocument(updates);
-    }
-
-
-
-
 
     @Override
     public void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
@@ -490,41 +315,23 @@ public class ProfileFragment extends Fragment {
             // Differentiate between the requests
             if (requestCode == PICK_IMAGE_REQUEST) {
                 selectedImageUri = data.getData();
-                backgroundAvatar.setImageURI(selectedImageUri);
-                uploadToFirestore(selectedImageUri, "backgroundImageUrl");
+                profileViewModel.uploadImageAndUpdateProfile(selectedImageUri, "backgroundImageUrl");
             } else if (requestCode == PICK_AVATAR_IMAGE_REQUEST) {
                 selectedAvatarUri = data.getData();
-                avatar.setImageURI(selectedAvatarUri);
-                uploadToFirestore(selectedAvatarUri, "avatarUrl");
+                profileViewModel.uploadImageAndUpdateProfile(selectedAvatarUri, "avatarUrl");
+
             }
         }
     }
-
-    private void uploadToFirestore(Uri fileUri, String key) {
-        if (fileUri != null) {
-            StorageReference fileRef = storage.getReference().child(key + "/" + UUID.randomUUID().toString());
-
-            fileRef.putFile(fileUri).addOnSuccessListener(taskSnapshot -> {
-                fileRef.getDownloadUrl().addOnSuccessListener(downloadUri -> {
-                    Map<String, Object> updates = new HashMap<>();
-                    updates.put(key, downloadUri.toString());
-                    updateDocument(updates);
-                });
-            }).addOnFailureListener(e -> {
-                Toast.makeText(getActivity(), "Failed to upload image: " + e.getMessage(), Toast.LENGTH_SHORT).show();
-                Log.e("ProfileFragment", "Error uploading image", e);
-            });
+    private void hideKeyboardAndClearFocus(View view) {
+        if (view != null) {
+            InputMethodManager imm = (InputMethodManager) getActivity().getSystemService(Context.INPUT_METHOD_SERVICE);
+            imm.hideSoftInputFromWindow(view.getWindowToken(), 0);
+            view.clearFocus();
         }
+        // This will remove focus from all the views in the current window
+        // and effectively remove the cursor from the EditText
+        view.getRootView().clearFocus();
     }
 
-    private void updateDocument(Map<String, Object> updates) {
-        FirebaseFirestore db = FirebaseFirestore.getInstance();
-        FirebaseUser user = mAuth.getCurrentUser();
-        if (user != null) {
-            DocumentReference userDocRef = db.collection("users").document(user.getUid());
-            userDocRef.update(updates)
-                    .addOnSuccessListener(aVoid -> Log.d("ProfileFragment", "DocumentSnapshot successfully updated!"))
-                    .addOnFailureListener(e -> Log.w("ProfileFragment", "Error updating document", e));
-        }
-    }
 }
