@@ -231,8 +231,11 @@ public class SongAdapter extends RecyclerView.Adapter<SongAdapter.ViewHolder> {
                 fragment.setArguments(args);
 
                 fragment.show(((AppCompatActivity) v.getContext()).getSupportFragmentManager(), "PlaySongFragment");
-                // recent listening song
-                listener.onSongSelected(songList.get(position));
+
+                if (listener != null) {
+                    listener.onSongSelected(songList.get(position));
+                }
+
 
             }
         }

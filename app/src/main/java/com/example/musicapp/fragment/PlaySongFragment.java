@@ -26,6 +26,7 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.fragment.app.FragmentManager;
+import androidx.fragment.app.FragmentTransaction;
 
 import com.bumptech.glide.Glide;
 import com.example.musicapp.R;
@@ -43,10 +44,10 @@ import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FieldValue;
 import com.google.firebase.firestore.FirebaseFirestore;
-import com.google.firebase.firestore.MemoryLruGcSettings;
 import com.google.gson.annotations.SerializedName;
 
 import java.io.IOException;
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -84,7 +85,7 @@ public class PlaySongFragment extends BottomSheetDialogFragment implements Fetch
     private boolean isPlaying = false;
     private int position = -1;
     private FetchAccessToken fetchAccessToken;
-    private String accessToken;
+    public String accessToken;
 
     private ImageView heartBtn;
     private String songId, previousSongId, nextSongId;
@@ -92,6 +93,17 @@ public class PlaySongFragment extends BottomSheetDialogFragment implements Fetch
     private ImageView miniPlayerPlayPauseButton;
 
     private SongAdapter songAdapter; // Add SongAdapter here
+    private static PlaySongFragment instance;
+    public static PlaySongFragment getInstance(List<Song> songList, String songId) {
+        if (instance == null) {
+            instance = new PlaySongFragment();
+            Bundle args = new Bundle();
+            args.putString("songId", songId);
+            args.putSerializable("songList", (java.io.Serializable) songList);
+            instance.setArguments(args);
+        }
+        return instance;
+    }
 
     public interface OnPlayingStateChangeListener {
         void onPlayingStateChanged(boolean isPlaying);
@@ -120,6 +132,7 @@ public class PlaySongFragment extends BottomSheetDialogFragment implements Fetch
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         view = inflater.inflate(R.layout.play_song, container, false);
+
         // hide bottom navigation bar
         fetchAccessToken = new FetchAccessToken();
 
@@ -218,9 +231,7 @@ public class PlaySongFragment extends BottomSheetDialogFragment implements Fetch
                                     if (isShuffle) {
                                         shuffleBtn.setImageResource(R.drawable.shuffle_green);
                                         mediaPlayerManager.setIsRepeat(false);
-                                    }
-                                    else
-                                        shuffleBtn.setImageResource(R.drawable.shuffle_gray);
+                                    } else shuffleBtn.setImageResource(R.drawable.shuffle_gray);
                                 }
                             });
                         } else {
@@ -260,15 +271,12 @@ public class PlaySongFragment extends BottomSheetDialogFragment implements Fetch
                             checkIsRepeat(new OnRepeatCallback() {
                                 @Override
                                 public void onResult(boolean isRepeat) {
-                                    if (isRepeat){
+                                    if (isRepeat) {
                                         repeateBtn.setImageResource(R.drawable.repeate_green);
-                                    }
-                                    else repeateBtn.setImageResource(R.drawable.repeate);
+                                    } else repeateBtn.setImageResource(R.drawable.repeate);
                                 }
                             });
-                        }
-                        else
-                            shuffleBtn.setImageResource(R.drawable.shuffle_gray);
+                        } else shuffleBtn.setImageResource(R.drawable.shuffle_gray);
                     }
                 });
             }
@@ -307,6 +315,7 @@ public class PlaySongFragment extends BottomSheetDialogFragment implements Fetch
         LinearLayout album = dialogView.findViewById(R.id.album);
         LinearLayout share = dialogView.findViewById(R.id.share);
         LinearLayout report = dialogView.findViewById(R.id.report);
+        LinearLayout upcoming = dialogView.findViewById(R.id.upcoming);
         Button cancel = dialogView.findViewById(R.id.cancel);
         AlertDialog dialog = builder.create();
         dialog.show();
@@ -353,22 +362,19 @@ public class PlaySongFragment extends BottomSheetDialogFragment implements Fetch
                         } else {
                             Map<String, Object> updates = new HashMap<>();
                             String subject = "Thanks for sending us Feedback&Error report";
-                            updates.put("reportContent", "Report song " + songnameValue + ": "+ reportContent);
+                            updates.put("reportContent", "Report song " + songnameValue + ": " + reportContent);
                             FirebaseFirestore db = FirebaseFirestore.getInstance();
-                            db.collection("reports_1")
-                                    .add(updates)
-                                    .addOnSuccessListener(new OnSuccessListener<DocumentReference>() {
-                                        @Override
-                                        public void onSuccess(DocumentReference documentReference) {
-                                            Log.d("saveErrorReport", "DocumentSnapshot added with ID: " + documentReference.getId());
-                                        }
-                                    })
-                                    .addOnFailureListener(new OnFailureListener() {
-                                        @Override
-                                        public void onFailure(@NonNull Exception e) {
+                            db.collection("reports_1").add(updates).addOnSuccessListener(new OnSuccessListener<DocumentReference>() {
+                                @Override
+                                public void onSuccess(DocumentReference documentReference) {
+                                    Log.d("saveErrorReport", "DocumentSnapshot added with ID: " + documentReference.getId());
+                                }
+                            }).addOnFailureListener(new OnFailureListener() {
+                                @Override
+                                public void onFailure(@NonNull Exception e) {
 
-                                        }
-                                    });
+                                }
+                            });
                             dialog.setOnDismissListener(new DialogInterface.OnDismissListener() {
                                 @Override
                                 public void onDismiss(DialogInterface dialog) {
@@ -424,6 +430,22 @@ public class PlaySongFragment extends BottomSheetDialogFragment implements Fetch
                 addToPlayListFragment.show(getChildFragmentManager(), "AddToPlayListFragment");
 
                 dialog.dismiss();
+            }
+        });
+
+        upcoming.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                hideFragment();
+                UpcomingSongFragment upcomingFragment = new UpcomingSongFragment();
+                Bundle bundle = new Bundle();
+                bundle.putSerializable("songList", (java.io.Serializable) songList);
+                upcomingFragment.setArguments(bundle);
+                upcomingFragment.show(getChildFragmentManager(), "UpcomingSongFragment");
+
+                dialog.dismiss();
+                // dismiss the bottomsheets
+
             }
         });
     }
@@ -512,12 +534,7 @@ public class PlaySongFragment extends BottomSheetDialogFragment implements Fetch
         args.putString("artistId", artistId);
 
         lyricFragment.setArguments(args);
-        ((AppCompatActivity) requireContext())
-                .getSupportFragmentManager()
-                .beginTransaction()
-                .replace(R.id.frame_layout, lyricFragment, "LyricFragment")
-                .addToBackStack("LyricFragment")
-                .commit();
+        ((AppCompatActivity) requireContext()).getSupportFragmentManager().beginTransaction().replace(R.id.frame_layout, lyricFragment, "LyricFragment").addToBackStack("LyricFragment").commit();
     }
 
 
@@ -552,9 +569,7 @@ public class PlaySongFragment extends BottomSheetDialogFragment implements Fetch
                 if (isRepeat) {
                     repeateBtn.setImageResource(R.drawable.repeate_green);
                     mediaPlayerManager.setIsShuffle(false);
-                }
-                else
-                    repeateBtn.setImageResource(R.drawable.repeate);
+                } else repeateBtn.setImageResource(R.drawable.repeate);
             }
         });
 
@@ -564,9 +579,7 @@ public class PlaySongFragment extends BottomSheetDialogFragment implements Fetch
                 if (isShuffle) {
                     shuffleBtn.setImageResource(R.drawable.shuffle_green);
                     mediaPlayerManager.setIsRepeat(false);
-                }
-                else
-                    shuffleBtn.setImageResource(R.drawable.shuffle_gray);
+                } else shuffleBtn.setImageResource(R.drawable.shuffle_gray);
             }
         });
 
@@ -630,18 +643,16 @@ public class PlaySongFragment extends BottomSheetDialogFragment implements Fetch
     }
 
     private void checkIsRepeat(OnRepeatCallback callback) {
-        if (mediaPlayerManager.getIsRepeat() == true)
-            callback.onResult(true);
-        else
-            callback.onResult(false);
-    }
-
-    private void checkIsShuffle (OnShuffleCallback callback){
-        if (mediaPlayerManager.getIsShuffle() == true){
-            callback.onResult(true);
-        }
+        if (mediaPlayerManager.getIsRepeat() == true) callback.onResult(true);
         else callback.onResult(false);
     }
+
+    private void checkIsShuffle(OnShuffleCallback callback) {
+        if (mediaPlayerManager.getIsShuffle() == true) {
+            callback.onResult(true);
+        } else callback.onResult(false);
+    }
+
     private void removeSongFromLikedSongs(String songId) {
         FirebaseAuth mAuth = FirebaseAuth.getInstance();
         String userId = mAuth.getCurrentUser().getUid();
@@ -685,7 +696,7 @@ public class PlaySongFragment extends BottomSheetDialogFragment implements Fetch
         });
     }
 
-    private void getTrack(String accessToken) {
+    public void getTrack(String accessToken) {
         Retrofit retrofit = new Retrofit.Builder().baseUrl("https://api.spotify.com/").addConverterFactory(GsonConverterFactory.create()).build();
 
         SpotifyApi apiService = retrofit.create(SpotifyApi.class);
@@ -700,7 +711,7 @@ public class PlaySongFragment extends BottomSheetDialogFragment implements Fetch
                         setupTrack(track);
                     }
                 } else {
-                    showError(response);
+
                 }
             }
 
@@ -720,7 +731,7 @@ public class PlaySongFragment extends BottomSheetDialogFragment implements Fetch
 
             songname.setText(songName);
             artistname.setText(artistName);
-            if (imageUrl!= null) {
+            if (imageUrl != null) {
                 Glide.with(this).load(imageUrl).into(cover_art);
             }
 
@@ -749,7 +760,6 @@ public class PlaySongFragment extends BottomSheetDialogFragment implements Fetch
     }
 
 
-
     @Override
     public void onPause() {
         super.onPause();
@@ -761,6 +771,7 @@ public class PlaySongFragment extends BottomSheetDialogFragment implements Fetch
     @Override
     public void onResume() {
         super.onResume();
+
     }
 
     public void setupMediaPlayer(String playUrl) {
@@ -785,16 +796,16 @@ public class PlaySongFragment extends BottomSheetDialogFragment implements Fetch
                             if (mediaPlayerManager.getIsRepeat()) {
                                 mediaPlayerManager.getMediaPlayer().seekTo(0);
                                 mediaPlayerManager.setCurrentPosition(0);
-                            }
-                            else if (mediaPlayerManager.getIsShuffle())
-                            {
+                            } else if (mediaPlayerManager.getIsShuffle()) {
                                 mediaPlayerManager.getMediaPlayer().pause();
                                 mediaPlayerManager.setCurrentPosition(0);
                                 PlayRandomSong();
+                            } else if (mediaPlayerManager.getIsRepeat() == false && mediaPlayerManager.getIsShuffle() == false) {
+                                mediaPlayerManager.getMediaPlayer().pause();
+                                mediaPlayerManager.setCurrentPosition(0);
+                                PlayNextSong();
                             }
-                            else if (mediaPlayerManager.getIsRepeat() == false && mediaPlayerManager.getIsShuffle() == false)
-                            {mediaPlayerManager.getMediaPlayer().pause(); mediaPlayerManager.setCurrentPosition(0); PlayNextSong();}
-         }
+                        }
                         handler.postDelayed(this, 500); // Update every 500 milliseconds
                     }
                 }
@@ -877,11 +888,7 @@ public class PlaySongFragment extends BottomSheetDialogFragment implements Fetch
         args.putString("albumId", albumId);
         likedAlbumDetailFragment.setArguments(args);
         // Add the Fragment to the Activity
-        ((AppCompatActivity) getContext()).getSupportFragmentManager()
-                .beginTransaction()
-                .replace(R.id.frame_layout, likedAlbumDetailFragment)
-                .addToBackStack(null)
-                .commit();
+        ((AppCompatActivity) getContext()).getSupportFragmentManager().beginTransaction().replace(R.id.frame_layout, likedAlbumDetailFragment).addToBackStack(null).commit();
     }
 
     public void showError(Response<TrackModel> response) {
@@ -924,6 +931,14 @@ public class PlaySongFragment extends BottomSheetDialogFragment implements Fetch
         updateCurrentSong(songId);
     }
 
+    public void hideFragment() {
+        FragmentTransaction transaction = getParentFragmentManager().beginTransaction();
+        transaction.hide(this);
+        transaction.commit();
+    }
+
+
+
     private void updateCurrentSong(String newSongId) {
         if (newSongId != null && !newSongId.isEmpty() && !newSongId.equals(songId)) {
             this.songId = newSongId;
@@ -965,8 +980,9 @@ public class PlaySongFragment extends BottomSheetDialogFragment implements Fetch
     private interface OnRepeatCallback {
         void onResult(boolean isRepeat);
     }
+
     private interface OnShuffleCallback {
-        void onResult (boolean isShuffle);
+        void onResult(boolean isShuffle);
     }
 
     public interface SpotifyApi {
