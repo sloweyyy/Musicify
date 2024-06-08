@@ -49,6 +49,11 @@ public class SongAdapter extends RecyclerView.Adapter<SongAdapter.ViewHolder> {
         this.songList = songList;
     }
 
+    public void setSongs(List<Song> songs) {
+        this.songList = songs;
+        notifyDataSetChanged();
+    }
+
     public void sortSongByName() {
         songList.sort((song1, song2) -> {
             String name1 = song1.getTitle();

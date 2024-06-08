@@ -8,9 +8,16 @@ public class MediaPlayerManager {
     private static MediaPlayerManager instance;
 
     private static boolean isPlaying;
+    private static boolean isRepeat;
+    private static boolean isShuffle;
     private MediaPlayer mediaPlayer;
     private int currentPosition;
     private int lastPlaybackPosition = 0;
+
+    public static boolean isIsShuffle() {
+        return isShuffle;
+    }
+
     public int getLastPlaybackPosition() {
         return lastPlaybackPosition;
     }
@@ -39,9 +46,12 @@ public class MediaPlayerManager {
         isPlaying = sth;
     }
 
+    public boolean getIsRepeat() {return isRepeat;}
+    public void setIsRepeat(boolean sth) {isRepeat = sth;}
 
     public static MediaPlayerManager getInstance() {
         if (instance == null) {
+            isRepeat = false;
             instance = new MediaPlayerManager();
         }
         return instance;

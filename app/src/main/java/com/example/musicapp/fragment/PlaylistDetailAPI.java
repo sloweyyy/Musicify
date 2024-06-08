@@ -14,6 +14,7 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentManager;
+import androidx.lifecycle.ViewModelProvider;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
@@ -23,6 +24,8 @@ import com.example.musicapp.adapter.FetchAccessToken;
 import com.example.musicapp.adapter.SongAdapter;
 import com.example.musicapp.model.SimplifiedTrack;
 import com.example.musicapp.model.Song;
+import com.example.musicapp.viewmodel.PlaylistDetailAPIViewModel;
+import com.example.musicapp.viewmodel.PlaylistDetailViewModel;
 import com.google.gson.annotations.SerializedName;
 
 import java.util.ArrayList;
@@ -40,6 +43,7 @@ import retrofit2.http.Path;
 public class PlaylistDetailAPI extends Fragment implements FetchAccessToken.AccessTokenCallback {
     View view;
     RecyclerView recyclerView;
+    private PlaylistDetailAPIViewModel viewModel;
     private FetchAccessToken fetchAccessToken;
     private PlaylistSimplified playlistSimplified;
     private String playlistId;
@@ -55,13 +59,14 @@ public class PlaylistDetailAPI extends Fragment implements FetchAccessToken.Acce
 
     @Override
     public void onTokenReceived(String accessToken) {
-        getSongs(accessToken);
+        viewModel.fetchPlaylistDetails(accessToken, playlistId);
     }
 
     @Nullable
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         view = inflater.inflate(R.layout.fragment_playlist_detail, container, false);
+        viewModel = new ViewModelProvider(this).get(PlaylistDetailAPIViewModel.class);
         recyclerView = view.findViewById(R.id.recyclerViewSongDetail);
         playlistName = view.findViewById(R.id.playlistName);
         playlistDescription = view.findViewById(R.id.playlistDescription);
@@ -83,7 +88,6 @@ public class PlaylistDetailAPI extends Fragment implements FetchAccessToken.Acce
                 fragmentManager.popBackStack();
             }
         });
-
         iconBack.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -91,6 +95,7 @@ public class PlaylistDetailAPI extends Fragment implements FetchAccessToken.Acce
                 fragmentManager.popBackStack();
             }
         });
+        setupObservers();
         return view;
     }
 
@@ -98,50 +103,60 @@ public class PlaylistDetailAPI extends Fragment implements FetchAccessToken.Acce
         this.playlistId = playlistId;
     }
 
-    public void getSongs(String accessToken) {
-        Retrofit retrofit = new Retrofit.Builder()
-                .baseUrl("https://api.spotify.com/")
-                .addConverterFactory(GsonConverterFactory.create())
-                .build();
-        SpotifyApiService apiService = retrofit.create(PlaylistDetailAPI.SpotifyApiService.class);
-        String authorization = "Bearer " + accessToken;
-        Call<PlaylistSimplified> call = apiService.getSongs(authorization, playlistId);
-        call.enqueue(new Callback<PlaylistSimplified>() {
-            @Override
-            public void onResponse(Call<PlaylistSimplified> call, Response<PlaylistSimplified> response) {
-                AlertDialog.Builder builder = new AlertDialog.Builder(requireContext());
-                if (response.isSuccessful()) {
-                    PlaylistSimplified playlist = response.body();
-                    playlistName.setText(playlist.getName());
-                    playlistDescription.setText(playlist.getDescription().split("\\.")[0]);
-                    Glide.with(requireContext()).load(playlist.images.get(0).getUrl()).into(imageView);
-                    List<Song> songs = new ArrayList<>();
-                    for (ItemModel item : playlist.tracksContainer.tracks) {
-                        SimplifiedTrack track = item.track;
-                        if (track != null) {
-                            songs.add(Song.fromSimplifiedTrack(track));
-                        } else {
+//    public void getSongs(String accessToken) {
+//        Retrofit retrofit = new Retrofit.Builder()
+//                .baseUrl("https://api.spotify.com/")
+//                .addConverterFactory(GsonConverterFactory.create())
+//                .build();
+//        SpotifyApiService apiService = retrofit.create(PlaylistDetailAPI.SpotifyApiService.class);
+//        String authorization = "Bearer " + accessToken;
+//        Call<PlaylistSimplified> call = apiService.getSongs(authorization, playlistId);
+//        call.enqueue(new Callback<PlaylistSimplified>() {
+//            @Override
+//            public void onResponse(Call<PlaylistSimplified> call, Response<PlaylistSimplified> response) {
+//                AlertDialog.Builder builder = new AlertDialog.Builder(requireContext());
+//                if (response.isSuccessful()) {
+//                    PlaylistSimplified playlist = response.body();
+//                    playlistName.setText(playlist.getName());
+//                    playlistDescription.setText(playlist.getDescription().split("\\.")[0]);
+//                    Glide.with(requireContext()).load(playlist.images.get(0).getUrl()).into(imageView);
+//                    List<Song> songs = new ArrayList<>();
+//                    for (ItemModel item : playlist.tracksContainer.tracks) {
+//                        SimplifiedTrack track = item.track;
+//                        if (track != null) {
+//                            songs.add(Song.fromSimplifiedTrack(track));
+//                        } else {
+//
+//                        }
+//                    }
+//                    songAdapter = new SongAdapter(getContext(), songs, homeFragment);
+//                    recyclerView.setAdapter(songAdapter);
+//                    recyclerView.setVisibility(View.VISIBLE);
+//
+//                } else {
+//                    builder.setTitle("Cảnh báo");
+//                    builder.setMessage(response.body().getName());
+//                    builder.setPositiveButton("OK", null);
+//                    builder.show();
+//                }
+//            }
+//
+//            @Override
+//            public void onFailure(Call<PlaylistSimplified> call, Throwable throwable) {
+//
+//            }
+//        });
+//
+//    }
 
-                        }
-                    }
-                    songAdapter = new SongAdapter(getContext(), songs, homeFragment);
-                    recyclerView.setAdapter(songAdapter);
-                    recyclerView.setVisibility(View.VISIBLE);
-
-                } else {
-                    builder.setTitle("Cảnh báo");
-                    builder.setMessage(response.body().getName());
-                    builder.setPositiveButton("OK", null);
-                    builder.show();
-                }
-            }
-
-            @Override
-            public void onFailure(Call<PlaylistSimplified> call, Throwable throwable) {
-
-            }
+    private void setupObservers() {
+        viewModel.playlistDetail.observe(getViewLifecycleOwner(), playlistDetail -> {
+            playlistName.setText(playlistDetail.getName());
+            playlistDescription.setText(playlistDetail.getDescription());
+            Glide.with(requireContext()).load(playlistDetail.getImageUrl()).into(imageView);
+            songAdapter = new SongAdapter(getContext(), playlistDetail.getSongs(), homeFragment);
+            recyclerView.setAdapter(songAdapter);
         });
-
     }
 
     public interface SpotifyApiService {
