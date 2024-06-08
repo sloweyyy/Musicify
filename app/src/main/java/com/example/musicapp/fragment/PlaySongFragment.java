@@ -51,6 +51,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.locks.ReentrantLock;
 
 import retrofit2.Call;
 import retrofit2.Callback;
@@ -161,13 +162,13 @@ public class PlaySongFragment extends BottomSheetDialogFragment implements Fetch
         if (getActivity() instanceof OnPlayingStateChangeListener) {
             playingStateChangeListener = (OnPlayingStateChangeListener) getActivity();
         }
-        backButtonLayout.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                mediaPlayerManager.getMediaPlayer().seekTo(0);
-                dismiss();
-            }
-        });
+//        backButtonLayout.setOnClickListener(new View.OnClickListener() {
+//            @Override
+//            public void onClick(View v) {
+//                mediaPlayerManager.getMediaPlayer().seekTo(0);
+//                dismiss();
+//            }
+//        });
 
         iconBackPlaying.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -715,6 +716,7 @@ public class PlaySongFragment extends BottomSheetDialogFragment implements Fetch
     public void setupTrack(TrackModel track) {
         if (isAdded()) {
             String songName = track.getName();
+            Log.e("In setUpTrack", songName);
             String artistName = track.artists.get(0).getName();
             String imageUrl = track.album.images.get(0).getUrl();
             String playUrl = track.getPreview_url();
@@ -731,8 +733,9 @@ public class PlaySongFragment extends BottomSheetDialogFragment implements Fetch
             avataValue = imageUrl;
             urlAudioValue = playUrl;
             artistId = track.artists.get(0).getId();
-            setupMediaPlayer(playUrl);
             mediaPlayerManager.getMediaPlayer().seekTo(0);
+            setupMediaPlayer(playUrl);
+
             setupSeekBar();
             setupPauseButton();
             artistname.setOnClickListener(new View.OnClickListener() {
@@ -778,11 +781,15 @@ public class PlaySongFragment extends BottomSheetDialogFragment implements Fetch
             updateSeekBarRunnable = new Runnable() {
                 @Override
                 public void run() {
-                    if (mediaPlayerManager.getMediaPlayer() != null && mediaPlayerManager.getIsPlaying()) { // Check if mediaPlayer is playing
+                    if (mediaPlayerManager.getMediaPlayer() != null && mediaPlayerManager.getIsPlaying())
+                    { // Check if mediaPlayer is playing
                         int CurrentPosition = (mediaPlayerManager.getMediaPlayer().getCurrentPosition() / 1000);
                         seekBar.setProgress(CurrentPosition);
                         duration_played.setText(formattedTime(CurrentPosition));
                         if (CurrentPosition == mediaPlayerManager.getMediaPlayer().getDuration() / 1000) {
+                            Log.e("cuối bài ", "hehe");
+                            //mediaPlayerManager.getMediaPlayer().seekTo(0);
+
                             if (mediaPlayerManager.getIsRepeat()) {
                                 mediaPlayerManager.getMediaPlayer().seekTo(0);
                                 mediaPlayerManager.setCurrentPosition(0);
@@ -791,10 +798,15 @@ public class PlaySongFragment extends BottomSheetDialogFragment implements Fetch
                             {
                                 mediaPlayerManager.getMediaPlayer().pause();
                                 mediaPlayerManager.setCurrentPosition(0);
+                                mediaPlayerManager.getMediaPlayer().seekTo(0);
                                 PlayRandomSong();
                             }
-                            else if (mediaPlayerManager.getIsRepeat() == false && mediaPlayerManager.getIsShuffle() == false)
-                            {mediaPlayerManager.getMediaPlayer().pause(); mediaPlayerManager.setCurrentPosition(0); PlayNextSong();}
+                            else
+                            {
+                                mediaPlayerManager.getMediaPlayer().pause();
+                                mediaPlayerManager.getMediaPlayer().seekTo(0);
+                                PlayNextSong();
+                            }
          }
                         handler.postDelayed(this, 500); // Update every 500 milliseconds
                     }
@@ -803,6 +815,7 @@ public class PlaySongFragment extends BottomSheetDialogFragment implements Fetch
             handler.postDelayed(updateSeekBarRunnable, 0);
         }
     }
+
 
     public void setupSeekBar() {
         seekBar.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
