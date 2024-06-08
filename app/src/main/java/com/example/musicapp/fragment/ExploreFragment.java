@@ -102,7 +102,7 @@ public class ExploreFragment extends Fragment implements FetchAccessToken.Access
             @Override
             public void onTextChanged(CharSequence s, int start, int before, int count) {
                 String query = s.toString();
-                viewModel.searchSongs(query);
+                viewModel.searchSongs(query, accessToken);
             }
 
             @Override
@@ -216,9 +216,15 @@ public class ExploreFragment extends Fragment implements FetchAccessToken.Access
     }
 
     private void updateSearchResults(List<Song> songs) {
-        if (songs != null) {
+        if (songs != null && !songs.isEmpty()) {
             songAdapter = new SongAdapter(getContext(), songs);
+            recyclerViewSongs.setVisibility(View.VISIBLE); // Hiển thị RecyclerView cho kết quả tìm kiếm
+            recyclerView.setVisibility(View.GONE); // Ẩn RecyclerView cho danh sách categories
             recyclerViewSongs.setAdapter(songAdapter);
+        } else {
+            recyclerViewSongs.setVisibility(View.GONE); // Ẩn RecyclerView cho kết quả tìm kiếm
+            recyclerView.setVisibility(View.VISIBLE); // Hiển thị RecyclerView cho danh sách categories
+            // Optionally, you can show a message or do something else when there are no search results
         }
     }
 

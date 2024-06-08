@@ -62,6 +62,7 @@ public class ExploreViewModel extends AndroidViewModel {
     }
 
     public void fetchCategories(String accessToken) {
+        this.accessToken  = accessToken;
         Retrofit retrofit = new Retrofit.Builder()
                 .baseUrl("https://api.spotify.com/")
                 .addConverterFactory(GsonConverterFactory.create())
@@ -96,8 +97,8 @@ public class ExploreViewModel extends AndroidViewModel {
         });
     }
 
-    public void searchSongs(String query) {
-        if (accessToken == null || query.isEmpty()) {
+    public void searchSongs(String query, String accessTokenInput) {
+        if (accessTokenInput == null || query.isEmpty()) {
             _searchResults.setValue(new ArrayList<>());
             return;
         }
