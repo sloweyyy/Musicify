@@ -5,7 +5,6 @@ import static android.app.Activity.RESULT_OK;
 import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -32,8 +31,8 @@ import com.google.android.material.tabs.TabLayout;
 import com.google.firebase.auth.FirebaseAuth;
 
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
-import java.util.UUID;
 
 public class PlaylistsFragment extends Fragment {
     private View view;
@@ -43,7 +42,7 @@ public class PlaylistsFragment extends Fragment {
     private PlaylistAdapter adapter;
 
     private enum SortState {
-        DEFAULT, BY_NAME, BY_PRIVACY
+        DEFAULT, BY_NAME, BY_CREATED_AT
     }
 
     private SortState currentSortState = SortState.DEFAULT;
@@ -98,11 +97,15 @@ public class PlaylistsFragment extends Fragment {
             createBtn.setOnClickListener(v12 -> {
                 String playlistName = textInputEditText.getText().toString();
                 String userId1 = FirebaseAuth.getInstance().getCurrentUser().getUid();
-
+                if (playlistName.isEmpty()) {
+                    Toast.makeText(getActivity(), "Playlist name cannot be empty", Toast.LENGTH_SHORT).show();
+                    return;
+                }
                 if (selectedImageUri != null) {
                     playlistViewModel.uploadImage(selectedImageUri, uri -> {
                         String imageURL = uri.toString();
-                        Playlist newPlaylist = new Playlist(userId1, playlistName, "Description", imageURL);
+                        Date createdAt = new Date();
+                        Playlist newPlaylist = new Playlist(userId1, playlistName, imageURL, createdAt);
                         playlistViewModel.savePlaylistToFirestore(newPlaylist, success -> {
                             if (success) {
                                 Toast.makeText(getActivity(), "Playlist created successfully", Toast.LENGTH_SHORT).show();
@@ -114,7 +117,8 @@ public class PlaylistsFragment extends Fragment {
                         });
                     });
                 } else {
-                    Playlist newPlaylist = new Playlist(userId1, playlistName, "Description", null);
+                    Date createdAt = new Date();
+                    Playlist newPlaylist = new Playlist(userId1, playlistName, null, createdAt);
                     playlistViewModel.savePlaylistToFirestore(newPlaylist, success -> {
                         if (success) {
                             Toast.makeText(getActivity(), "Playlist created successfully", Toast.LENGTH_SHORT).show();
@@ -159,14 +163,14 @@ public class PlaylistsFragment extends Fragment {
                     recentlyPlayedText.setText("Sort by Name");
                     playlistViewModel.sortPlaylistsByName();
                 } else if (currentSortState == SortState.BY_NAME) {
-                    currentSortState = SortState.BY_PRIVACY;
+                    currentSortState = SortState.BY_CREATED_AT;
                     recentlyPlayedIcon.setImageResource(R.drawable.up_arrow);
-                    recentlyPlayedText.setText("Sort by Privacy");
-                    playlistViewModel.sortPlaylistsByPrivacy();
+                    recentlyPlayedText.setText("Sort by Created Date");
+                    playlistViewModel.sortPlaylistsbyDate();
                 } else {
                     currentSortState = SortState.DEFAULT;
                     recentlyPlayedIcon.setImageResource(R.drawable.down_up_arrow);
-                    recentlyPlayedText.setText("Recently Played");
+                    recentlyPlayedText.setText("Sort by Default");
                     playlistViewModel.fetchPlaylists(finalUserId);
                 }
             }

@@ -3,6 +3,7 @@ package com.example.musicapp.model;
 import com.example.musicapp.R;
 
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 
 public class Playlist {
@@ -12,11 +13,9 @@ public class Playlist {
     private String description;
     private int thumbnail;
     private String imageURL;
-    private List<String> songs; // Add a field to store song IDs
+    private List<String> songs;
 
-
-
-
+    private Date createdAt;
     private String privacy;
 
     private int privacyIcon;
@@ -42,6 +41,14 @@ public class Playlist {
         this.description = description;
         this.imageURL = imageURL;
     }
+
+    public Playlist(String userId, String name, String imageURL, Date createdAt) {
+        this.userId = userId;
+        this.name = name;
+        this.imageURL = imageURL;
+        this.createdAt = createdAt;
+    }
+
 
     public List<String> getSongs() {
         if (songs == null) {
@@ -134,6 +141,14 @@ public class Playlist {
 
     public void setPrivacy(String privacy) {
         this.privacy = privacy;
+    }
+
+    public Date getCreatedAt() {
+        return createdAt;
+    }
+
+    public void setCreatedAt(Date createdAt) {
+        this.createdAt = createdAt;
     }
 
 
