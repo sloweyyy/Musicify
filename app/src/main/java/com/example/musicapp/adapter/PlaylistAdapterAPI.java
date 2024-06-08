@@ -9,17 +9,13 @@ import android.widget.TextView;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
-import androidx.cardview.widget.CardView;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.bumptech.glide.Glide;
 import com.example.musicapp.R;
-import com.example.musicapp.fragment.List_Playlist;
 
 import com.example.musicapp.fragment.PlaylistDetailAPI;
 
-import com.example.musicapp.model.Category;
-import com.example.musicapp.model.Playlist;
 import com.example.musicapp.model.PlaylistAPI;
 
 import java.util.List;

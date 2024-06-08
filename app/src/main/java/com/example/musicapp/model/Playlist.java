@@ -15,6 +15,8 @@ public class Playlist {
     private List<String> songs; // Add a field to store song IDs
 
 
+
+
     private String privacy;
 
     private int privacyIcon;
