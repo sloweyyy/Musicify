@@ -11,6 +11,8 @@ public class SimplifiedTrack {
     @SerializedName("id")
     private String id;
 
+    @SerializedName("preview_url")
+    private String url;
     @SerializedName("artists")
     private List<Artist> artists;
     @SerializedName("album")
@@ -19,6 +21,7 @@ public class SimplifiedTrack {
     public String getName() {
         return name;
     }
+    public String getUrl() {return url;}
 
     public List<Artist> getArtists() {
         return artists;

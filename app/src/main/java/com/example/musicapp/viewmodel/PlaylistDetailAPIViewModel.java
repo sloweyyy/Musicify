@@ -72,7 +72,7 @@ public class PlaylistDetailAPIViewModel extends AndroidViewModel {
         List<Song> songs = new ArrayList<>();
         for (PlaylistDetailAPI.ItemModel item : playlist.tracksContainer.tracks) {
             SimplifiedTrack track = item.track;
-            if (track != null) {
+            if (track != null && track.getUrl() != null ) {
                 songs.add(Song.fromSimplifiedTrack(track));
             }
         }
