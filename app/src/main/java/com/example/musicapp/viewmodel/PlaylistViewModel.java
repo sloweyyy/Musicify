@@ -3,13 +3,11 @@ package com.example.musicapp.viewmodel;
 import android.net.Uri;
 import android.util.Log;
 
-import androidx.annotation.NonNull;
 import androidx.lifecycle.LiveData;
 import androidx.lifecycle.MutableLiveData;
 import androidx.lifecycle.ViewModel;
 
 import com.example.musicapp.model.Playlist;
-import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.firestore.FirebaseFirestore;
@@ -17,7 +15,7 @@ import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
 
 import java.util.ArrayList;
-import java.util.Collections;
+import java.util.Date;
 import java.util.List;
 import java.util.UUID;
 
@@ -54,16 +52,19 @@ public class PlaylistViewModel extends ViewModel {
     }
 
     public void savePlaylistToFirestore(Playlist newPlaylist, OnSuccessListener<Boolean> onSuccessListener) {
+        if (newPlaylist.getName().isEmpty()) {
+            onSuccessListener.onSuccess(false);
+            return;
+        }
+
         db.collection("playlists")
                 .add(newPlaylist)
                 .addOnSuccessListener(documentReference -> {
-                    newPlaylist.setId(documentReference.getId());
-                    documentReference.set(newPlaylist)
-                            .addOnSuccessListener(aVoid -> onSuccessListener.onSuccess(true))
-                            .addOnFailureListener(e -> onSuccessListener.onSuccess(false));
+                    onSuccessListener.onSuccess(true);
                 })
                 .addOnFailureListener(e -> onSuccessListener.onSuccess(false));
     }
+
 
     public void uploadImage(Uri selectedImageUri, OnSuccessListener<Uri> onSuccessListener) {
         StorageReference storageRef = storage.getReference().child("playlist/" + UUID.randomUUID().toString());
@@ -82,12 +83,12 @@ public class PlaylistViewModel extends ViewModel {
         playlists.setValue(sortedPlaylists);
     }
 
-    public void sortPlaylistsByPrivacy() {
+    public void sortPlaylistsbyDate() {
         List<Playlist> sortedPlaylists = new ArrayList<>(playlists.getValue());
         sortedPlaylists.sort((playlist1, playlist2) -> {
-            String privacy1 = playlist1.getPrivacy();
-            String privacy2 = playlist2.getPrivacy();
-            return privacy1 != null && privacy2 != null ? privacy1.compareTo(privacy2) : 0;
+            Date date1 = playlist1.getCreatedAt();
+            Date date2 = playlist2.getCreatedAt();
+            return date1 != null && date2 != null ? date1.compareTo(date2) : 0;
         });
         playlists.setValue(sortedPlaylists);
     }
@@ -106,7 +107,8 @@ public class PlaylistViewModel extends ViewModel {
                         onSuccessListener.onSuccess(false);
                     });
         } else {
-            savePlaylistToFirestore(new Playlist(userId, playlistName, "Description", null), onSuccessListener);
+            Date date = new Date();
+            savePlaylistToFirestore(new Playlist(userId, playlistName, null, date), onSuccessListener);
         }
     }
 }
