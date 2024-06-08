@@ -42,6 +42,7 @@ import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FieldValue;
 import com.google.firebase.firestore.FirebaseFirestore;
+import com.google.firebase.firestore.MemoryLruGcSettings;
 import com.google.gson.annotations.SerializedName;
 
 import java.io.IOException;
@@ -202,6 +203,18 @@ public class PlaySongFragment extends BottomSheetDialogFragment implements Fetch
                     public void onResult(boolean isRepeat) {
                         if (isRepeat){
                             repeateBtn.setImageResource(R.drawable.repeate_green);
+                            mediaPlayerManager.setIsShuffle(false);
+                            checkIsShuffle(new OnShuffleCallback() {
+                                @Override
+                                public void onResult(boolean isShuffle) {
+                                    if (isShuffle) {
+                                        shuffleBtn.setImageResource(R.drawable.shuffle_green);
+                                        mediaPlayerManager.setIsRepeat(false);
+                                    }
+                                    else
+                                        shuffleBtn.setImageResource(R.drawable.shuffle_gray);
+                                }
+                            });
                         } else {
                             repeateBtn.setImageResource(R.drawable.repeate);
                         }
@@ -209,6 +222,7 @@ public class PlaySongFragment extends BottomSheetDialogFragment implements Fetch
                 });
             }
         });
+
 
         previousBtn.setOnClickListener(v -> {
             mediaPlayerManager.getMediaPlayer().pause();
@@ -228,9 +242,27 @@ public class PlaySongFragment extends BottomSheetDialogFragment implements Fetch
         shuffleBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                mediaPlayerManager.getMediaPlayer().pause();
-                mediaPlayerManager.setCurrentPosition(0);
-                PlayRandomSong();
+                mediaPlayerManager.setIsShuffle(!mediaPlayerManager.getIsShuffle());
+                checkIsShuffle(new OnShuffleCallback() {
+                    @Override
+                    public void onResult(boolean isShuffle) {
+                        if (isShuffle) {
+                            shuffleBtn.setImageResource(R.drawable.shuffle_green);
+                            mediaPlayerManager.setIsRepeat(false);
+                            checkIsRepeat(new OnRepeatCallback() {
+                                @Override
+                                public void onResult(boolean isRepeat) {
+                                    if (isRepeat){
+                                        repeateBtn.setImageResource(R.drawable.repeate_green);
+                                    }
+                                    else repeateBtn.setImageResource(R.drawable.repeate);
+                                }
+                            });
+                        }
+                        else
+                            shuffleBtn.setImageResource(R.drawable.shuffle_gray);
+                    }
+                });
             }
         });
 
@@ -306,7 +338,7 @@ public class PlaySongFragment extends BottomSheetDialogFragment implements Fetch
                         } else {
                             Map<String, Object> updates = new HashMap<>();
                             String subject = "Thanks for sending us Feedback&Error report";
-                            updates.put("reportContent", reportContent);
+                            updates.put("reportContent", "Report song " + songnameValue + ": "+ reportContent);
                             FirebaseFirestore db = FirebaseFirestore.getInstance();
                             db.collection("reports_1")
                                     .add(updates)
@@ -409,22 +441,26 @@ public class PlaySongFragment extends BottomSheetDialogFragment implements Fetch
     }
 
     public void PlayNextSong() {
-        int currentIndex = getCurrentSongIndex(songId);
-        String nextSongId = "";
-        if (currentIndex < songList.size() - 1) {
-            nextSongId = songList.get(currentIndex + 1).getId();
-        } else {
-            nextSongId = songList.get(0).getId();
+        if (getActivity() != null) {
+            int currentIndex = getCurrentSongIndex(songId);
+            String nextSongId = "";
+            if (currentIndex < songList.size() - 1) {
+                nextSongId = songList.get(currentIndex + 1).getId();
+            } else {
+                nextSongId = songList.get(0).getId();
+            }
+            updateCurrentSong(nextSongId);
+            MiniPlayerListener miniPlayerListener = (MiniPlayerListener) requireActivity();
+            miniPlayerListener.updateMiniPlayer(songList, getCurrentSongIndex(songId));
         }
-        updateCurrentSong(nextSongId);
-        MiniPlayerListener miniPlayerListener = (MiniPlayerListener) requireActivity();
-        miniPlayerListener.updateMiniPlayer(songList, getCurrentSongIndex(songId));
     }
 
     private void PlayRandomSong() {
         int randomIndex = (int) (Math.random() * songList.size());
         String nextSongId = songList.get(randomIndex).getId();
         updateCurrentSong(nextSongId);
+        MiniPlayerListener miniPlayerListener = (MiniPlayerListener) requireActivity();
+        miniPlayerListener.updateMiniPlayer(songList, getCurrentSongIndex(songId));
     }
 
     private Song getSongById(String songId) {
@@ -497,10 +533,24 @@ public class PlaySongFragment extends BottomSheetDialogFragment implements Fetch
         checkIsRepeat(new OnRepeatCallback() {
             @Override
             public void onResult(boolean isRepeat) {
-                if (isRepeat)
+                if (isRepeat) {
                     repeateBtn.setImageResource(R.drawable.repeate_green);
+                    mediaPlayerManager.setIsShuffle(false);
+                }
                 else
                     repeateBtn.setImageResource(R.drawable.repeate);
+            }
+        });
+
+        checkIsShuffle(new OnShuffleCallback() {
+            @Override
+            public void onResult(boolean isShuffle) {
+                if (isShuffle) {
+                    shuffleBtn.setImageResource(R.drawable.shuffle_green);
+                    mediaPlayerManager.setIsRepeat(false);
+                }
+                else
+                    shuffleBtn.setImageResource(R.drawable.shuffle_gray);
             }
         });
 
@@ -571,6 +621,12 @@ public class PlaySongFragment extends BottomSheetDialogFragment implements Fetch
             callback.onResult(false);
     }
 
+    private void checkIsShuffle (OnShuffleCallback callback){
+        if (mediaPlayerManager.getIsShuffle() == true){
+            callback.onResult(true);
+        }
+        else callback.onResult(false);
+    }
     private void removeSongFromLikedSongs(String songId) {
         FirebaseAuth mAuth = FirebaseAuth.getInstance();
         String userId = mAuth.getCurrentUser().getUid();
@@ -710,8 +766,14 @@ public class PlaySongFragment extends BottomSheetDialogFragment implements Fetch
                                 mediaPlayerManager.getMediaPlayer().seekTo(0);
                                 mediaPlayerManager.setCurrentPosition(0);
                             }
-                            else
-                                PlayNextSong();
+                            else if (mediaPlayerManager.getIsShuffle())
+                            {
+                                mediaPlayerManager.getMediaPlayer().pause();
+                                mediaPlayerManager.setCurrentPosition(0);
+                                PlayRandomSong();
+                            }
+                            else if (mediaPlayerManager.getIsRepeat() == false && mediaPlayerManager.getIsShuffle() == false)
+                            {mediaPlayerManager.getMediaPlayer().pause(); mediaPlayerManager.setCurrentPosition(0); PlayNextSong();}
                         }
                         handler.postDelayed(this, 500); // Update every 500 milliseconds
                     }
@@ -745,8 +807,8 @@ public class PlaySongFragment extends BottomSheetDialogFragment implements Fetch
     }
 
     public void setupPauseButton() {
-        mediaPlayerManager.setIsPlaying(true);
-        isPlaying = true;
+        //mediaPlayerManager.setIsPlaying(true);
+        //isPlaying = true;
         if (playingStateChangeListener != null) {
             playingStateChangeListener.onPlayingStateChanged(isPlaying);
         }
@@ -882,6 +944,9 @@ public class PlaySongFragment extends BottomSheetDialogFragment implements Fetch
 
     private interface OnRepeatCallback {
         void onResult(boolean isRepeat);
+    }
+    private interface OnShuffleCallback {
+        void onResult (boolean isShuffle);
     }
 
     public interface SpotifyApi {
