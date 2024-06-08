@@ -177,8 +177,34 @@ public class PlaylistDetailFragment extends Fragment implements FetchAccessToken
         songList = new ArrayList<>();
         adapter = new SongAdapter(getContext(), songList, song -> {
         });
+        adapter.setOnLongItemClickListener(new SongAdapter.OnLongItemClickListener() {
+            @Override
+            public void onLongItemClick(Song song) {
+                showDeleteConfirmationDialog(song);
+            }
+        });
+
         recyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
         recyclerView.setAdapter(adapter);
+    }
+
+    private void showDeleteConfirmationDialog(Song song) {
+        new AlertDialog.Builder(requireContext()).setTitle("Delete Song").setMessage("Are you sure you want to delete this song from the playlist?").setPositiveButton("Delete", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+                List<String> updatedSongIds = new ArrayList<>(currentPlaylist.getSongs());
+                updatedSongIds.remove(song.getId());
+                FirebaseFirestore db = FirebaseFirestore.getInstance();
+                db.collection("playlists").document(currentPlaylist.getId()).update("songs", updatedSongIds).addOnSuccessListener(aVoid -> {
+                    Toast.makeText(requireContext(), "Song deleted successfully", Toast.LENGTH_SHORT).show();
+                    currentPlaylist.setSongs(updatedSongIds);
+                    fetchSpotifyTracks(updatedSongIds);
+                }).addOnFailureListener(e -> {
+                    Toast.makeText(requireContext(), "Failed to delete song", Toast.LENGTH_SHORT).show();
+                    Log.e("PlaylistDetailFragment", "Error deleting song", e);
+                });
+            }
+        }).setNegativeButton("Cancel", null).show();
     }
 
     private void fetchPlaylistSongs(String playlistId) {
@@ -186,6 +212,8 @@ public class PlaylistDetailFragment extends Fragment implements FetchAccessToken
         db.collection("playlists").document(playlistId).get().addOnSuccessListener(documentSnapshot -> {
             if (documentSnapshot.exists()) {
                 Playlist playlist = documentSnapshot.toObject(Playlist.class);
+                currentPlaylist = documentSnapshot.toObject(Playlist.class);
+
 
                 assert playlist != null;
                 spotifySongIds = playlist.getSongs();
@@ -242,17 +270,16 @@ public class PlaylistDetailFragment extends Fragment implements FetchAccessToken
 
     private void fetchSongDetails(String songId) {
         FirebaseFirestore db = FirebaseFirestore.getInstance();
-        db.collection("songs")
-                .document(songId).get().addOnSuccessListener(documentSnapshot -> {
-                    if (documentSnapshot.exists()) {
-                        Song song = documentSnapshot.toObject(Song.class);
-                        adapter.addSong(song);
-                    } else {
-                        Log.d("PlaylistDetailFragment", "No song found with ID: " + songId);
-                    }
-                }).addOnFailureListener(e -> {
-                    Log.e("PlaylistDetailFragment", "Error fetching song details", e);
-                });
+        db.collection("songs").document(songId).get().addOnSuccessListener(documentSnapshot -> {
+            if (documentSnapshot.exists()) {
+                Song song = documentSnapshot.toObject(Song.class);
+                adapter.addSong(song);
+            } else {
+                Log.d("PlaylistDetailFragment", "No song found with ID: " + songId);
+            }
+        }).addOnFailureListener(e -> {
+            Log.e("PlaylistDetailFragment", "Error fetching song details", e);
+        });
     }
 
     private void loadSongsFromSpotify() {
@@ -303,15 +330,10 @@ public class PlaylistDetailFragment extends Fragment implements FetchAccessToken
         });
 
         deleteButton.setOnClickListener(v -> {
-            new AlertDialog.Builder(requireContext())
-                    .setTitle("Delete Playlist")
-                    .setMessage("Are you sure you want to delete this playlist?")
-                    .setPositiveButton("Yes", (dialog, which) -> {
-                        deletePlaylist(playlist);
-                        editPlaylistDialog.dismiss();
-                    })
-                    .setNegativeButton("No", null)
-                    .show();
+            new AlertDialog.Builder(requireContext()).setTitle("Delete Playlist").setMessage("Are you sure you want to delete this playlist?").setPositiveButton("Yes", (dialog, which) -> {
+                deletePlaylist(playlist);
+                editPlaylistDialog.dismiss();
+            }).setNegativeButton("No", null).show();
         });
 
         playlistImage.setOnClickListener(v -> {

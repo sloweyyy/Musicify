@@ -1,8 +1,5 @@
 package com.example.musicapp.viewmodel;
 
-import static java.security.AccessController.getContext;
-
-import android.app.AlertDialog;
 import android.app.Application;
 
 import androidx.annotation.NonNull;
@@ -11,30 +8,26 @@ import androidx.lifecycle.LiveData;
 import androidx.lifecycle.MutableLiveData;
 
 import com.example.musicapp.adapter.FetchAccessToken;
-import com.example.musicapp.fragment.ExploreFragment;
-import com.example.musicapp.model.Category;
+import com.example.musicapp.model.Categories;
+import com.example.musicapp.model.CategoryResponse;
 import com.example.musicapp.model.SearchResult;
 import com.example.musicapp.model.SimplifiedTrack;
 import com.example.musicapp.model.Song;
-import com.google.gson.Gson;
+import com.example.musicapp.service.SpotifyApiService;
 
 import java.io.IOException;
-import java.util.List;
 import java.util.ArrayList;
 import java.util.List;
+
 import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
 import retrofit2.Retrofit;
 import retrofit2.converter.gson.GsonConverterFactory;
-import retrofit2.http.GET;
-import retrofit2.http.Header;
-import retrofit2.http.Path;
-import retrofit2.http.Query;
 
 public class ExploreViewModel extends AndroidViewModel {
-    private MutableLiveData<List<Category>> _categories;
-    public LiveData<List<Category>> categories;
+    private MutableLiveData<List<Categories>> _categories;
+    public LiveData<List<Categories>> categories;
 
     private MutableLiveData<List<Song>> _searchResults;
     public LiveData<List<Song>> searchResults;
@@ -62,7 +55,7 @@ public class ExploreViewModel extends AndroidViewModel {
     }
 
     public void fetchCategories(String accessToken) {
-        this.accessToken  = accessToken;
+        this.accessToken = accessToken;
         Retrofit retrofit = new Retrofit.Builder()
                 .baseUrl("https://api.spotify.com/")
                 .addConverterFactory(GsonConverterFactory.create())
@@ -134,58 +127,5 @@ public class ExploreViewModel extends AndroidViewModel {
             }
         });
     }
-    public class CategoryResponse {
-        private ExploreFragment.Categories categories;
-
-        public ExploreFragment.Categories getCategories() {
-            return categories;
-        }
-
-        public void setCategories(ExploreFragment.Categories categories) {
-            this.categories = categories;
-        }
-
-        @Override
-        public String toString() {
-            return "CategoryResponse{" + "categories=" + categories + '}';
-        }
-    }
-
-    // Categories class
-    public class Categories {
-        private String href;
-        private List<Category> items;
-
-        public String getHref() {
-            return href;
-        }
-
-        public void setHref(String href) {
-            this.href = href;
-        }
-
-        public List<Category> getItems() {
-            return items;
-        }
-
-        public void setItems(List<Category> items) {
-            this.items = items;
-        }
-
-        @Override
-        public String toString() {
-            return "Categories{" + "href='" + href + '\'' + ", items=" + items + '}';
-        }
-    }
-
-    public interface SpotifyApiService {
-        @GET("v1/categories/{categoryId}")
-        Call<CategoryResponse> getCategory(@Header("Authorization") String authorization, @Path("categoryId") String categoryId);
-
-        @GET("v1/browse/categories")
-        Call<CategoryResponse> getCategories(@Header("Authorization") String authorization);
-
-        @GET("v1/search")
-        Call<SearchResult> searchTracks(@Header("Authorization") String authorization, @Query("q") String query, @Query("type") String type);
-    }
+    
 }
