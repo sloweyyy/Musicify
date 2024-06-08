@@ -207,7 +207,12 @@ public class ExploreFragment extends Fragment implements FetchAccessToken.Access
 
     private void updateSearchResults(List<Song> songs) {
         if (songs != null && !songs.isEmpty()) {
-            songAdapter = new SongAdapter(getContext(), songs);
+            songAdapter = new SongAdapter(getContext(), songs, new SongAdapter.OnSongSelectedListener() {
+                @Override
+                public void onSongSelected(Song song) {
+                    // Handle song selection
+                }
+            });
             recyclerViewSongs.setVisibility(View.VISIBLE); // Hiển thị RecyclerView cho kết quả tìm kiếm
             recyclerView.setVisibility(View.GONE); // Ẩn RecyclerView cho danh sách categories
             recyclerViewSongs.setAdapter(songAdapter);
