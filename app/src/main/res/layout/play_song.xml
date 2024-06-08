@@ -17,11 +17,8 @@
         android:orientation="horizontal">
 
         <LinearLayout
-            android:id="@+id/backButtonLayout"
             android:layout_gravity="center"
-
-<!--             android:id="@+id/iconBackPlayingLayout" -->
-
+            android:id="@+id/iconBackPlayingLayout"
             android:layout_width="@dimen/_30sdp"
             android:layout_height="@dimen/_30sdp"
             android:layout_weight="0"
