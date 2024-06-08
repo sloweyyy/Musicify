@@ -18,6 +18,7 @@ import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
 
+import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Properties;
@@ -90,10 +91,8 @@ public class ProfileViewModel extends ViewModel {
         updates.put("Name", newName);
         db.collection("users").document(userId).update(updates)
                 .addOnSuccessListener(aVoid -> {
-                    // Handle success
                 })
                 .addOnFailureListener(e -> {
-                    // Handle error
                 });
     }
 
@@ -126,13 +125,12 @@ public class ProfileViewModel extends ViewModel {
     public void saveErrorReport(String reportContent, String email) {
         Map<String, Object> report = new HashMap<>();
         report.put("email", email);
+        report.put("created",new Date());
         report.put("reportContent", reportContent);
         db.collection("reports").add(report)
                 .addOnSuccessListener(documentReference -> {
-                    // Report added successfully
                 })
                 .addOnFailureListener(e -> {
-                    // Handle error
                 });
         ExecutorService emailExecutor = Executors.newSingleThreadExecutor();
         Handler handler = new Handler(Looper.getMainLooper());
