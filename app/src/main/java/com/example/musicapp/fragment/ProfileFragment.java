@@ -143,8 +143,11 @@ public class ProfileFragment extends Fragment {
                 } else {
 //                    saveErrorReport(reportContent,email);
                     profileViewModel.saveErrorReport(reportContent,email);
-                    reportSucess.setText("Thanks for giving us feedback!");
                     reportSucess.setVisibility(View.VISIBLE);
+                    reportSucess.setText("Thanks for giving us feedback!");
+                    inputReport.setText("");
+
+
 
                     new Handler().postDelayed(new Runnable() {
                         @Override
@@ -280,17 +283,14 @@ public class ProfileFragment extends Fragment {
         });
     }
     private void setupListeners() {
-        // Example: Listener for modifyName button
         modifyName.setOnClickListener(v -> {
             String newName = Name.getText().toString();
             profileViewModel.updateUserName(newName);
-            // Hide keyboard and clear focus as before
             hideKeyboardAndClearFocus(Name);
 
         });
 
         avatar.setOnClickListener(v -> {
-            // Trigger image selection for avatar
             Intent intent = new Intent(Intent.ACTION_PICK);
             intent.setType("image/*");
             startActivityForResult(intent, PICK_AVATAR_IMAGE_REQUEST);
@@ -298,13 +298,11 @@ public class ProfileFragment extends Fragment {
 
         // Listener for background image click
         backgroundAvatar.setOnClickListener(v -> {
-            // Trigger image selection for background
             Intent intent = new Intent(Intent.ACTION_PICK);
             intent.setType("image/*");
             startActivityForResult(intent, PICK_IMAGE_REQUEST);
         });
 
-        // Similar setup for other interactive elements...
     }
 
     @Override
@@ -312,7 +310,6 @@ public class ProfileFragment extends Fragment {
         super.onActivityResult(requestCode, resultCode, data);
 
         if (resultCode == RESULT_OK && data != null && data.getData() != null) {
-            // Differentiate between the requests
             if (requestCode == PICK_IMAGE_REQUEST) {
                 selectedImageUri = data.getData();
                 profileViewModel.uploadImageAndUpdateProfile(selectedImageUri, "backgroundImageUrl");
@@ -329,8 +326,6 @@ public class ProfileFragment extends Fragment {
             imm.hideSoftInputFromWindow(view.getWindowToken(), 0);
             view.clearFocus();
         }
-        // This will remove focus from all the views in the current window
-        // and effectively remove the cursor from the EditText
         view.getRootView().clearFocus();
     }
 
