@@ -25,7 +25,7 @@
             android:id="@+id/horizontal_recyclerView"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginBottom="16dp"
+            android:layout_marginBottom="@dimen/_10sdp"
             android:orientation="horizontal" />
 
         <TextView

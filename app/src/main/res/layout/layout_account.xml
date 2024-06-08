@@ -27,7 +27,7 @@
             android:layout_width="150dp"
             android:layout_height="150dp"
             android:layout_marginStart="131dp"
-            android:layout_marginTop="-70dp"
+            android:layout_marginTop="-80dp"
             android:layout_marginEnd="130dp"
             android:clickable="true"
             android:src="@drawable/upload_24dp_fill0_wght400_grad0_opsz24"
@@ -64,7 +64,8 @@
         android:fillViewport="true"
         app:layout_behavior="@string/appbar_scrolling_view_behavior"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/linearLayout1">
+        app:layout_constraintTop_toBottomOf="@+id/linearLayout1"
+        android:layout_marginTop="@dimen/_10sdp">
 
         <LinearLayout
             android:layout_width="match_parent"
@@ -74,7 +75,7 @@
             <TextView
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginLeft="@dimen/_15sdp"
+                android:layout_marginHorizontal="@dimen/_15sdp"
                 android:layout_marginBottom="@dimen/_10sdp"
                 android:text="Settings"
                 android:textColor="@color/dark_caribbean_current"
@@ -91,7 +92,7 @@
                     android:id="@+id/modifyPassword"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:layout_marginLeft="@dimen/_20sdp"
+                    android:layout_marginHorizontal="@dimen/_20sdp"
                     android:drawableLeft="@drawable/manage_accounts_24dp_fill0_wght400_grad0_opsz24"
                     android:drawablePadding="10dp"
                     android:drawableTint="@color/white"
@@ -182,14 +183,14 @@
 
                 <Button
                     android:id="@+id/btnLogout"
-                    android:layout_width="230dp"
-                    android:layout_height="50dp"
-                    android:layout_marginTop="15dp"
+                    android:layout_width="@dimen/_200sdp"
+                    android:layout_height="@dimen/_40sdp"
+                    android:layout_marginTop="@dimen/_12sdp"
                     android:background="@drawable/button_custom_selector"
                     android:text="Log out"
-                    android:textSize="@dimen/_14sdp"
+                    android:textSize="@dimen/_15sdp"
                     android:textColor="@color/textColor"
-                    app:backgroundTint="@color/btnColor" />
+                    app:backgroundTint="@color/btnColor"/>
                 </LinearLayout>
         </LinearLayout>
     </androidx.core.widget.NestedScrollView>

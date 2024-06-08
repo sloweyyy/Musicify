@@ -3,8 +3,9 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:layout_margin="@dimen/_5sdp"
-    app:cardCornerRadius="8dp"
+    android:layout_marginHorizontal="@dimen/_10sdp"
+    android:layout_marginVertical="@dimen/_6sdp"
+    app:cardCornerRadius="@dimen/_8sdp"
     app:cardElevation="4dp">
 
     <LinearLayout
@@ -16,7 +17,6 @@
             android:layout_width="60dp"
             android:layout_height="64dp"
             android:layout_gravity="center_vertical"
-            android:layout_marginLeft="19dp"
             android:background="@drawable/image_button_round_bg"
             android:src="@drawable/play_arrow_24dp_fill0_wght400_grad0_opsz24" />
 
@@ -60,7 +60,6 @@
             android:layout_width="25dp"
             android:layout_height="64dp"
             android:layout_gravity="center_vertical"
-            android:layout_marginRight="10dp"
             android:contentDescription="addToLikedSong"
             android:src="@drawable/favourite_outline"
             app:tint="@color/btnPressed"/>

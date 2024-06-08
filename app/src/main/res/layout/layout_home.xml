@@ -3,13 +3,12 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:layout_marginTop="@dimen/_30sdp">
+    android:layout_marginTop="@dimen/_32sdp">
     <androidx.cardview.widget.CardView
         android:id="@+id/cardView"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:layout_marginLeft="20dp"
-        android:layout_marginRight="20dp"
+        android:layout_marginHorizontal="@dimen/_17sdp"
         android:clipToPadding="false"
         app:cardBackgroundColor="@android:color/transparent"
         app:cardCornerRadius="23dp"
@@ -97,7 +96,7 @@
         android:id="@+id/tabLayout"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginTop="20dp"
+        android:layout_marginTop="@dimen/_12sdp"
         app:layout_constraintTop_toBottomOf="@+id/cardView"
         app:tabMode="fixed"
         app:tabIndicatorColor="#30AF75"

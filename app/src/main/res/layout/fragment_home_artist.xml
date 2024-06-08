@@ -15,7 +15,7 @@
     <androidx.recyclerview.widget.RecyclerView
         android:layout_width="match_parent"
         android:orientation="vertical"
-        android:layout_marginTop="10dp"
+        android:layout_marginTop="@dimen/_3sdp"
         android:id="@+id/artist_recyclerView"
         android:layout_height="wrap_content"/>
 
