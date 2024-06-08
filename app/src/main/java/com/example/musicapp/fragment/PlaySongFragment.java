@@ -71,8 +71,8 @@ public class PlaySongFragment extends BottomSheetDialogFragment implements Fetch
     private MediaPlayerManager mediaPlayerManager;
     private String songnameValue, artistnameValue, avataValue, played_value, total_value, urlAudioValue, artistId;
     private TextView songname, artistname, duration_played, duration_total, lyric;
-    private ImageView cover_art, threeDots, repeateBtn;
-    private ImageButton previousBtn, pauseBtn, nextBtn, shuffleBtn, show_lyricBtn;
+    private ImageView cover_art, threeDots, repeateBtn, shuffleBtn;
+    private ImageButton previousBtn, pauseBtn, nextBtn, show_lyricBtn;
 
     private LinearLayout backButtonLayout, lyricLayout;
 
