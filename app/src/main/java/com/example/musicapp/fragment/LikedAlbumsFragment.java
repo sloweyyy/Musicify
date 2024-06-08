@@ -1,7 +1,5 @@
 package com.example.musicapp.fragment;
 
-import android.app.AlertDialog;
-import android.graphics.Color;
 import android.net.Uri;
 import android.os.Bundle;
 
@@ -9,6 +7,7 @@ import android.util.Log;
 
 import androidx.annotation.NonNull;
 import androidx.fragment.app.Fragment;
+import androidx.lifecycle.ViewModelProvider;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
@@ -18,43 +17,22 @@ import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.TextView;
 
-import com.bumptech.glide.Glide;
+
 import com.example.musicapp.R;
 import com.example.musicapp.adapter.LikedAlbumAdapter;
-import com.example.musicapp.adapter.SongAdapter;
 import com.example.musicapp.model.AlbumSimplified;
-import com.example.musicapp.model.SimplifiedTrack;
-import com.example.musicapp.model.Song;
-import com.google.android.gms.tasks.OnFailureListener;
-import com.google.android.gms.tasks.OnSuccessListener;
-import com.google.android.material.bottomsheet.BottomSheetDialog;
-import com.google.android.material.tabs.TabLayout;
-import com.google.firebase.Firebase;
-import com.google.firebase.auth.FirebaseAuth;
+import com.example.musicapp.viewmodel.LikedAlbumViewModel;
 import com.example.musicapp.adapter.FetchAccessToken;
-import com.google.firebase.firestore.DocumentReference;
-import com.google.firebase.firestore.DocumentSnapshot;
-import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.storage.FirebaseStorage;
 
-import java.time.LocalDateTime;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
-import retrofit2.Call;
-import retrofit2.Callback;
-import retrofit2.Response;
-import retrofit2.Retrofit;
-import retrofit2.converter.gson.GsonConverterFactory;
-import retrofit2.http.GET;
-import retrofit2.http.Header;
-import retrofit2.http.Path;
 
 public class LikedAlbumsFragment extends Fragment implements FetchAccessToken.AccessTokenCallback {
     private View view;
     private RecyclerView recyclerView;
+    private LikedAlbumViewModel viewModel;
     private LikedAlbumAdapter adapter;
     List<AlbumSimplified> albumList = new ArrayList<>();
     private FetchAccessToken fetchAccessToken;
@@ -75,6 +53,7 @@ public class LikedAlbumsFragment extends Fragment implements FetchAccessToken.Ac
         storage = FirebaseStorage.getInstance();
         fetchAccessToken = new FetchAccessToken();
         fetchAccessToken.getTokenFromSpotify(this);
+        viewModel = new ViewModelProvider(this).get(LikedAlbumViewModel.class);
 
         ImageView sortIcon = view.findViewById(R.id.sortIcon);
         TextView sortText = view.findViewById(R.id.sortText);
@@ -103,47 +82,10 @@ public class LikedAlbumsFragment extends Fragment implements FetchAccessToken.Ac
     @Override
     public void onTokenReceived(String accessToken) {
         this.accessToken = accessToken;
-        String userId = FirebaseAuth.getInstance().getCurrentUser().getUid();
-        FirebaseFirestore db = FirebaseFirestore.getInstance();
-        db.collection("users").whereEqualTo("id", userId).get().addOnSuccessListener(queryDocumentSnapshots ->
-        {
-            if (!queryDocumentSnapshots.isEmpty()) {
-                DocumentSnapshot documentSnapshot = queryDocumentSnapshots.getDocuments().get(0);
-                ArrayList<String> albumids = (ArrayList<String>) documentSnapshot.get("likedAlbums");
-                for (String id : albumids){
-                    getAlbum(accessToken,id);
-                }
-                adapter = new LikedAlbumAdapter(getContext(), albumList);
-                recyclerView.setAdapter(adapter);
-            }
-        }).addOnFailureListener(e -> {});
-    }
-
-    public interface SpotifyApi {
-        @GET("v1/albums/{albumId}")
-        Call<AlbumSimplified> getAlbum(@Header("Authorization") String authorization, @Path("albumId") String albumId);
-    }
-    private void getAlbum (String accessToken, String albumId){
-        Retrofit retrofit = new Retrofit.Builder().baseUrl("https://api.spotify.com/").addConverterFactory(GsonConverterFactory.create()).build();
-        SpotifyApi apiService = retrofit.create(SpotifyApi.class);
-        String authorization = "Bearer " + accessToken;
-
-        Call<AlbumSimplified> call = apiService.getAlbum(authorization, albumId);
-        call.enqueue(new Callback<AlbumSimplified>() {
-            @Override
-            public void onResponse(@NonNull Call<AlbumSimplified> call, @NonNull Response<AlbumSimplified> response) {
-                if (response.isSuccessful()) {
-                    AlbumSimplified album = response.body();
-                    albumList.add(album);
-                    adapter.notifyItemInserted(albumList.size() - 1);
-                }
-            }
-
-            @Override
-            public void onFailure(Call<AlbumSimplified> call, Throwable throwable) {
-                Log.e("Error fetching:", throwable.getMessage());
-            }
+        viewModel.fetchLikedAlbums(accessToken);
+        viewModel.getLikedAlbumsLiveData().observe(this, albums -> {
+            LikedAlbumAdapter adapter = new LikedAlbumAdapter(getContext(), albums);
+            recyclerView.setAdapter(adapter);
         });
     }
-
 }

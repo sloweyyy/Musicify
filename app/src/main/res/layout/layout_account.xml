@@ -78,7 +78,8 @@
                 android:layout_marginBottom="@dimen/_10sdp"
                 android:text="Settings"
                 android:textColor="@color/dark_caribbean_current"
-                android:textSize="@dimen/_18sdp" />
+                android:textSize="@dimen/_18sdp"
+                android:textStyle="bold"/>
             <LinearLayout
                 android:id="@+id/linearLayout2"
                 android:layout_width="match_parent"
@@ -105,11 +106,12 @@
             <TextView
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginLeft="@dimen/_15sdp"
+                android:layout_marginHorizontal="@dimen/_15sdp"
                 android:layout_marginBottom="@dimen/_10sdp"
                 android:text="Options"
                 android:textColor="@color/dark_caribbean_current"
-                android:textSize="@dimen/_18sdp" />
+                android:textSize="@dimen/_18sdp"
+                android:textStyle="bold"/>
 
 
             <LinearLayout

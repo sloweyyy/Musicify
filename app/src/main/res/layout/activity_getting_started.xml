@@ -20,21 +20,21 @@
   <TextView
       android:layout_width="match_parent"
       android:layout_height="wrap_content"
-      android:layout_marginBottom="20dp"
+      android:layout_marginBottom="@dimen/_10sdp"
       android:text="Enjoy Listening to Music"
       android:textSize="30dp"
       android:textAlignment="center"
       />
 
 
-    <TextView
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:textSize="25dp"
-        android:textAlignment="center"
-        android:fontFamily="@font/museo_moderno_regular"
-        android:text="Musicify"
-        android:textColor="@color/btnColor"/>
+  <TextView
+      android:layout_width="match_parent"
+      android:layout_height="wrap_content"
+      android:fontFamily="@font/museo_moderno_medium"
+      android:text="Musicify"
+      android:textAlignment="center"
+      android:textColor="@color/btnColor"
+      android:textSize="@dimen/_24sdp" />
 
   <TextView
       android:id="@+id/typingt"
@@ -47,9 +47,9 @@
         android:id="@+id/btnStart"
         android:layout_marginTop="50dp"
         android:layout_width="match_parent"
-        android:layout_marginLeft="29dp"
-        android:layout_marginRight="29dp"
+        android:layout_marginHorizontal="29dp"
         android:text="Getting started"
+        android:textSize="@dimen/_15sdp"
         app:backgroundTint="@color/btnColor"
         android:textColor="#ffffff"
         android:layout_height="65dp"

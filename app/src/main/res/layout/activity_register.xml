@@ -36,14 +36,23 @@
         android:layout_height="150dp"
         android:src="@drawable/logo"
         />
-
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="@dimen/_10sdp"
+        android:fontFamily="@font/museo_moderno_medium"
+        android:text="Musicify"
+        android:textAlignment="center"
+        android:textColor="@color/btnColor"
+        android:textSize="@dimen/_25sdp" />
     <TextView
         android:layout_width="wrap_content"
         android:layout_height="40dp"
-        android:layout_marginBottom="10dp"
+        android:layout_marginBottom="@dimen/_10sdp"
         android:text="Register"
         android:textAlignment="center"
-        android:textSize="30dp" />
+        android:textColor="@color/white"
+        android:textSize="@dimen/_25sdp" />
     <androidx.cardview.widget.CardView
         android:layout_width="match_parent"
         android:layout_height="58dp"
@@ -61,8 +70,7 @@
                 android:id="@+id/name_text_input_layout"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="5dp"
-                android:layout_marginStart="19dp"
+                android:layout_marginVertical="5dp"
                 app:errorEnabled="true">
 
                 <com.google.android.material.textfield.TextInputEditText
@@ -85,7 +93,6 @@
         android:layout_marginLeft="24dp"
         android:layout_marginTop="12dp"
         android:layout_marginRight="24dp"
-        android:layout_marginBottom="12dp"
         app:cardCornerRadius="15dp"
         app:cardElevation="5dp"
         >
@@ -97,8 +104,7 @@
                 android:id="@+id/email_text_input_layout"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="5dp"
-                android:layout_marginStart="19dp"
+                android:layout_marginVertical="5dp"
                 app:errorEnabled="true">
 
                 <com.google.android.material.textfield.TextInputEditText
@@ -122,6 +128,7 @@
         android:layout_height="58dp"
         android:layout_marginLeft="24dp"
         android:layout_marginRight="24dp"
+        android:layout_marginTop="12dp"
         app:cardCornerRadius="15dp"
         app:cardElevation="5dp"
         >
@@ -133,9 +140,8 @@
                 android:id="@+id/password_text_input_layout"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginStart="19dp"
-                android:layout_marginTop="5dp"
                 app:passwordToggleEnabled="true"
+                android:layout_marginVertical="5dp"
                 app:passwordToggleDrawable="@drawable/visibility_off_24dp"
                 app:errorEnabled="true">
 
@@ -172,6 +178,8 @@
         android:layout_marginTop="19dp"
         app:backgroundTint="@color/btnColor"
         android:text="Create Account"
+        android:textSize="@dimen/_15sdp"
+        android:textColor="@color/white"
         android:layout_height="70dp"
         android:background="@drawable/button_custom_selector"/>
 

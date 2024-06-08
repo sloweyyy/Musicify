@@ -56,7 +56,7 @@
         android:layout_below="@id/albumName"
         android:layout_centerHorizontal="true"
         android:layout_marginTop="8dp"
-        android:text="Album Description"
+        android:text="Album Artist"
         android:textColor="#bbbbbb"
         android:textSize="18sp" />
 
