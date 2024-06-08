@@ -25,6 +25,7 @@ import android.widget.Toast;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.fragment.app.FragmentManager;
 
 import com.bumptech.glide.Glide;
 import com.example.musicapp.R;
@@ -75,7 +76,7 @@ public class PlaySongFragment extends BottomSheetDialogFragment implements Fetch
     private ImageView cover_art, threeDots, repeateBtn, shuffleBtn;
     private ImageButton previousBtn, pauseBtn, nextBtn, show_lyricBtn;
 
-    private LinearLayout backButtonLayout, lyricLayout;
+    private LinearLayout backButtonLayout, lyricLayout, threeDotsLayout, iconBackPlayingLayout;
 
     private Button iconBackPlaying;
 
@@ -106,6 +107,13 @@ public class PlaySongFragment extends BottomSheetDialogFragment implements Fetch
     public void onTokenReceived(String accessToken) {
         this.accessToken = accessToken;
         getTrack(accessToken);
+    }
+
+    @Override
+    public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
+        super.onViewCreated(view, savedInstanceState);
+        // set default image for cover_art
+        cover_art.setImageResource(R.drawable.playlist_image);
     }
 
     @Nullable
@@ -201,7 +209,7 @@ public class PlaySongFragment extends BottomSheetDialogFragment implements Fetch
                 checkIsRepeat(new OnRepeatCallback() {
                     @Override
                     public void onResult(boolean isRepeat) {
-                        if (isRepeat){
+                        if (isRepeat) {
                             repeateBtn.setImageResource(R.drawable.repeate_green);
                             mediaPlayerManager.setIsShuffle(false);
                             checkIsShuffle(new OnShuffleCallback() {
@@ -266,11 +274,18 @@ public class PlaySongFragment extends BottomSheetDialogFragment implements Fetch
             }
         });
 
-        threeDots.setOnClickListener(new View.OnClickListener() {
+        threeDotsLayout.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 showMoreOptionsDialog(getContext());
                 Log.d("PlaySongFragment", "onClick: Three dots clicked" + songId);
+            }
+        });
+        iconBackPlayingLayout.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                FragmentManager fragmentManager = getParentFragmentManager();
+                fragmentManager.popBackStack();
             }
         });
         miniPlayerPlayPauseButton = requireActivity().findViewById(R.id.mini_player_play_pause_button);
@@ -522,8 +537,10 @@ public class PlaySongFragment extends BottomSheetDialogFragment implements Fetch
         shuffleBtn = view.findViewById(R.id.shuffleBtn);
         cover_art = view.findViewById(R.id.imageCon);
         threeDots = view.findViewById(R.id.threeDots);
+        threeDotsLayout = view.findViewById(R.id.threeDotsLayout);
         seekBar = view.findViewById(R.id.seekbar);
         backButtonLayout = view.findViewById(R.id.backButtonLayout);
+        iconBackPlayingLayout = view.findViewById(R.id.iconBackPlayingLayout);
         iconBackPlaying = view.findViewById(R.id.iconBackPlaying);
         heartBtn = view.findViewById(R.id.heartBtn);
         show_lyricBtn = view.findViewById(R.id.show_lyricBtn);
@@ -582,7 +599,7 @@ public class PlaySongFragment extends BottomSheetDialogFragment implements Fetch
                 });
             }
         });
-        threeDots.setOnClickListener(new View.OnClickListener() {
+        threeDotsLayout.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 showMoreOptionsDialog(getContext());
@@ -613,8 +630,7 @@ public class PlaySongFragment extends BottomSheetDialogFragment implements Fetch
         });
     }
 
-    private void checkIsRepeat(OnRepeatCallback callback)
-    {
+    private void checkIsRepeat(OnRepeatCallback callback) {
         if (mediaPlayerManager.getIsRepeat() == true)
             callback.onResult(true);
         else
@@ -697,37 +713,42 @@ public class PlaySongFragment extends BottomSheetDialogFragment implements Fetch
     }
 
     public void setupTrack(TrackModel track) {
-        String songName = track.getName();
-        String artistName = track.artists.get(0).getName();
-        String imageUrl = track.album.images.get(0).getUrl();
-        String playUrl = track.getPreview_url();
+        if (isAdded()) {
+            String songName = track.getName();
+            String artistName = track.artists.get(0).getName();
+            String imageUrl = track.album.images.get(0).getUrl();
+            String playUrl = track.getPreview_url();
 
-        songname.setText(songName);
-        artistname.setText(artistName);
-        Glide.with(getActivity()).load(imageUrl).into(cover_art);
-
-        albumId = track.album.getId();
-        songnameValue = songName;
-        artistnameValue = artistName;
-        avataValue = imageUrl;
-        urlAudioValue = playUrl;
-        artistId = track.artists.get(0).getId();
-        setupMediaPlayer(playUrl);
-        mediaPlayerManager.getMediaPlayer().seekTo(0);
-        setupSeekBar();
-        setupPauseButton();
-        artistname.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                MoveToArtistDetail(track.artists.get(0).getId());
-                view.setVisibility(View.GONE);
+            songname.setText(songName);
+            artistname.setText(artistName);
+            if (imageUrl!= null) {
+                Glide.with(this).load(imageUrl).into(cover_art);
             }
-        });
-        MiniPlayerListener miniPlayerListener = (MiniPlayerListener) requireActivity();
-        Log.d("Song list", songList.toString() + " " + getCurrentSongIndex(songId));
-        miniPlayerListener.updateMiniPlayer(songList, getCurrentSongIndex(songId));
-        miniPlayerListener.showMiniPlayer();
+
+            albumId = track.album.getId();
+            songnameValue = songName;
+            artistnameValue = artistName;
+            avataValue = imageUrl;
+            urlAudioValue = playUrl;
+            artistId = track.artists.get(0).getId();
+            setupMediaPlayer(playUrl);
+            mediaPlayerManager.getMediaPlayer().seekTo(0);
+            setupSeekBar();
+            setupPauseButton();
+            artistname.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    MoveToArtistDetail(track.artists.get(0).getId());
+                    view.setVisibility(View.GONE);
+                }
+            });
+            MiniPlayerListener miniPlayerListener = (MiniPlayerListener) requireActivity();
+            Log.d("Song list", songList.toString() + " " + getCurrentSongIndex(songId));
+            miniPlayerListener.updateMiniPlayer(songList, getCurrentSongIndex(songId));
+            miniPlayerListener.showMiniPlayer();
+        }
     }
+
 
 
     @Override
@@ -774,7 +795,7 @@ public class PlaySongFragment extends BottomSheetDialogFragment implements Fetch
                             }
                             else if (mediaPlayerManager.getIsRepeat() == false && mediaPlayerManager.getIsShuffle() == false)
                             {mediaPlayerManager.getMediaPlayer().pause(); mediaPlayerManager.setCurrentPosition(0); PlayNextSong();}
-                        }
+         }
                         handler.postDelayed(this, 500); // Update every 500 milliseconds
                     }
                 }

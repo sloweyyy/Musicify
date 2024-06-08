@@ -61,7 +61,7 @@
             android:contentDescription="addToLikedAlbums"
             android:layout_height="64dp"
             android:layout_marginStart="8dp"
-            android:src="@drawable/heart_green_ouline"
+            android:src="@drawable/favourite_outline"
             app:tint="@color/btnColor"/>
 
     </LinearLayout>

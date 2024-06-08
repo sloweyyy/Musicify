@@ -9,6 +9,7 @@ import androidx.lifecycle.MutableLiveData;
 
 import com.example.musicapp.model.SimplifiedTrack;
 import com.example.musicapp.model.Song;
+import com.example.musicapp.service.SpotifyApiService;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
@@ -66,7 +67,7 @@ public class LikedSongViewModel extends AndroidViewModel {
                 .addConverterFactory(GsonConverterFactory.create())
                 .build();
 
-        SpotifyApi apiService = retrofit.create(SpotifyApi.class);
+        SpotifyApiService apiService = retrofit.create(SpotifyApiService.class);
         String authorization = "Bearer " + accessToken;
 
         Call<SimplifiedTrack> call = apiService.getTrack(authorization, songId);
@@ -92,8 +93,4 @@ public class LikedSongViewModel extends AndroidViewModel {
         });
     }
 
-    public interface SpotifyApi {
-        @GET("v1/tracks/{songId}")
-        Call<SimplifiedTrack> getTrack(@Header("Authorization") String authorization, @Path("songId") String songId);
-    }
 }

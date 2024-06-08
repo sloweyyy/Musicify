@@ -11,6 +11,7 @@ import com.example.musicapp.fragment.PlaylistDetailAPI;
 import com.example.musicapp.model.PlaylistSimplified;
 import com.example.musicapp.model.SimplifiedTrack;
 import com.example.musicapp.model.Song;
+import com.example.musicapp.service.SpotifyApiService;
 import com.google.gson.annotations.SerializedName;
 
 import java.util.ArrayList;
@@ -78,10 +79,6 @@ public class PlaylistDetailAPIViewModel extends AndroidViewModel {
         return songs;
     }
 
-    public interface SpotifyApiService {
-        @GET("v1/playlists/{playlistId}")
-        Call<PlaylistSimplified> getSongs(@Header("Authorization") String authorization, @Path("playlistId") String playlistId);
-    }
 
     public static class PlaylistDetail {
         private String name;

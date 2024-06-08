@@ -93,7 +93,7 @@ public class ArtitstHomeAdapter extends RecyclerView.Adapter<ArtitstHomeAdapter.
             if (isLiked) {
                 holder.heartBtn.setImageResource(R.drawable.favourite_filled);
             } else {
-                holder.heartBtn.setImageResource(R.drawable.heart_green_ouline);
+                holder.heartBtn.setImageResource(R.drawable.favourite_outline);
             }
         });
     }
@@ -188,7 +188,7 @@ public class ArtitstHomeAdapter extends RecyclerView.Adapter<ArtitstHomeAdapter.
 
                         checkIsLiked(artist.getId(), isLiked -> {
                             if (isLiked) {
-                                heartBtn.setImageResource(R.drawable.heart_green_ouline);
+                                heartBtn.setImageResource(R.drawable.favourite_outline);
                                 removeArtistFromLikedSongs(artist.getId());
                             } else {
                                 heartBtn.setImageResource(R.drawable.favourite_filled);

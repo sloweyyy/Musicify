@@ -1,6 +1,5 @@
 package com.example.musicapp.adapter;
 
-import android.content.Intent;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -16,14 +15,14 @@ import androidx.recyclerview.widget.RecyclerView;
 import com.bumptech.glide.Glide;
 import com.example.musicapp.R;
 import com.example.musicapp.fragment.List_Playlist;
-import com.example.musicapp.model.Category;
+import com.example.musicapp.model.Categories;
 
 import java.util.List;
 
 public class exploreAdapter extends RecyclerView.Adapter<exploreAdapter.myViewHolder> {
-    private List<Category> categories;
+    private List<Categories> categories;
 
-    public exploreAdapter(List<Category> categories) {
+    public exploreAdapter(List<Categories> categories) {
         this.categories = categories;
     }
 
@@ -48,13 +47,13 @@ public class exploreAdapter extends RecyclerView.Adapter<exploreAdapter.myViewHo
             int position = getAbsoluteAdapterPosition();
             if (position != RecyclerView.NO_POSITION) {
 //                listener.onItemClick(categories.get(position));
-                Category selectedCategory = categories.get(position);
+                Categories selectedCategories = categories.get(position);
                 List_Playlist fragment = new List_Playlist();
-                fragment.setCategoryId(selectedCategory.getId());
+                fragment.setCategoryId(selectedCategories.getId());
 
                 // Pass the selected category ID to the Fragment
                 Bundle args = new Bundle();
-                args.putString("categoryId", selectedCategory.getId());
+                args.putString("categoryId", selectedCategories.getId());
                 fragment.setArguments(args);
 
                 // Add the Fragment to the Activity
@@ -73,7 +72,7 @@ public class exploreAdapter extends RecyclerView.Adapter<exploreAdapter.myViewHo
     }
 
     public interface OnItemClickListener {
-        void onItemClick(Category category);
+        void onItemClick(Categories categories);
     }
 
     @NonNull
@@ -82,7 +81,7 @@ public class exploreAdapter extends RecyclerView.Adapter<exploreAdapter.myViewHo
         View view = LayoutInflater.from(parent.getContext()).inflate(R.layout.explore_card, parent, false);
         return new myViewHolder(view,new OnItemClickListener() {
             @Override
-            public void onItemClick(Category category) {
+            public void onItemClick(Categories categories) {
 
             }
         });
@@ -90,11 +89,11 @@ public class exploreAdapter extends RecyclerView.Adapter<exploreAdapter.myViewHo
 
     @Override
     public void onBindViewHolder(@NonNull myViewHolder holder, int position) {
-        Category category = categories.get(position);
-        holder.textView.setText(category.getName());
+        Categories categories = this.categories.get(position);
+        holder.textView.setText(categories.getName());
 
         Glide.with(holder.itemView.getContext())
-                .load(category.getImageUrl())
+                .load(categories.getImageUrl())
                 .placeholder(R.drawable.image_up)
                 .error(R.drawable.image_up)
                 .into(holder.imageView);

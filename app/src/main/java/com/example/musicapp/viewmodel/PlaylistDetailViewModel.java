@@ -13,6 +13,7 @@ import androidx.lifecycle.MutableLiveData;
 import com.example.musicapp.model.Playlist;
 import com.example.musicapp.model.SimplifiedTrack;
 import com.example.musicapp.model.Song;
+import com.example.musicapp.service.SpotifyApiService;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.firestore.DocumentSnapshot;
@@ -154,8 +155,8 @@ public class PlaylistDetailViewModel extends AndroidViewModel {
         });
     }
 
-    public interface SpotifyApiService {
-        @GET("v1/tracks/{trackId}")
-        Call<SimplifiedTrack> getTrack(@Header("Authorization") String authorization, @Path("trackId") String trackId);
-    }
+//    public interface SpotifyApiService {
+//        @GET("v1/tracks/{trackId}")
+//        Call<SimplifiedTrack> getTrack(@Header("Authorization") String authorization, @Path("trackId") String trackId);
+//    }
 }

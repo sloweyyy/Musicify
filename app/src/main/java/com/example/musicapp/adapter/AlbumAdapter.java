@@ -66,7 +66,7 @@ public class AlbumAdapter extends RecyclerView.Adapter<AlbumAdapter.ViewHolder>{
                 if (isLiked) {
                     holder.heartBtn.setImageResource(R.drawable.favourite_filled);
                 } else {
-                    holder.heartBtn.setImageResource(R.drawable.heart_green_ouline);
+                    holder.heartBtn.setImageResource(R.drawable.favourite_outline);
                 }
             }
         });
@@ -134,7 +134,7 @@ public class AlbumAdapter extends RecyclerView.Adapter<AlbumAdapter.ViewHolder>{
                             public void onResult(boolean isLiked) {
                                 if (isLiked) {
                                     unlikeAlbum(albumSimplified.getId());
-                                    heartBtn.setImageResource(R.drawable.heart_green_ouline);
+                                    heartBtn.setImageResource(R.drawable.favourite_outline);
                                 } else {
                                     addAlbumToLikedAlbums(albumSimplified.getId());
                                     heartBtn.setImageResource(R.drawable.favourite_filled);

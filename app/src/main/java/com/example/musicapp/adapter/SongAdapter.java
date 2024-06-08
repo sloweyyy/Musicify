@@ -37,6 +37,16 @@ public class SongAdapter extends RecyclerView.Adapter<SongAdapter.ViewHolder> {
 
     private OnSongSelectedListener listener;
 
+    public interface OnLongItemClickListener {
+        void onLongItemClick(Song song);
+    }
+
+    private OnLongItemClickListener longItemClickListener;
+
+    public void setOnLongItemClickListener(OnLongItemClickListener listener) {
+        this.longItemClickListener = listener;
+    }
+
 
     public SongAdapter(Context context, List<Song> songList, OnSongSelectedListener listener) {
         this.context = context;
@@ -66,7 +76,6 @@ public class SongAdapter extends RecyclerView.Adapter<SongAdapter.ViewHolder> {
             } else if (name2 == null) {
                 return 1;
             } else {
-
                 return name1.compareTo(name2);
             }
         });
@@ -97,9 +106,22 @@ public class SongAdapter extends RecyclerView.Adapter<SongAdapter.ViewHolder> {
             if (isLiked) {
                 holder.heartBtn.setImageResource(R.drawable.favourite_filled);
             } else {
-                holder.heartBtn.setImageResource(R.drawable.heart_green_ouline);
+                holder.heartBtn.setImageResource(R.drawable.favourite_outline);
             }
         });
+
+        holder.itemView.setOnLongClickListener(new View.OnLongClickListener() {
+            @Override
+            public boolean onLongClick(View v) {
+                int position = holder.getAdapterPosition();
+                if (position != RecyclerView.NO_POSITION && longItemClickListener != null) {
+                    longItemClickListener.onLongItemClick(songList.get(position));
+                    return true;
+                }
+                return false;
+            }
+        });
+
 
     }
 
