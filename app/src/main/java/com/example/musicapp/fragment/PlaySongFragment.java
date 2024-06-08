@@ -25,6 +25,7 @@ import android.widget.Toast;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.fragment.app.FragmentManager;
 
 import com.bumptech.glide.Glide;
 import com.example.musicapp.R;
@@ -74,7 +75,7 @@ public class PlaySongFragment extends BottomSheetDialogFragment implements Fetch
     private ImageView cover_art, threeDots, repeateBtn, shuffleBtn;
     private ImageButton previousBtn, pauseBtn, nextBtn, show_lyricBtn;
 
-    private LinearLayout backButtonLayout, lyricLayout;
+    private LinearLayout backButtonLayout, lyricLayout, threeDotsLayout, iconBackPlayingLayout;
 
     private Button iconBackPlaying;
 
@@ -234,11 +235,18 @@ public class PlaySongFragment extends BottomSheetDialogFragment implements Fetch
             }
         });
 
-        threeDots.setOnClickListener(new View.OnClickListener() {
+        threeDotsLayout.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 showMoreOptionsDialog(getContext());
                 Log.d("PlaySongFragment", "onClick: Three dots clicked" + songId);
+            }
+        });
+        iconBackPlayingLayout.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                FragmentManager fragmentManager = getParentFragmentManager();
+                fragmentManager.popBackStack();
             }
         });
         miniPlayerPlayPauseButton = requireActivity().findViewById(R.id.mini_player_play_pause_button);
@@ -486,8 +494,10 @@ public class PlaySongFragment extends BottomSheetDialogFragment implements Fetch
         shuffleBtn = view.findViewById(R.id.shuffleBtn);
         cover_art = view.findViewById(R.id.imageCon);
         threeDots = view.findViewById(R.id.threeDots);
+        threeDotsLayout = view.findViewById(R.id.threeDotsLayout);
         seekBar = view.findViewById(R.id.seekbar);
         backButtonLayout = view.findViewById(R.id.backButtonLayout);
+        iconBackPlayingLayout = view.findViewById(R.id.iconBackPlayingLayout);
         iconBackPlaying = view.findViewById(R.id.iconBackPlaying);
         heartBtn = view.findViewById(R.id.heartBtn);
         show_lyricBtn = view.findViewById(R.id.show_lyricBtn);
@@ -532,7 +542,7 @@ public class PlaySongFragment extends BottomSheetDialogFragment implements Fetch
                 });
             }
         });
-        threeDots.setOnClickListener(new View.OnClickListener() {
+        threeDotsLayout.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 showMoreOptionsDialog(getContext());

@@ -97,7 +97,7 @@ public class SongAdapter extends RecyclerView.Adapter<SongAdapter.ViewHolder> {
             if (isLiked) {
                 holder.heartBtn.setImageResource(R.drawable.favourite_filled);
             } else {
-                holder.heartBtn.setImageResource(R.drawable.heart_green_ouline);
+                holder.heartBtn.setImageResource(R.drawable.favourite_outline);
             }
         });
 

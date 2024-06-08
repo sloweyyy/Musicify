@@ -62,7 +62,7 @@
             android:layout_gravity="center_vertical"
             android:layout_marginRight="10dp"
             android:contentDescription="addToLikedSong"
-            android:src="@drawable/heart_green_ouline"
+            android:src="@drawable/favourite_outline"
             app:tint="@color/btnPressed"/>
     </LinearLayout>
 </com.google.android.material.card.MaterialCardView>

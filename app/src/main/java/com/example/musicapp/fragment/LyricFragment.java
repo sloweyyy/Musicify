@@ -392,7 +392,7 @@ public class LyricFragment extends Fragment implements FetchAccessToken.AccessTo
                 if (isLiked) {
                     heartBtn.setImageResource(R.drawable.favourite_filled);
                 } else {
-                    heartBtn.setImageResource(R.drawable.heart_green_ouline);
+                    heartBtn.setImageResource(R.drawable.favourite_outline);
                 }
             }
         });
