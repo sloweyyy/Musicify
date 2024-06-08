@@ -17,6 +17,7 @@ import androidx.recyclerview.widget.RecyclerView;
 import com.bumptech.glide.Glide;
 import com.example.musicapp.R;
 import com.example.musicapp.fragment.PlaySongFragment;
+import com.example.musicapp.manager.MediaPlayerManager;
 import com.example.musicapp.model.PlaylistAPI;
 import com.example.musicapp.model.Song;
 import com.google.firebase.auth.FirebaseAuth;
@@ -187,6 +188,8 @@ public class SongAdapter extends RecyclerView.Adapter<SongAdapter.ViewHolder> {
         ImageView heartBtn;
         ImageView songThumbnail;
 
+        private MediaPlayerManager mediaPlayerManager;
+
         public ViewHolder(@NonNull View itemView) {
             super(itemView);
             itemView.setOnClickListener(this);
@@ -215,6 +218,8 @@ public class SongAdapter extends RecyclerView.Adapter<SongAdapter.ViewHolder> {
         @Override
         public void onClick(View v) {
             int position = getAbsoluteAdapterPosition();
+            mediaPlayerManager = MediaPlayerManager.getInstance();
+            mediaPlayerManager.setCurrentPosition(0);
             if (position != RecyclerView.NO_POSITION) {
                 Song selected = songList.get(position);
                 String preId = (position == 0) ? songList.get(songList.size() - 1).getId() : songList.get(position - 1).getId();

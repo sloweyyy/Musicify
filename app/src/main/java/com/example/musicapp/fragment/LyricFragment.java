@@ -74,12 +74,12 @@ public class LyricFragment extends Fragment implements FetchAccessToken.AccessTo
     private boolean isNullLyric;
     private MediaPlayerManager mediaPlayerManager;
     PlaySongFragment playSongFragment = new PlaySongFragment();
-    private ImageView background, threeDots, artistAvata, heartBtn;
+    private ImageView background, threeDots, artistAvata, heartBtn, repeateBtn, shuffleBtn;
     private String songNameValue, artistNameValue, avataValue, played_value, total_value, urlAudioValue, albumId, artistId;
     private LinearLayout backButtonLayout;
     private Button iconBack;
     private TextView header, artistName, songName, playedDuration, totalDuration, lyric;
-    private ImageButton repeateBtn, previousBtn, pauseBtn, nextBtn, shuffleBtn;
+    private ImageButton previousBtn, pauseBtn, nextBtn;
     private SeekBar seekBar;
     private MusixmatchApi musixmatchApi;
     private String commondId;
@@ -138,7 +138,29 @@ public class LyricFragment extends Fragment implements FetchAccessToken.AccessTo
         repeateBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                mediaPlayerManager.getMediaPlayer().seekTo(0);
+//                mediaPlayerManager.setCurrentPosition(0);
+//                mediaPlayerManager.getMediaPlayer().seekTo(0);
+                mediaPlayerManager.setIsRepeat(!mediaPlayerManager.getIsRepeat());
+                checkIsRepeat(new OnRepeatCallback() {
+                    @Override
+                    public void onResult(boolean isRepeat) {
+                        if (isRepeat) {
+                            repeateBtn.setImageResource(R.drawable.repeate_green);
+                            mediaPlayerManager.setIsShuffle(false);
+                            checkIsShuffle(new OnShuffleCallback() {
+                                @Override
+                                public void onResult(boolean isShuffle) {
+                                    if (isShuffle) {
+                                        shuffleBtn.setImageResource(R.drawable.shuffle_green);
+                                        mediaPlayerManager.setIsRepeat(false);
+                                    } else shuffleBtn.setImageResource(R.drawable.shuffle_gray);
+                                }
+                            });
+                        } else {
+                            repeateBtn.setImageResource(R.drawable.repeate);
+                        }
+                    }
+                });
             }
         });
         previousBtn.setOnClickListener(new View.OnClickListener() {
@@ -169,13 +191,24 @@ public class LyricFragment extends Fragment implements FetchAccessToken.AccessTo
         shuffleBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                mediaPlayerManager.getMediaPlayer().pause();
-                mediaPlayerManager.setCurrentPosition(0);
-                mediaPlayerManager.getMediaPlayer().seekTo(0);
-                ((BottomAppBarListener) requireActivity()).showBottomAppBar();
-                FragmentManager fragmentManager = getParentFragmentManager();
-                fragmentManager.popBackStack();
-                PlayRandomSong();
+                mediaPlayerManager.setIsShuffle(!mediaPlayerManager.getIsShuffle());
+                checkIsShuffle(new OnShuffleCallback() {
+                    @Override
+                    public void onResult(boolean isShuffle) {
+                        if (isShuffle) {
+                            shuffleBtn.setImageResource(R.drawable.shuffle_green);
+                            mediaPlayerManager.setIsRepeat(false);
+                            checkIsRepeat(new OnRepeatCallback() {
+                                @Override
+                                public void onResult(boolean isRepeat) {
+                                    if (isRepeat) {
+                                        repeateBtn.setImageResource(R.drawable.repeate_green);
+                                    } else repeateBtn.setImageResource(R.drawable.repeate);
+                                }
+                            });
+                        } else shuffleBtn.setImageResource(R.drawable.shuffle_gray);
+                    }
+                });
             }
         });
         return view;
@@ -396,6 +429,25 @@ public class LyricFragment extends Fragment implements FetchAccessToken.AccessTo
                 }
             }
         });
+        checkIsRepeat(new OnRepeatCallback() {
+            @Override
+            public void onResult(boolean isRepeat) {
+                if (isRepeat) {
+                    repeateBtn.setImageResource(R.drawable.repeate_green);
+                    mediaPlayerManager.setIsShuffle(false);
+                } else repeateBtn.setImageResource(R.drawable.repeate);
+            }
+        });
+
+        checkIsShuffle(new OnShuffleCallback() {
+            @Override
+            public void onResult(boolean isShuffle) {
+                if (isShuffle) {
+                    shuffleBtn.setImageResource(R.drawable.shuffle_green);
+                    mediaPlayerManager.setIsRepeat(false);
+                } else shuffleBtn.setImageResource(R.drawable.shuffle_gray);
+            }
+        });
         heartBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -462,13 +514,23 @@ public class LyricFragment extends Fragment implements FetchAccessToken.AccessTo
                     playedDuration.setText(formattedTime(CurrentPosition));
                     handler.postDelayed(this, 500);
                     if (CurrentPosition == mediaPlayerManager.getMediaPlayer().getDuration()/1000){
-                        mediaPlayerManager.getMediaPlayer().pause();
-                        mediaPlayerManager.setCurrentPosition(0);
-                        mediaPlayerManager.getMediaPlayer().seekTo(0);
-                        ((BottomAppBarListener) requireActivity()).showBottomAppBar();
-                        FragmentManager fragmentManager = getParentFragmentManager();
-                        fragmentManager.popBackStack();
-                        PlayNextSong();// Update every 500 milliseconds
+                        if (CurrentPosition == mediaPlayerManager.getMediaPlayer().getDuration() / 1000) {
+                            Log.e("cuối bài ", "hehe");
+                            //mediaPlayerManager.getMediaPlayer().seekTo(0);
+                            if (mediaPlayerManager.getIsRepeat()) {
+                                mediaPlayerManager.getMediaPlayer().seekTo(0);
+                                mediaPlayerManager.setCurrentPosition(0);
+                            } else if (mediaPlayerManager.getIsShuffle()) {
+                                mediaPlayerManager.getMediaPlayer().pause();
+                                mediaPlayerManager.setCurrentPosition(0);
+                                mediaPlayerManager.getMediaPlayer().seekTo(0);
+                                PlayRandomSong();
+                            } else if (mediaPlayerManager.getIsRepeat() == false && mediaPlayerManager.getIsShuffle() == false) {
+                                mediaPlayerManager.getMediaPlayer().pause();
+                                mediaPlayerManager.getMediaPlayer().seekTo(0);
+                                PlayNextSong();
+                            }
+                        }
                     }
                 }
             }
@@ -605,7 +667,6 @@ public class LyricFragment extends Fragment implements FetchAccessToken.AccessTo
             }
         });
     }
-
     public void PlayPreviousSong() {
         ((BottomAppBarListener) requireActivity()).hideBottomAppBar();
         int currentIndex = getCurrentSongIndex(songId);
@@ -617,7 +678,6 @@ public class LyricFragment extends Fragment implements FetchAccessToken.AccessTo
         }
         updateCurrentSong(previousSongId);
     }
-
     private void PlayNextSong() {
         ((BottomAppBarListener) requireActivity()).hideBottomAppBar();
         int currentIndex = getCurrentSongIndex(songId);
@@ -629,7 +689,6 @@ public class LyricFragment extends Fragment implements FetchAccessToken.AccessTo
         }
         updateCurrentSong(nextSongId);
     }
-
     private int getCurrentSongIndex(String songId) {
         for (int i = 0; i < songList.size(); i++) {
             if (songList.get(i).getId().equals(songId)) {
@@ -656,7 +715,6 @@ public class LyricFragment extends Fragment implements FetchAccessToken.AccessTo
             fragment.show(((AppCompatActivity) requireContext()).getSupportFragmentManager(), "PlaySongFragment");
         }
     }
-
     private String getPreviousSongId(String currentSongId) {
         int currentIndex = getCurrentSongIndex(currentSongId);
         if (currentIndex > 0) {
@@ -665,7 +723,6 @@ public class LyricFragment extends Fragment implements FetchAccessToken.AccessTo
             return songList.get(songList.size() - 1).getId();
         }
     }
-
     private String getNextSongId(String currentSongId) {
         int currentIndex = getCurrentSongIndex(currentSongId);
         if (currentIndex < songList.size() - 1) {
@@ -674,11 +731,16 @@ public class LyricFragment extends Fragment implements FetchAccessToken.AccessTo
             return songList.get(0).getId();
         }
     }
-
     private interface OnIsLikedCallback {
         void onResult(boolean isLiked);
     }
+    private interface OnRepeatCallback {
+        void onResult(boolean isRepeat);
+    }
 
+    private interface OnShuffleCallback {
+        void onResult(boolean isShuffle);
+    }
     private void checkIsLiked(String id, OnIsLikedCallback callback) {
         FirebaseAuth mAuth = FirebaseAuth.getInstance();
         String userId = mAuth.getCurrentUser().getUid();
@@ -698,6 +760,15 @@ public class LyricFragment extends Fragment implements FetchAccessToken.AccessTo
             Log.e("SongAdapter", "Failed to retrieve user document: " + e.getMessage());
             callback.onResult(false);
         });
+    }
+    private void checkIsRepeat(OnRepeatCallback callback) {
+        if (mediaPlayerManager.getIsRepeat() == true) callback.onResult(true);
+        else callback.onResult(false);
+    }
+    private void checkIsShuffle(OnShuffleCallback callback) {
+        if (mediaPlayerManager.getIsShuffle() == true) {
+            callback.onResult(true);
+        } else callback.onResult(false);
     }
     private void removeSongFromLikedSongs(String songId) {
         FirebaseAuth mAuth = FirebaseAuth.getInstance();
@@ -740,7 +811,6 @@ public class LyricFragment extends Fragment implements FetchAccessToken.AccessTo
             Log.e("SongAdapter", "Failed to retrieve user document: " + e.getMessage());
         });
     }
-
     public interface MusixmatchApi {
         @GET("track.search")
         Call<MusixmatchSearchResponse> searchTrack(
@@ -755,7 +825,6 @@ public class LyricFragment extends Fragment implements FetchAccessToken.AccessTo
                 @Query("apikey") String apiKey
         );
     }
-
     public static class MusixmatchSearchResponse {
         @SerializedName("message")
         private MessageContainer messageBody;
@@ -812,7 +881,6 @@ public class LyricFragment extends Fragment implements FetchAccessToken.AccessTo
 
 
     }
-
     public static class LyricsResponse {
         @SerializedName("message")
         private MessageContainer messageBody;

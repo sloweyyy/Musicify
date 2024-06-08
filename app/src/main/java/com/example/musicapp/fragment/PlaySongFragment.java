@@ -215,7 +215,6 @@ public class PlaySongFragment extends BottomSheetDialogFragment implements Fetch
                 view.setVisibility(View.GONE);
             }
         });
-
         repeateBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -244,14 +243,11 @@ public class PlaySongFragment extends BottomSheetDialogFragment implements Fetch
                 });
             }
         });
-
-
         previousBtn.setOnClickListener(v -> {
             mediaPlayerManager.getMediaPlayer().pause();
             mediaPlayerManager.setCurrentPosition(0);
             PlayPreviousSong();
         });
-
         nextBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -260,7 +256,6 @@ public class PlaySongFragment extends BottomSheetDialogFragment implements Fetch
                 PlayNextSong();
             }
         });
-
         shuffleBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -479,7 +474,6 @@ public class PlaySongFragment extends BottomSheetDialogFragment implements Fetch
         MiniPlayerListener miniPlayerListener = (MiniPlayerListener) requireActivity();
         miniPlayerListener.updateMiniPlayer(songList, getCurrentSongIndex(songId));
     }
-
     public void PlayNextSong() {
         if (getActivity() != null) {
             int currentIndex = getCurrentSongIndex(songId);
@@ -494,7 +488,6 @@ public class PlaySongFragment extends BottomSheetDialogFragment implements Fetch
             miniPlayerListener.updateMiniPlayer(songList, getCurrentSongIndex(songId));
         }
     }
-
     private void PlayRandomSong() {
         int randomIndex = (int) (Math.random() * songList.size());
         String nextSongId = songList.get(randomIndex).getId();
@@ -502,7 +495,6 @@ public class PlaySongFragment extends BottomSheetDialogFragment implements Fetch
         MiniPlayerListener miniPlayerListener = (MiniPlayerListener) requireActivity();
         miniPlayerListener.updateMiniPlayer(songList, getCurrentSongIndex(songId));
     }
-
     private Song getSongById(String songId) {
         if (songList != null) {
             for (Song song : songList) {
@@ -514,8 +506,6 @@ public class PlaySongFragment extends BottomSheetDialogFragment implements Fetch
         Log.e("PlaySongFragment", "Song with ID " + songId + " not found.");
         return null;
     }
-
-
     private void ShowLyric() {
         ((BottomAppBarListener) requireActivity()).hideBottomAppBar();
         LyricFragment lyricFragment = new LyricFragment();
@@ -539,12 +529,9 @@ public class PlaySongFragment extends BottomSheetDialogFragment implements Fetch
         lyricFragment.setArguments(args);
         ((AppCompatActivity) requireContext()).getSupportFragmentManager().beginTransaction().replace(R.id.frame_layout, lyricFragment, "LyricFragment").addToBackStack("LyricFragment").commit();
     }
-
-
     public void setSongId(String songId) {
         this.songId = songId;
     }
-
     private void initializeViews() {
         songname = view.findViewById(R.id.songNamePlay);
         artistname = view.findViewById(R.id.artistNamePlay);
@@ -763,8 +750,6 @@ public class PlaySongFragment extends BottomSheetDialogFragment implements Fetch
             miniPlayerListener.showMiniPlayer();
         }
     }
-
-
     @Override
     public void onPause() {
         super.onPause();
@@ -793,15 +778,13 @@ public class PlaySongFragment extends BottomSheetDialogFragment implements Fetch
             updateSeekBarRunnable = new Runnable() {
                 @Override
                 public void run() {
-                    if (mediaPlayerManager.getMediaPlayer() != null && mediaPlayerManager.getIsPlaying())
-                    { // Check if mediaPlayer is playing
+                    if (mediaPlayerManager.getMediaPlayer() != null && mediaPlayerManager.getIsPlaying()) { // Check if mediaPlayer is playing
                         int CurrentPosition = (mediaPlayerManager.getMediaPlayer().getCurrentPosition() / 1000);
                         seekBar.setProgress(CurrentPosition);
                         duration_played.setText(formattedTime(CurrentPosition));
                         if (CurrentPosition == mediaPlayerManager.getMediaPlayer().getDuration() / 1000) {
                             Log.e("cuối bài ", "hehe");
                             //mediaPlayerManager.getMediaPlayer().seekTo(0);
-
                             if (mediaPlayerManager.getIsRepeat()) {
                                 mediaPlayerManager.getMediaPlayer().seekTo(0);
                                 mediaPlayerManager.setCurrentPosition(0);
@@ -815,12 +798,12 @@ public class PlaySongFragment extends BottomSheetDialogFragment implements Fetch
                                 mediaPlayerManager.getMediaPlayer().seekTo(0);
                                 PlayNextSong();
                             }
-
-                        handler.postDelayed(this, 500); // Update every 500 milliseconds
+                        }
+                        handler.postDelayed(this, 500);
                     }
                 }
             };
-            handler.postDelayed(updateSeekBarRunnable, 0);
+            handler.postDelayed(updateSeekBarRunnable,0);
         }
     }
 
