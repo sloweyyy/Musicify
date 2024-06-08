@@ -1,12 +1,10 @@
 package com.example.musicapp.fragment;
 
-import android.app.AlertDialog;
+import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
-
-import android.os.Bundle;
 import android.widget.ImageView;
 import android.widget.TextView;
 
@@ -20,26 +18,13 @@ import androidx.recyclerview.widget.RecyclerView;
 import com.bumptech.glide.Glide;
 import com.example.musicapp.R;
 import com.example.musicapp.adapter.FetchAccessToken;
-import com.example.musicapp.adapter.LikedAlbumAdapter;
 import com.example.musicapp.adapter.SongAdapter;
-import com.example.musicapp.model.SimplifiedTrack;
-import com.example.musicapp.model.Song;
 import com.example.musicapp.model.AlbumSimplified;
+import com.example.musicapp.model.Song;
+import com.example.musicapp.viewmodel.AlbumDetailViewModel;
 
 import java.util.ArrayList;
 import java.util.List;
-
-import retrofit2.Call;
-import retrofit2.Callback;
-import retrofit2.Response;
-import retrofit2.Retrofit;
-import retrofit2.converter.gson.GsonConverterFactory;
-import retrofit2.http.GET;
-import retrofit2.http.Header;
-import retrofit2.http.Path;
-
-import com.example.musicapp.adapter.FetchAccessToken;
-import com.example.musicapp.viewmodel.AlbumDetailViewModel;
 
 public class AlbumDetailFragment extends Fragment implements FetchAccessToken.AccessTokenCallback {
     private RecyclerView recyclerView;
@@ -58,7 +43,8 @@ public class AlbumDetailFragment extends Fragment implements FetchAccessToken.Ac
     private ImageView imageView;
     HomeFragment homeFragment;
 
-    public AlbumDetailFragment() {}
+    public AlbumDetailFragment() {
+    }
 
     @Nullable
     @Override
@@ -108,6 +94,7 @@ public class AlbumDetailFragment extends Fragment implements FetchAccessToken.Ac
         recyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
         recyclerView.setAdapter(songAdapter);
     }
+
     @Override
     public void onTokenReceived(String accessToken) {
         this.accessToken = accessToken;
@@ -115,7 +102,12 @@ public class AlbumDetailFragment extends Fragment implements FetchAccessToken.Ac
 
         viewModel.albumSongs.observe(getViewLifecycleOwner(), songs -> {
             if (songs != null) {
-                songAdapter = new SongAdapter(getContext(), songs);
+                songAdapter = new SongAdapter(getContext(), songs, new SongAdapter.OnSongSelectedListener() {
+                    @Override
+                    public void onSongSelected(Song song) {
+                        // Handle song selection
+                    }
+                });
                 recyclerView.setAdapter(songAdapter);
                 recyclerView.setVisibility(View.VISIBLE);
             }

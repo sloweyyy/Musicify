@@ -161,7 +161,7 @@ public class PlaySongFragment extends BottomSheetDialogFragment implements Fetch
         if (getActivity() instanceof OnPlayingStateChangeListener) {
             playingStateChangeListener = (OnPlayingStateChangeListener) getActivity();
         }
-        backButtonLayout.setOnClickListener(new View.OnClickListener() {
+        iconBackPlayingLayout.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 mediaPlayerManager.getMediaPlayer().seekTo(0);
@@ -539,7 +539,6 @@ public class PlaySongFragment extends BottomSheetDialogFragment implements Fetch
         threeDots = view.findViewById(R.id.threeDots);
         threeDotsLayout = view.findViewById(R.id.threeDotsLayout);
         seekBar = view.findViewById(R.id.seekbar);
-        backButtonLayout = view.findViewById(R.id.backButtonLayout);
         iconBackPlayingLayout = view.findViewById(R.id.iconBackPlayingLayout);
         iconBackPlaying = view.findViewById(R.id.iconBackPlaying);
         heartBtn = view.findViewById(R.id.heartBtn);
