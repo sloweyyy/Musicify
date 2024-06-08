@@ -1,5 +1,6 @@
 package com.example.musicapp.service;
 
+import com.example.musicapp.model.AlbumSimplified;
 import com.example.musicapp.model.CategoryResponse;
 import com.example.musicapp.model.SearchResult;
 import com.example.musicapp.model.SimplifiedTrack;
@@ -26,5 +27,11 @@ public interface SpotifyApiService {
 
     @GET("v1/playlists/{playlistId}")
     Call<PlaylistDetailAPIViewModel.PlaylistSimplified> getSongs(@Header("Authorization") String authorization, @Path("playlistId") String playlistId);
+
+    @GET("v1/albums/{albumId}")
+    Call<AlbumSimplified> getAlbum(@Header("Authorization") String authorization, @Path("albumId") String albumId);
+
+    @GET("v1/albums/{albumId}")
+    Call<AlbumSimplified> getSongsOfAlbum(@Header("Authorization") String authorization, @Path("albumId") String albumId);
 
 }

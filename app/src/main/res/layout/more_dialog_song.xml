@@ -1,27 +1,29 @@
 <?xml version="1.0" encoding="utf-8"?>
 <com.google.android.material.card.MaterialCardView xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
-    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="@dimen/_250sdp"
-    android:layout_height="@dimen/_240sdp"
+    android:layout_height="wrap_content"
+    android:layout_gravity="center"
     android:layout_margin="8dp"
     app:cardCornerRadius="10dp"
-    android:layout_gravity="center"
     app:cardElevation="4dp">
+
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
+        android:orientation="vertical"
         android:paddingHorizontal="30dp"
-        android:paddingVertical="@dimen/_10sdp"
-        android:orientation="vertical">
+        android:paddingVertical="@dimen/_10sdp">
+
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="More"
-            android:textStyle="bold"
-            android:textSize="@dimen/_20sdp"
             android:layout_marginBottom="@dimen/_5sdp"
-            android:textColor="#49A078"/>
+            android:text="More"
+            android:textColor="#49A078"
+            android:textSize="@dimen/_20sdp"
+            android:textStyle="bold" />
+
         <LinearLayout
             android:id="@+id/addToPlaylist"
             android:layout_width="wrap_content"
@@ -29,21 +31,24 @@
             android:layout_marginVertical="@dimen/_7sdp"
             android:layout_marginLeft="@dimen/_10sdp"
             android:gravity="center_vertical">
+
             <ImageButton
                 android:layout_width="25dp"
-                android:contentDescription="addToPlaylist"
                 android:layout_height="25dp"
-                android:background="@drawable/plus"/>
+                android:background="@drawable/plus"
+                android:contentDescription="addToPlaylist" />
+
             <TextView
                 android:id="@+id/addToPlaylist_Text"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="Add to playlist"
-                android:textStyle="normal"
-                android:textSize="@dimen/_16sdp"
                 android:layout_marginLeft="@dimen/_10sdp"
-                android:textColor="@color/white"/>
+                android:text="Add to playlist"
+                android:textColor="@color/white"
+                android:textSize="@dimen/_16sdp"
+                android:textStyle="normal" />
         </LinearLayout>
+
         <LinearLayout
             android:id="@+id/album"
             android:layout_width="wrap_content"
@@ -51,21 +56,24 @@
             android:layout_marginVertical="@dimen/_7sdp"
             android:layout_marginLeft="@dimen/_10sdp"
             android:gravity="center_vertical">
+
             <ImageButton
                 android:layout_width="25dp"
-                android:contentDescription="report Infor"
                 android:layout_height="25dp"
                 android:background="@drawable/album"
-                android:backgroundTint="@color/white"/>
+                android:backgroundTint="@color/white"
+                android:contentDescription="report Infor" />
+
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="Album"
-                android:textStyle="normal"
-                android:textSize="@dimen/_16sdp"
                 android:layout_marginLeft="@dimen/_10sdp"
-                android:textColor="@color/white"/>
+                android:text="Album"
+                android:textColor="@color/white"
+                android:textSize="@dimen/_16sdp"
+                android:textStyle="normal" />
         </LinearLayout>
+
         <LinearLayout
             android:id="@+id/share"
             android:layout_width="wrap_content"
@@ -73,21 +81,24 @@
             android:layout_marginVertical="@dimen/_7sdp"
             android:layout_marginLeft="@dimen/_10sdp"
             android:gravity="center_vertical">
+
             <ImageButton
                 android:layout_width="25dp"
-                android:contentDescription="report Infor"
                 android:layout_height="25dp"
                 android:background="@drawable/share_outline"
-                android:backgroundTint="@color/white"/>
+                android:backgroundTint="@color/white"
+                android:contentDescription="report Infor" />
+
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="Share"
-                android:textStyle="normal"
-                android:textSize="@dimen/_16sdp"
                 android:layout_marginLeft="@dimen/_10sdp"
-                android:textColor="@color/white"/>
+                android:text="Share"
+                android:textColor="@color/white"
+                android:textSize="@dimen/_16sdp"
+                android:textStyle="normal" />
         </LinearLayout>
+
         <LinearLayout
             android:id="@+id/report"
             android:layout_width="wrap_content"
@@ -95,30 +106,57 @@
             android:layout_marginVertical="@dimen/_7sdp"
             android:layout_marginLeft="@dimen/_10sdp"
             android:gravity="center_vertical">
+
             <ImageButton
                 android:layout_width="25dp"
-                android:contentDescription="report Infor"
                 android:layout_height="25dp"
                 android:background="@drawable/flag_24dp_fill0_wght400_grad0_opsz24"
-                android:backgroundTint="@color/white"/>
+                android:backgroundTint="@color/white"
+                android:contentDescription="report Infor" />
+
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="Report"
-                android:textStyle="normal"
-                android:textSize="@dimen/_16sdp"
                 android:layout_marginLeft="@dimen/_10sdp"
-                android:textColor="@color/white"/>
+                android:text="Report"
+                android:textColor="@color/white"
+                android:textSize="@dimen/_16sdp"
+                android:textStyle="normal" />
         </LinearLayout>
+
+        <LinearLayout
+            android:id="@+id/upcoming"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginVertical="@dimen/_7sdp"
+            android:layout_marginLeft="@dimen/_10sdp"
+            android:gravity="center_vertical">
+
+            <ImageButton
+                android:layout_width="25dp"
+                android:layout_height="25dp"
+                android:background="@drawable/upcoming"
+                android:backgroundTint="@color/white"
+                android:contentDescription="report Infor" />
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginLeft="@dimen/_10sdp"
+                android:text="Upcoming"
+                android:textColor="@color/white"
+                android:textSize="@dimen/_16sdp"
+                android:textStyle="normal" />
+        </LinearLayout>
+
         <Button
             android:id="@+id/cancel"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_gravity="end"
+            android:backgroundTint="@color/btnColor"
             android:text="Cancel"
-            android:textColor="@color/white"
-            android:backgroundTint="@color/btnColor">
-        </Button>
+            android:textColor="@color/white"></Button>
     </LinearLayout>
 
 </com.google.android.material.card.MaterialCardView>
