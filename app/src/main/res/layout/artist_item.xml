@@ -62,7 +62,7 @@
         android:layout_height="64dp"
         android:layout_marginRight="10dp"
         android:layout_gravity="center_vertical"
-        android:src="@drawable/heart_green_ouline"
+        android:src="@drawable/favourite_outline"
         app:tint="@color/btnPressed"
         />
 </LinearLayout>
