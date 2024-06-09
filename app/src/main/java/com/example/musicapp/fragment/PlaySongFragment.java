@@ -47,12 +47,10 @@ import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.gson.annotations.SerializedName;
 
 import java.io.IOException;
-import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.concurrent.locks.ReentrantLock;
 
 import retrofit2.Call;
 import retrofit2.Callback;
@@ -95,6 +93,7 @@ public class PlaySongFragment extends BottomSheetDialogFragment implements Fetch
 
     private SongAdapter songAdapter; // Add SongAdapter here
     private static PlaySongFragment instance;
+
     public static PlaySongFragment getInstance(List<Song> songList, String songId) {
         if (instance == null) {
             instance = new PlaySongFragment();
@@ -473,6 +472,7 @@ public class PlaySongFragment extends BottomSheetDialogFragment implements Fetch
         MiniPlayerListener miniPlayerListener = (MiniPlayerListener) requireActivity();
         miniPlayerListener.updateMiniPlayer(songList, getCurrentSongIndex(songId));
     }
+
     public void PlayNextSong() {
         if (getActivity() != null) {
             int currentIndex = getCurrentSongIndex(songId);
@@ -487,6 +487,7 @@ public class PlaySongFragment extends BottomSheetDialogFragment implements Fetch
             miniPlayerListener.updateMiniPlayer(songList, getCurrentSongIndex(songId));
         }
     }
+
     private void PlayRandomSong() {
         int randomIndex = (int) (Math.random() * songList.size());
         String nextSongId = songList.get(randomIndex).getId();
@@ -494,6 +495,7 @@ public class PlaySongFragment extends BottomSheetDialogFragment implements Fetch
         MiniPlayerListener miniPlayerListener = (MiniPlayerListener) requireActivity();
         miniPlayerListener.updateMiniPlayer(songList, getCurrentSongIndex(songId));
     }
+
     private Song getSongById(String songId) {
         if (songList != null) {
             for (Song song : songList) {
@@ -505,6 +507,7 @@ public class PlaySongFragment extends BottomSheetDialogFragment implements Fetch
         Log.e("PlaySongFragment", "Song with ID " + songId + " not found.");
         return null;
     }
+
     private void ShowLyric() {
         ((BottomAppBarListener) requireActivity()).hideBottomAppBar();
         LyricFragment lyricFragment = new LyricFragment();
@@ -527,9 +530,11 @@ public class PlaySongFragment extends BottomSheetDialogFragment implements Fetch
         lyricFragment.setArguments(args);
         ((AppCompatActivity) requireContext()).getSupportFragmentManager().beginTransaction().replace(R.id.frame_layout, lyricFragment, "LyricFragment").addToBackStack("LyricFragment").commit();
     }
+
     public void setSongId(String songId) {
         this.songId = songId;
     }
+
     private void initializeViews() {
         songname = view.findViewById(R.id.songNamePlay);
         artistname = view.findViewById(R.id.artistNamePlay);
@@ -748,6 +753,7 @@ public class PlaySongFragment extends BottomSheetDialogFragment implements Fetch
             miniPlayerListener.showMiniPlayer();
         }
     }
+
     @Override
     public void onPause() {
         super.onPause();
@@ -801,7 +807,7 @@ public class PlaySongFragment extends BottomSheetDialogFragment implements Fetch
                     }
                 }
             };
-            handler.postDelayed(updateSeekBarRunnable,0);
+            handler.postDelayed(updateSeekBarRunnable, 0);
         }
     }
 
@@ -928,7 +934,6 @@ public class PlaySongFragment extends BottomSheetDialogFragment implements Fetch
         transaction.hide(this);
         transaction.commit();
     }
-
 
 
     private void updateCurrentSong(String newSongId) {
