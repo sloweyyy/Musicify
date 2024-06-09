@@ -1,7 +1,9 @@
 package com.example.musicapp.adapter;
 
+import android.content.Context;
 import android.os.Bundle;
 import android.util.Log;
+import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageButton;
@@ -10,42 +12,37 @@ import android.widget.TextView;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
-import androidx.recyclerview.widget.RecyclerView;
-
-import android.content.Context;
-import android.view.LayoutInflater;
-import android.view.View;
-import android.view.ViewGroup;
-import android.widget.ImageView;
-import android.widget.TextView;
-
-import androidx.annotation.NonNull;
+import androidx.fragment.app.FragmentManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.bumptech.glide.Glide;
 import com.example.musicapp.R;
-import com.example.musicapp.fragment.HomeFragment;
 import com.example.musicapp.fragment.PlaySongFragment;
-import com.example.musicapp.fragment.PlaylistDetailAPI;
-import com.example.musicapp.model.PlaylistAPI;
-import com.example.musicapp.model.SimplifiedTrack;
 import com.example.musicapp.model.Song;
+import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.firestore.FirebaseFirestore;
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 public class SongHomeAdapter extends RecyclerView.Adapter<SongHomeAdapter.ViewHolder> {
     private Context context;
     private List<Song> songList;
     int position;
+
     public interface OnSongSelectedListener {
         void onSongSelected(Song song);
     }
+
     private OnSongSelectedListener listener;
-    public SongHomeAdapter(Context context, List<Song> songList,OnSongSelectedListener listener) {
+
+    public SongHomeAdapter(Context context, List<Song> songList, OnSongSelectedListener listener) {
         this.context = context;
         this.songList = songList;
         this.listener = listener;
     }
+
     @NonNull
     @Override
     public ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
@@ -53,6 +50,7 @@ public class SongHomeAdapter extends RecyclerView.Adapter<SongHomeAdapter.ViewHo
         return new SongHomeAdapter.ViewHolder(view);
 
     }
+
     @Override
     public void onBindViewHolder(@NonNull ViewHolder holder, int position) {
         Song song = songList.get(position);
@@ -70,7 +68,7 @@ public class SongHomeAdapter extends RecyclerView.Adapter<SongHomeAdapter.ViewHo
         return songList.size();
     }
 
-    public class ViewHolder extends RecyclerView.ViewHolder   {
+    public class ViewHolder extends RecyclerView.ViewHolder {
 
         TextView trackName;
         ImageView artistPic;
@@ -82,17 +80,15 @@ public class SongHomeAdapter extends RecyclerView.Adapter<SongHomeAdapter.ViewHo
             trackName = itemView.findViewById(R.id.trackName);
             artistName = itemView.findViewById(R.id.artistName);
             artistPic = itemView.findViewById(R.id.artistPic);
-            playButton=itemView.findViewById(R.id.playButton);
+            playButton = itemView.findViewById(R.id.playButton);
 
             playButton.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
                     int position = getAbsoluteAdapterPosition();
                     if (position != RecyclerView.NO_POSITION) {
-                        listener.onSongSelected(songList.get(position));
                         Song selected = songList.get(position);
                         PlaySongFragment fragment = new PlaySongFragment();
-                        HomeFragment homeFragment = new HomeFragment();
                         fragment.setSongId(selected.getId());
                         fragment.setCurrentSongList(songList, selected.getId());
                         Bundle args = new Bundle();
@@ -100,15 +96,20 @@ public class SongHomeAdapter extends RecyclerView.Adapter<SongHomeAdapter.ViewHo
                         args.putString("previousSongId", getPreviousSongId(position));
                         args.putString("nextSongId", getNextSongId(position));
                         fragment.setArguments(args);
-                        homeFragment.setArguments(args);
-                        homeFragment.setPreviousSongId(getPreviousSongId(position));
-                        homeFragment.setNextSongId(getNextSongId(position));
-                        fragment.show(((AppCompatActivity) v.getContext()).getSupportFragmentManager(), "PlaySongFragment");
-//                        homeFragment.show(((AppCompatActivity) v.getContext()).getSupportFragmentManager(), "HomeFragment");
+
+                        FragmentManager fragmentManager = ((AppCompatActivity) v.getContext()).getSupportFragmentManager();
+                        fragment.show(fragmentManager, "PlaySongFragment");
+
+                        updateRecentListeningSong(selected);
+
+                        if (listener != null) {
+                            listener.onSongSelected(selected);
+                        }
                     }
                 }
             });
         }
+
         private String getPreviousSongId(int currentPosition) {
             if (currentPosition == 0) {
                 return null;
@@ -125,6 +126,22 @@ public class SongHomeAdapter extends RecyclerView.Adapter<SongHomeAdapter.ViewHo
             }
         }
 
+        private void updateRecentListeningSong(Song song) {
+            FirebaseAuth mAuth = FirebaseAuth.getInstance();
+            FirebaseFirestore db = FirebaseFirestore.getInstance();
 
+            String userId = mAuth.getCurrentUser().getUid();
+            Map<String, Object> recentListeningSong = new HashMap<>();
+            recentListeningSong.put("songName", song.getTitle());
+            recentListeningSong.put("imageURL", song.getImageUrl());
+            recentListeningSong.put("artistName", song.getArtist());
+            recentListeningSong.put("songId", song.getId());
+            db.collection("users").document(userId).update("recentListeningSong", recentListeningSong)
+                    .addOnSuccessListener(aVoid -> Log.d("SongHomeAdapter", "Recent listening song updated successfully"))
+                    .addOnFailureListener(e -> Log.e("SongHomeAdapter", "Failed to update recent listening song: " + e.getMessage()));
+        }
     }
+
+
 }
+
