@@ -105,6 +105,15 @@ public class PlaylistDetailFragment extends Fragment implements FetchAccessToken
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
+        Bundle bundle = getArguments();
+        if (bundle != null) {
+            mPlaylistName = bundle.getString(ARG_PLAYLIST_NAME);
+            mPlaylistDescription = bundle.getString(ARG_PLAYLIST_DESCRIPTION);
+            mPlaylistImageURL = bundle.getString(ARG_PLAYLIST_IMAGE_URL);
+            mPlaylistId = bundle.getString(ARG_PLAYLIST_ID);
+        }
+
+        Log.d("PlaylistDetailFragment", "Playlist ID: " + mPlaylistId);
 
         thumbnailImageView = view.findViewById(R.id.playlistBanner);
         nameTextView = view.findViewById(R.id.playlistName);
@@ -147,7 +156,7 @@ public class PlaylistDetailFragment extends Fragment implements FetchAccessToken
                 if (task.isSuccessful()) {
                     DocumentSnapshot document = task.getResult();
                     if (document.exists()) {
-                        currentPlaylist = document.toObject(Playlist.class);
+                        currentPlaylist = new Playlist(document.getId(), document.getString("userId"), document.getString("name"), document.getString("description"), document.getString("imageURL"));
                         showEditPlaylistBottomSheet(currentPlaylist);
                     } else {
                         Log.d("PlaylistDetailFragment", "No such playlist");
@@ -376,7 +385,14 @@ public class PlaylistDetailFragment extends Fragment implements FetchAccessToken
 
 
     private void updatePlaylistInFirestore(Playlist playlist, String newName, String newImageURL, BottomSheetDialog bottomSheetDialog) {
+        if (playlist.getId() == null) {
+            Log.e("PlaylistDetailFragment", "Playlist ID is null. Cannot update playlist.");
+            // Handle the error appropriately, e.g., display an error message to the user.
+            return; // Stop further execution.
+        }
+
         FirebaseFirestore db = FirebaseFirestore.getInstance();
+        Log.d("PlaylistDetailFragment", "Updating playlist: " + playlist.getId());
         db.collection("playlists").document(playlist.getId()).update("name", newName, "imageURL", newImageURL).addOnSuccessListener(aVoid -> {
             Toast.makeText(requireContext(), "Playlist updated successfully", Toast.LENGTH_SHORT).show();
             bottomSheetDialog.dismiss();
@@ -408,7 +424,13 @@ public class PlaylistDetailFragment extends Fragment implements FetchAccessToken
 
     public void getPlaylistById(String playlistId, OnCompleteListener<DocumentSnapshot> listener) {
         FirebaseFirestore db = FirebaseFirestore.getInstance();
-        db.collection("playlists").document(playlistId).get().addOnCompleteListener(listener);
+        db.collection("playlists").document(playlistId)
+                .get()
+                .addOnCompleteListener(listener)
+                .addOnFailureListener(e -> {
+                    Log.e("PlaylistDetailFragment", "Error fetching playlist data", e);
+
+                });
     }
 
     public interface SpotifyApiService {

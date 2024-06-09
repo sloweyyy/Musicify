@@ -42,6 +42,7 @@ public class PlaylistViewModel extends ViewModel {
                     queryDocumentSnapshots.forEach(document -> {
                         Playlist playlist = document.toObject(Playlist.class);
                         playlist.setId(document.getId());
+                        Log.d("PlaylistViewModel", "Fetched playlist: " + playlist.getId());
                         List<String> songs = (List<String>) document.get("songs");
                         playlist.setSongs(songs != null ? songs : new ArrayList<>());
                         fetchedPlaylists.add(playlist);
