@@ -1,9 +1,12 @@
 package com.example.musicapp.service;
 
+
 import com.example.musicapp.model.AlbumSimplified;
+import com.example.musicapp.model.Artist;
 import com.example.musicapp.model.CategoryResponse;
 import com.example.musicapp.model.SearchResult;
 import com.example.musicapp.model.SimplifiedTrack;
+import com.example.musicapp.viewmodel.ArtistDetailViewModel;
 import com.example.musicapp.viewmodel.PlaylistDetailAPIViewModel;
 
 import retrofit2.Call;
@@ -33,5 +36,13 @@ public interface SpotifyApiService {
 
     @GET("v1/albums/{albumId}")
     Call<AlbumSimplified> getSongsOfAlbum(@Header("Authorization") String authorization, @Path("albumId") String albumId);
+    @GET("v1/artists/{artistId}")
+    Call<Artist> getArtist(@Header("Authorization") String authorization, @Path("artistId") String artistId);
+
+    @GET("v1/artists/{artistId}/albums")
+    Call<ArtistDetailViewModel.ArtistAlbums> getArtistAlbums(@Header("Authorization") String authorization, @Path("artistId") String artistId);
+
+    @GET("v1/artists/{artistId}/top-tracks")
+    Call<ArtistDetailViewModel.ArtistTopTrack> getArtistTopTrack(@Header("Authorization") String authorization, @Path("artistId") String artistId);
 
 }

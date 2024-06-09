@@ -6,43 +6,51 @@
     android:background="@color/black"
     tools:context=".fragment.AlbumDetailFragment">
 
-    <!-- Nút back -->
-    <LinearLayout
-        android:id="@+id/backButtonLayout"
-        android:layout_width="35dp"
-        android:layout_height="35dp"
-        android:layout_marginLeft="15dp"
-        android:layout_marginTop="@dimen/_30sdp"
-        android:background="@drawable/back_btn_custom"
-        android:gravity="center"
-        android:orientation="horizontal">
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:id="@+id/albumHeader">
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="@dimen/_180sdp">
+            <ImageView
+                android:id="@+id/albumBanner"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_below="@id/backButtonLayout"
+                android:layout_centerHorizontal="true"
+                android:scaleType="centerCrop"
+                android:src="@drawable/playlist_image" />
+        </LinearLayout>
 
-        <Button
-            android:id="@+id/iconBack"
-            android:layout_width="25dp"
-            android:layout_height="25dp"
-            android:layout_marginLeft="10dp"
-            android:background="@drawable/arrow_back"
-            android:paddingLeft="28dp"
-            app:backgroundTint="@android:color/white" />
-    </LinearLayout>
+        <!-- Nút back -->
+        <LinearLayout
+            android:id="@+id/backButtonLayout"
+            android:layout_width="35dp"
+            android:layout_height="35dp"
+            android:layout_marginLeft="15dp"
+            android:layout_marginTop="@dimen/_30sdp"
+            android:background="@drawable/back_btn_custom"
+            android:gravity="center"
+            android:orientation="horizontal">
 
-    <!-- Phần còn lại của layout -->
-    <ImageView
-        android:id="@+id/albumBanner"
-        android:layout_width="350dp"
-        android:layout_height="200dp"
-        android:layout_below="@id/backButtonLayout"
-        android:layout_centerHorizontal="true"
-        android:layout_marginTop="16dp"
-        android:scaleType="centerCrop"
-        android:src="@drawable/playlist_image" />
+            <Button
+                android:id="@+id/iconBack"
+                android:layout_width="25dp"
+                android:layout_height="25dp"
+                android:layout_marginLeft="10dp"
+                android:background="@drawable/arrow_back"
+                android:paddingLeft="28dp"
+                app:backgroundTint="@android:color/white" />
+        </LinearLayout>
+
+    </RelativeLayout>
 
     <TextView
         android:id="@+id/albumName"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_below="@id/albumBanner"
+        android:layout_below="@id/albumHeader"
         android:layout_centerHorizontal="true"
         android:layout_marginTop="16dp"
         android:text="Album Name"

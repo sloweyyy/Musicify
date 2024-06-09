@@ -38,7 +38,6 @@ public class LikedAlbumViewModel extends AndroidViewModel {
     }
 
     public void fetchLikedAlbums(String accessToken) {
-        FirebaseAuth auth = FirebaseAuth.getInstance();
         String userId = FirebaseAuth.getInstance().getCurrentUser().getUid();
         FirebaseFirestore db = FirebaseFirestore.getInstance();
         db.collection("users").whereEqualTo("id", userId).get().addOnSuccessListener(queryDocumentSnapshots ->
