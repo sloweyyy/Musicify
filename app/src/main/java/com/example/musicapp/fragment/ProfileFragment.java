@@ -218,20 +218,24 @@ public class ProfileFragment extends Fragment {
             @Override
             public void onClick(View v) {
 
-                Intent intent = new Intent();
-                intent.setClass(v.getContext(), PrivacyPolicyActivity.class);
-                startActivity(intent);
-                getActivity().finish();
+                PrivacyPolicy fragment = new PrivacyPolicy();
+                ((AppCompatActivity) v.getContext()).getSupportFragmentManager()
+                        .beginTransaction()
+                        .replace(R.id.frame_layout, fragment)
+                        .addToBackStack(null)
+                        .commit();
 
             }
         });
         termsAndConditions.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Intent intent = new Intent();
-                intent.setClass(v.getContext(), TermsConditionActivity.class);
-                startActivity(intent);
-                getActivity().finish();
+                TermsAndCondition fragment = new TermsAndCondition();
+                ((AppCompatActivity) v.getContext()).getSupportFragmentManager()
+                        .beginTransaction()
+                        .replace(R.id.frame_layout, fragment)
+                        .addToBackStack(null)
+                        .commit();
             }
         });
 

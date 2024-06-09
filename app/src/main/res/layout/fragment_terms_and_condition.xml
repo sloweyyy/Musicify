@@ -1,0 +1,155 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/main"
+    android:layout_width="match_parent"
+    android:orientation="vertical"
+    android:layout_margin="16dp"
+    android:layout_marginTop="@dimen/_10sdp"
+    android:layout_height="match_parent"
+    tools:context=".fragment.TermsAndCondition">
+    <ImageButton
+        android:id="@+id/iconBack"
+        android:layout_width="25dp"
+        android:layout_marginTop="20dp"
+        android:layout_marginBottom="20dp"
+        android:layout_height="25dp"
+        android:layout_marginStart="10dp"
+        android:background="?android:selectableItemBackgroundBorderless"
+        android:contentDescription="back_to_home"
+        android:src="@drawable/arrow_back"
+        android:tint="@color/white"/>
+
+
+    <com.google.android.material.card.MaterialCardView
+        android:layout_width="match_parent"
+        app:cardCornerRadius="30dp"
+        android:layout_height="wrap_content">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:gravity="center_vertical"
+            android:padding="10dp"
+            android:orientation="horizontal" >
+
+            <TextView
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:layout_gravity="center_vertical"
+                android:textSize="@dimen/_15sdp"
+                android:text="Khi sử dụng ứng dụng này, người dùng đồng ý tuân thủ các điều khoản và điều kiện sau"
+                android:textStyle="bold"
+                android:textColor="@color/dark_caribbean_current"
+                android:layout_marginHorizontal="@dimen/_5sdp"/>
+
+
+        </LinearLayout>
+    </com.google.android.material.card.MaterialCardView>
+
+    <ScrollView
+        android:layout_width="match_parent"
+        android:id="@+id/tv_policy_content"
+        android:layout_height="match_parent">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:padding="16dp">
+
+            <TextView
+                android:id="@+id/titleTextView"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Nội dung"
+                android:textColor="@color/dark_caribbean_current"
+                android:textSize="@dimen/_15sdp"
+                android:textStyle="bold"
+                android:layout_marginBottom="16dp"/>
+
+            <TextView
+                android:id="@+id/contentTextView"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Người dùng chịu trách nhiệm đối với mọi nội dung do họ tải lên hoặc chia sẻ trên ứng dụng. Ứng dụng có quyền xóa bất kỳ nội dung nào vi phạm chính sách của ứng dụng."
+                android:textSize="16sp"
+                android:textColor="@color/white"
+                android:lineSpacingExtra="8dp"/>
+
+            <TextView
+                android:id="@+id/title2TextView"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Bản quyền"
+                android:textSize="@dimen/_15sdp"
+                android:textStyle="bold"
+                android:textColor="@color/dark_caribbean_current"
+                android:layout_marginTop="16dp"
+                android:layout_marginBottom="16dp"/>
+
+            <TextView
+                android:id="@+id/content2TextView"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Tất cả nội dung trong ứng dụng đều thuộc sở hữu của chủ sở hữu hoặc được cấp phép hợp pháp. Người dùng không được phép sao chép, phân phối hoặc sử dụng nội dung khi không được cho phép."
+                android:textSize="16sp"
+                android:textColor="@color/white"
+                android:lineSpacingExtra="8dp"/>
+
+            <TextView
+                android:id="@+id/title3TextView"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Quyền riêng tư"
+                android:textColor="@color/dark_caribbean_current"
+                android:textSize="@dimen/_15sdp"
+                android:textStyle="bold"
+                android:layout_marginTop="16dp"
+                android:layout_marginBottom="16dp"/>
+            <TextView
+                android:id="@+id/content3TextView"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Ứng dụng cam kết bảo vệ thông tin cá nhân của người dùng theo chính sách riêng tư. Người dùng đồng ý với việc thu thập và sử dụng dữ liệu như được mô tả trong chính sách."
+                android:textSize="16sp"
+                android:textColor="@color/white"
+                android:lineSpacingExtra="8dp"/>
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Trách nhiệm"
+                android:textSize="@dimen/_15sdp"
+                android:textStyle="bold"
+                android:layout_marginTop="16dp"
+                android:textColor="@color/dark_caribbean_current"
+                android:layout_marginBottom="16dp"/>
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Ứng dụng không chịu trách nhiệm về bất kỳ thiệt hại nào do việc sử dụng ứng dụng gây ra. Người dùng tự chịu trách nhiệm về mọi hành động của mình trên ứng dụng."
+                android:textSize="16sp"
+                android:textColor="@color/white"
+                android:lineSpacingExtra="8dp"/>
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:textColor="@color/dark_caribbean_current"
+                android:text="Thay đổi điều khoản"
+                android:textSize="@dimen/_15sdp"
+                android:textStyle="bold"
+                android:layout_marginTop="16dp"
+                android:layout_marginBottom="16dp"/>
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Ứng dụng có quyền thay đổi các điều khoản và điều kiện này vào bất kỳ thời điểm nào. Việc tiếp tục sử dụng ứng dụng sau khi thay đổi được coi là sự chấp nhận của người dùng đối với các điều khoản mới."
+                android:textSize="16sp"
+                android:textColor="@color/white"
+                android:lineSpacingExtra="8dp"/>
+        </LinearLayout>
+    </ScrollView>
+
+</LinearLayout>
