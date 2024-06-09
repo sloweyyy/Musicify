@@ -49,6 +49,8 @@ public class PlaylistDetailAPI extends Fragment implements FetchAccessToken.Acce
     private String playlistId;
     private LinearLayout backButtonLayout;
     private Button iconBack;
+    private Button threeDots;
+    private LinearLayout threeDotsLayout;
     private TextView playlistName;
     private TextView playlistDescription;
     private ImageView imageView;
@@ -73,6 +75,10 @@ public class PlaylistDetailAPI extends Fragment implements FetchAccessToken.Acce
         imageView = view.findViewById(R.id.playlistBanner);
         backButtonLayout = view.findViewById(R.id.backButtonLayout);
         iconBack = view.findViewById(R.id.iconBack);
+        threeDots = view.findViewById(R.id.threeDots);
+        threeDotsLayout = view.findViewById(R.id.iconThreeDots);
+        threeDots.setVisibility(View.GONE);
+        threeDotsLayout.setVisibility(View.GONE);
         LinearLayoutManager layoutManager = new LinearLayoutManager(getActivity());
         recyclerView.setLayoutManager(layoutManager);
         if (getArguments() != null) {
