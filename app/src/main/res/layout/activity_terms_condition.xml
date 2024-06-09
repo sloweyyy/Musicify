@@ -44,20 +44,12 @@
                 android:textColor="@color/dark_caribbean_current"
                 android:layout_marginHorizontal="@dimen/_5sdp"/>
 
-            <ImageButton
-                android:id="@+id/imageButton_toggle"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginEnd="10dp"
-                android:background="?attr/selectableItemBackground"
-                android:tint="@color/caribbean_current"
-                android:src="@drawable/expand_circle_right_24dp_fill0_wght400_grad0_opsz24" />
+
         </LinearLayout>
     </com.google.android.material.card.MaterialCardView>
 
     <ScrollView
         android:layout_width="match_parent"
-        android:visibility="gone"
         android:id="@+id/tv_policy_content"
         android:layout_height="match_parent">
 
