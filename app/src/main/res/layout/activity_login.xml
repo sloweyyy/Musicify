@@ -78,7 +78,7 @@
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:autofillHints="Email"
-                        android:padding="15dp"
+                        android:padding="12dp"
                         android:background="@android:color/transparent"
                         android:hint="Email"
                         android:textColorHint="#A7A7A7" />
@@ -113,10 +113,10 @@
                         android:id="@+id/inputPassword"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
+                        android:padding="12dp"
                         android:autofillHints="password"
                         android:background="@android:color/transparent"
                         android:hint="Password"
-                        android:padding="15dp"
                         android:inputType="textPassword"
                         android:textColorHint="#A7A7A7"
                         android:longClickable="false"/>
