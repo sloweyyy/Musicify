@@ -1,10 +1,8 @@
 package com.example.musicapp.viewmodel;
 
-import android.app.AlertDialog;
 import android.app.Application;
 import android.content.Context;
 import android.util.Log;
-import android.view.View;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
@@ -12,10 +10,6 @@ import androidx.lifecycle.AndroidViewModel;
 import androidx.lifecycle.LiveData;
 import androidx.lifecycle.MutableLiveData;
 
-import com.bumptech.glide.Glide;
-import com.example.musicapp.adapter.AlbumAdapter;
-import com.example.musicapp.adapter.SongAdapter;
-import com.example.musicapp.fragment.ArtistDetailFragment;
 import com.example.musicapp.model.AlbumSimplified;
 import com.example.musicapp.model.Artist;
 import com.example.musicapp.model.SimplifiedTrack;
@@ -44,6 +38,7 @@ public class ArtistDetailViewModel extends AndroidViewModel {
 
     private MutableLiveData<List<Song>> _artistTopSongs = new MutableLiveData<>();
     public LiveData<List<Song>> artistTopSongs = _artistTopSongs;
+
     public ArtistDetailViewModel(@NonNull Application application) {
         super(application);
     }
@@ -66,12 +61,14 @@ public class ArtistDetailViewModel extends AndroidViewModel {
                     _artistDetail.setValue(artist);
                 }
             }
+
             @Override
             public void onFailure(Call<Artist> call, Throwable throwable) {
 
             }
         });
     }
+
     //Artist's albums
     public void getArtistAlbums(String accessToken, String artistId) {
         Retrofit retrofit = new Retrofit.Builder()
@@ -96,7 +93,8 @@ public class ArtistDetailViewModel extends AndroidViewModel {
             public void onFailure(Call<ArtistAlbums> call1, Throwable throwable) {
 
             }
-        });}
+        });
+    }
 
     //get Artist's Top Songs
     public void getArtistTopSongs(String accessToken, String artistId) {
@@ -189,6 +187,7 @@ public class ArtistDetailViewModel extends AndroidViewModel {
                     onIsFollowedCallback.onResult(false);
                 });
     }
+
     public interface OnIsFollowedCallback {
         void onResult(boolean isFollowed);
     }

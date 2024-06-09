@@ -12,6 +12,7 @@ import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.fragment.app.FragmentManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.bumptech.glide.Glide;
@@ -218,14 +219,11 @@ public class SongAdapter extends RecyclerView.Adapter<SongAdapter.ViewHolder> {
         @Override
         public void onClick(View v) {
             int position = getAbsoluteAdapterPosition();
-            mediaPlayerManager = MediaPlayerManager.getInstance();
-            mediaPlayerManager.setCurrentPosition(0);
             if (position != RecyclerView.NO_POSITION) {
                 Song selected = songList.get(position);
                 String preId = (position == 0) ? songList.get(songList.size() - 1).getId() : songList.get(position - 1).getId();
                 String nextId = (position == songList.size() - 1) ? songList.get(0).getId() : songList.get(position + 1).getId();
 
-                // Open PlaySongFragment as a BottomSheet
                 PlaySongFragment fragment = new PlaySongFragment();
                 fragment.setSongId(selected.getId());
                 fragment.setCurrentSongList(songList, selected.getId());
@@ -235,15 +233,22 @@ public class SongAdapter extends RecyclerView.Adapter<SongAdapter.ViewHolder> {
                 args.putString("nextSongId", nextId);
                 fragment.setArguments(args);
 
-                fragment.show(((AppCompatActivity) v.getContext()).getSupportFragmentManager(), "PlaySongFragment");
+                FragmentManager fragmentManager = ((AppCompatActivity) v.getContext()).getSupportFragmentManager();
+
+                PlaySongFragment currentFragment = (PlaySongFragment) fragmentManager.findFragmentByTag("PlaySongFragment");
+                if (currentFragment != null) {
+                    currentFragment.dismiss();
+                }
+
+                // Show the new bottom sheet
+                fragment.show(fragmentManager, "PlaySongFragment");
 
                 if (listener != null) {
                     listener.onSongSelected(songList.get(position));
                 }
-
-
             }
         }
+
     }
 
     public void PlayFirstSong() {
