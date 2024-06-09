@@ -24,6 +24,7 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.bumptech.glide.Glide;
 import com.example.musicapp.R;
+import com.example.musicapp.fragment.HomeFragment;
 import com.example.musicapp.fragment.PlaySongFragment;
 import com.example.musicapp.fragment.PlaylistDetailAPI;
 import com.example.musicapp.model.PlaylistAPI;
@@ -91,6 +92,7 @@ public class SongHomeAdapter extends RecyclerView.Adapter<SongHomeAdapter.ViewHo
                         listener.onSongSelected(songList.get(position));
                         Song selected = songList.get(position);
                         PlaySongFragment fragment = new PlaySongFragment();
+                        HomeFragment homeFragment = new HomeFragment();
                         fragment.setSongId(selected.getId());
                         fragment.setCurrentSongList(songList, selected.getId());
                         Bundle args = new Bundle();
@@ -98,8 +100,11 @@ public class SongHomeAdapter extends RecyclerView.Adapter<SongHomeAdapter.ViewHo
                         args.putString("previousSongId", getPreviousSongId(position));
                         args.putString("nextSongId", getNextSongId(position));
                         fragment.setArguments(args);
-
+                        homeFragment.setArguments(args);
+                        homeFragment.setPreviousSongId(getPreviousSongId(position));
+                        homeFragment.setNextSongId(getNextSongId(position));
                         fragment.show(((AppCompatActivity) v.getContext()).getSupportFragmentManager(), "PlaySongFragment");
+//                        homeFragment.show(((AppCompatActivity) v.getContext()).getSupportFragmentManager(), "HomeFragment");
                     }
                 }
             });

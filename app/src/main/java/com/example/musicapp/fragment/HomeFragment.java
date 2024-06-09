@@ -37,7 +37,9 @@ import com.google.firebase.firestore.EventListener;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.FirebaseFirestoreException;
 
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 public class HomeFragment extends Fragment implements SongHomeAdapter.OnSongSelectedListener, SongAdapter.OnSongSelectedListener {
@@ -55,6 +57,8 @@ public class HomeFragment extends Fragment implements SongHomeAdapter.OnSongSele
     HomeFragment homeFragment;
     private HomeFragmentAdapter homeFragmentAdapter;
     private MainActivity mainActivity;
+    String previousSongId, nextSongId = null;
+    List<Song> songList = new ArrayList<>();
 
     public void setMainActivityReference(MainActivity activity) {
         mainActivity = activity;
@@ -88,7 +92,14 @@ public class HomeFragment extends Fragment implements SongHomeAdapter.OnSongSele
             getActivity().finish();
             return null;
         }
-
+        if (getArguments() != null) {
+            previousSongId = getArguments().getString("previousSongId");
+            nextSongId = getArguments().getString("nextSongId");
+            Log.d("previous song id inside home: " , previousSongId);
+        }
+//    if(getArguments()!=null){
+//        songList= getArguments().getParcelableArrayList("songList");
+//    }
         userId = user.getUid();
         artistImage = view.findViewById(R.id.artistImage);
         recentSongArtist = view.findViewById(R.id.recentSongArtist);
@@ -122,10 +133,12 @@ public class HomeFragment extends Fragment implements SongHomeAdapter.OnSongSele
             @Override
             public void onClick(View v) {
                 if (songId != null) {
-                    // playsongfragment is a bottom sheet
                     PlaySongFragment playSongFragment = new PlaySongFragment();
+//                    playSongFragment.setCurrentSongList(songId,songList );
                     Bundle args = new Bundle();
                     args.putString("songId", songId);
+                    args.putString("previousSongId",previousSongId );
+                    args.putString("nextSongId", nextSongId);
                     playSongFragment.setArguments(args);
                     playSongFragment.show(((AppCompatActivity) getContext()).getSupportFragmentManager(), "PlaySongFragment");
                 } else {
@@ -178,7 +191,16 @@ public class HomeFragment extends Fragment implements SongHomeAdapter.OnSongSele
 
         return view;
     }
+    public void setPreviousSongId(String previousSongId) {
+        this.previousSongId = previousSongId;
+        Log.d("previous song id in home : " , this.previousSongId);
+    }
+    public void setNextSongId(String nextSongId) {
+            this.nextSongId = nextSongId;
+        Log.d("previous song id in home : " , this.nextSongId);
 
+
+    }
     @Override
     public void onAttach(@NonNull Context context) {
         super.onAttach(context);
