@@ -84,7 +84,7 @@ public class LikedAlbumsFragment extends Fragment implements FetchAccessToken.Ac
         this.accessToken = accessToken;
         viewModel.fetchLikedAlbums(accessToken);
         viewModel.getLikedAlbumsLiveData().observe(this, albums -> {
-            LikedAlbumAdapter adapter = new LikedAlbumAdapter(getContext(), albums);
+            adapter = new LikedAlbumAdapter(getContext(), albums);
             recyclerView.setAdapter(adapter);
         });
     }

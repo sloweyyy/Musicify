@@ -20,6 +20,7 @@ import com.example.musicapp.R;
 import com.example.musicapp.adapter.FetchAccessToken;
 import com.example.musicapp.adapter.SongAdapter;
 import com.example.musicapp.model.AlbumSimplified;
+import com.example.musicapp.model.Artist;
 import com.example.musicapp.model.Song;
 import com.example.musicapp.viewmodel.AlbumDetailViewModel;
 
@@ -116,7 +117,17 @@ public class AlbumDetailFragment extends Fragment implements FetchAccessToken.Ac
         viewModel.albumDetails.observe(getViewLifecycleOwner(), albumSimplified -> {
             if (albumSimplified != null) {
                 albumName.setText(albumSimplified.getName());
-                albumArtist.setText(albumSimplified.getArtists().get(0).getName());
+                // Lấy danh sách tên nghệ sĩ từ albumSimplified
+                List<Artist> artists = albumSimplified.getArtists();
+                StringBuilder artistNames = new StringBuilder();
+                for (int i = 0; i < artists.size(); i++) {
+                    Artist artist = artists.get(i);
+                    artistNames.append(artist.getName());
+                    if (i < artists.size() - 1) {
+                        artistNames.append(", ");
+                    }
+                }
+                albumArtist.setText(artistNames.toString());
                 Glide.with(requireContext())
                         .load(albumSimplified.getImages().get(0).getUrl())
                         .into(imageView);

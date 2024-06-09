@@ -92,7 +92,7 @@ public class NewsFragment extends Fragment implements FetchAccessToken.AccessTok
                     List<Song> songs = new ArrayList<>();
                     for (PlaylistSimplified.TracksModel.ItemModel item : playlistSimplified.tracksContainer.tracks) {
                         SimplifiedTrack track = item.track;
-                        if (track != null) {
+                        if (track != null &&track.getUrl() != null ) {
                             songs.add(Song.fromSimplifiedTrack(track));
                         } else {
                             Log.d("NewsFragment", "A track returned null and was skipped.");

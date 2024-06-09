@@ -80,8 +80,8 @@
 
             <ImageView
                 android:id="@+id/threeDots"
-                android:layout_width="25sp"
-                android:layout_height="25sp"
+                android:layout_width="@dimen/_20sdp"
+                android:layout_height="@dimen/_20sdp"
                 android:background="@drawable/more_vert_btn"
                 android:paddingLeft="28sp"
                 app:backgroundTint="@android:color/white" />
@@ -141,7 +141,7 @@
                     android:textColor="#B7B7B7"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="Bad Guy"
+                    android:text="Song Name"
                     android:textStyle="bold"
                     android:textSize="20sp"/>
                 <TextView
@@ -149,7 +149,7 @@
                     android:textColor="#B7B7B7"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="Billie English"
+                    android:text="Artist Name"
                     android:textSize="20sp"/>
             </LinearLayout>
             <Space
@@ -222,7 +222,7 @@
                 android:layout_width="@dimen/_20sdp"
                 android:layout_height="@dimen/_20sdp"
                 android:background="@drawable/repeate"
-                />
+                android:backgroundTint="@color/gray"/>
             <Space
                 android:layout_width="wrap_content"
                 android:layout_height="match_parent"
@@ -271,7 +271,7 @@
                 android:contentDescription="Shuffe"
                 android:layout_width="@dimen/_20sdp"
                 android:layout_height="@dimen/_20sdp"
-                android:background="@drawable/shuffle"
+                android:background="@drawable/shuffle_gray"
                 />
         </LinearLayout>
 
