@@ -1076,4 +1076,18 @@ public class PlaySongFragment extends BottomSheetDialogFragment implements Fetch
         void hideMiniPlayer();
     }
 
+    private void updateRecentListeningSong(Song song) {
+        FirebaseFirestore db = FirebaseFirestore.getInstance();
+        FirebaseAuth mAuth = FirebaseAuth.getInstance();
+        String userId = mAuth.getCurrentUser().getUid();
+        Map<String, Object> recentListeningSong = new HashMap<>();
+        recentListeningSong.put("songName", song.getTitle());
+        recentListeningSong.put("imageURL", song.getImageUrl());
+        recentListeningSong.put("artistName", song.getArtist());
+        recentListeningSong.put("songId", song.getId());
+        db.collection("users").document(userId).update("recentListeningSong", recentListeningSong)
+                .addOnSuccessListener(aVoid -> Log.d("SongAdapter", "Recent listening song updated successfully"))
+                .addOnFailureListener(e -> Log.e("SongAdapter", "Failed to update recent listening song: " + e.getMessage()));
+    }
+
 }
