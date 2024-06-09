@@ -126,7 +126,7 @@ public class PlaySongFragment extends BottomSheetDialogFragment implements Fetch
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
         // set default image for cover_art
-        cover_art.setImageResource(R.drawable.playlist_image);
+        cover_art.setImageResource(R.drawable.logo);
     }
 
     @Nullable

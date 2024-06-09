@@ -84,10 +84,10 @@ public class ArtitstHomeAdapter extends RecyclerView.Adapter<ArtitstHomeAdapter.
         if (!artist.getImages().isEmpty()) {
             Glide.with(context)
                     .load(artist.getImages().get(0).getUrl())
-                    .error(R.drawable.playlist_image)
+                    .error(R.drawable.logo)
                     .into(holder.cicleArtistImg);
         } else {
-            holder.cicleArtistImg.setImageResource(R.drawable.playlist_image);
+            holder.cicleArtistImg.setImageResource(R.drawable.logo);
         }
         checkIsLiked(artist.getId(), isLiked -> {
             if (isLiked) {

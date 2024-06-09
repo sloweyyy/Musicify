@@ -2,6 +2,8 @@ package com.example.musicapp.model;
 
 import android.util.Log;
 
+import java.util.List;
+
 public class Song {
     private String title;
 
@@ -74,7 +76,16 @@ public class Song {
         }
 
         if (track.getArtists() != null && !track.getArtists().isEmpty()) {
-            artistName = track.getArtists().get(0).getName();
+            List<Artist> artists = track.getArtists();
+            StringBuilder artistNames = new StringBuilder();
+            for (int i = 0; i < artists.size(); i++) {
+                Artist artist = artists.get(i);
+                artistNames.append(artist.getName());
+                if (i < artists.size() - 1) {
+                    artistNames.append(", ");
+                }
+            }
+            artistName= artistNames.toString();
         }
 
         if (track.getAlbum() != null && track.getAlbum().getImages() != null && !track.getAlbum().getImages().isEmpty()) {

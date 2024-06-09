@@ -177,13 +177,13 @@ public class HomeFragment extends Fragment implements SongHomeAdapter.OnSongSele
                         recentSongName.setText("Select song to listen");
                         recentSongArtist.setText("");
                         if ((isAdded() && getActivity() != null))
-                            Glide.with(getContext()).load(R.drawable.playlist_image).apply(RequestOptions.circleCropTransform()).into(artistImage);
+                            Glide.with(getContext()).load(R.drawable.logo).apply(RequestOptions.circleCropTransform()).into(artistImage);
                     }
                 } else {
                     recentSongArtist.setText("");
                     recentSongName.setText("Choose song to listen");
                     if (isAdded() && getActivity() != null) {
-                        Glide.with(requireContext()).load(R.drawable.playlist_image).apply(RequestOptions.circleCropTransform()).into(artistImage);
+                        Glide.with(requireContext()).load(R.drawable.logo).apply(RequestOptions.circleCropTransform()).into(artistImage);
                     }
                 }
             }
