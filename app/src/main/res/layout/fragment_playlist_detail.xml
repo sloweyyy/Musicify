@@ -88,7 +88,8 @@
         android:layout_marginTop="8dp"
         android:text="Playlist Description"
         android:textColor="#bbbbbb"
-        android:textSize="18sp" />
+        android:textSize="18sp"
+        android:layout_marginHorizontal="@dimen/_8sdp"/>
 
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/recyclerViewSongDetail"
@@ -98,9 +99,8 @@
         android:layout_marginTop="16dp"
         android:background="@color/black"
         android:clipToPadding="false"
-        android:padding="8dp"
+        android:padding="@dimen/_10sdp"
         android:scrollbars="vertical"
-
         />
 <!--    tools:listitem="@layout/item_song"-->
 </RelativeLayout>

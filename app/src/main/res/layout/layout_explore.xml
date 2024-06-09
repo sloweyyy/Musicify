@@ -38,6 +38,7 @@
             android:background="@android:color/transparent"
             android:hint="Search song, album, artist,..."
             android:inputType="text"
+            android:imeOptions="actionDone"
             android:textColor="#000000"
             android:textColorHint="#A7A7A7" />
     </androidx.cardview.widget.CardView>

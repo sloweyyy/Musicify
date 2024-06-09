@@ -59,7 +59,7 @@ public class SongHomeAdapter extends RecyclerView.Adapter<SongHomeAdapter.ViewHo
 
         Glide.with(context)
                 .load(song.getImageUrl())
-                .error(R.drawable.playlist_image)
+                .error(R.drawable.logo)
                 .into(holder.artistPic);
     }
 
