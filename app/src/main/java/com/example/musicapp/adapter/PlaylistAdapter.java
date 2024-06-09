@@ -20,10 +20,7 @@ import com.bumptech.glide.Glide;
 import com.example.musicapp.R;
 import com.example.musicapp.fragment.PlaylistDetailFragment;
 import com.example.musicapp.model.Playlist;
-import com.google.firebase.firestore.FirebaseFirestore;
-import com.google.firebase.firestore.QueryDocumentSnapshot;
 
-import java.util.ArrayList;
 import java.util.List;
 
 public class PlaylistAdapter extends RecyclerView.Adapter<PlaylistAdapter.ViewHolder> {
@@ -56,6 +53,7 @@ public class PlaylistAdapter extends RecyclerView.Adapter<PlaylistAdapter.ViewHo
                 bundle.putString("from", "favorite");
                 Fragment playlistDetailFragment = PlaylistDetailFragment.newInstance(playlist.getName(), playlist.getImageURL(), playlist.getDescription(), playlist.getId()
                 );
+                Log.d("PlaylistAdapter", "Playlist ID: " + playlist.getId());
                 FragmentManager fragmentManager = ((AppCompatActivity) context).getSupportFragmentManager();
                 FragmentTransaction transaction = fragmentManager.beginTransaction();
                 transaction.replace(R.id.frame_layout, playlistDetailFragment);
@@ -103,118 +101,6 @@ public class PlaylistAdapter extends RecyclerView.Adapter<PlaylistAdapter.ViewHo
         playlistList.clear();
         playlistList.addAll(playlists);
         notifyDataSetChanged();
-    }
-
-
-    public void fetchPlaylists() {
-        FirebaseFirestore db = FirebaseFirestore.getInstance();
-        db.collection("playlists")
-                .whereEqualTo("userId", userId)
-                .get()
-                .addOnSuccessListener(queryDocumentSnapshots -> {
-                    List<Playlist> playlists = new ArrayList<>();
-                    for (QueryDocumentSnapshot document : queryDocumentSnapshots) {
-                        Playlist playlist = document.toObject(Playlist.class);
-                        playlist.setId(document.getId());
-
-                        // Get the songs array (assuming "songs" is the field name)
-                        List<String> songs = (List<String>) document.get("songs");
-                        playlist.setSongs(songs != null ? songs : new ArrayList<>());
-
-                        playlists.add(playlist);
-                    }
-                    updatePlaylistList(playlists);
-                })
-                .addOnFailureListener(e -> {
-                    Log.e("PlaylistAdapter", "Failed to fetch playlists", e);
-                });
-    }
-
-
-    // sort the playlist list by name
-    public void sortPlaylistByName() {
-        playlistList.sort((playlist1, playlist2) -> {
-            String name1 = playlist1.getName();
-            String name2 = playlist2.getName();
-
-            if (name1 == null && name2 == null) {
-                return 0;
-            } else if (name1 == null) {
-                return -1;
-            } else if (name2 == null) {
-                return 1;
-            } else {
-
-                return name1.compareTo(name2);
-            }
-        });
-        notifyDataSetChanged();
-    }
-
-
-    // sort the playlist by privacy
-    public void sortPlaylistByPrivacy() {
-        playlistList.sort((playlist1, playlist2) -> {
-            if (playlist1 != null && playlist2 != null) {
-                String privacy1 = playlist1.getPrivacy();
-                String privacy2 = playlist2.getPrivacy();
-
-                if (privacy1 != null && privacy2 != null) {
-                    return privacy1.compareTo(privacy2);
-                }
-            }
-            return 0;
-        });
-        notifyDataSetChanged();
-    }
-
-
-    // Method to delete a playlist from Firestore
-    public void deletePlaylist(Playlist playlist) {
-        FirebaseFirestore db = FirebaseFirestore.getInstance();
-        db.collection("playlists").document(playlist.getId()).delete().addOnSuccessListener(aVoid -> {
-            fetchPlaylists();
-        }).addOnFailureListener(e -> {
-        });
-    }
-
-    // Method to update the privacy of a playlist in Firestore
-    public void updatePlaylistPrivacy(Playlist playlist) {
-        FirebaseFirestore db = FirebaseFirestore.getInstance();
-        db.collection("playlists").document(playlist.getId()).update("privacy", playlist.getPrivacy()).addOnSuccessListener(aVoid -> {
-            fetchPlaylists();
-        }).addOnFailureListener(e -> {
-        });
-    }
-
-    // Method to update the name of a playlist in Firestore
-    public void updatePlaylistName(Playlist playlist) {
-        FirebaseFirestore db = FirebaseFirestore.getInstance();
-        db.collection("playlists").document(playlist.getId()).update("name", playlist.getName()).addOnSuccessListener(aVoid -> {
-            fetchPlaylists();
-        }).addOnFailureListener(e -> {
-            // Handle error
-        });
-    }
-
-    // Method to update the song count of a playlist in Firestore
-    public void updatePlaylistSongCount(Playlist playlist) {
-        FirebaseFirestore db = FirebaseFirestore.getInstance();
-        db.collection("playlists").document(playlist.getId()).update("songCount", playlist.getSongCount()).addOnSuccessListener(aVoid -> {
-            fetchPlaylists();
-        }).addOnFailureListener(e -> {
-            // Handle error
-        });
-    }
-
-    // Method to update the image of a playlist in Firestore
-    public void updatePlaylistImage(Playlist playlist) {
-        FirebaseFirestore db = FirebaseFirestore.getInstance();
-        db.collection("playlists").document(playlist.getId()).update("imageResource", playlist.getImageResource()).addOnSuccessListener(aVoid -> {
-            fetchPlaylists();
-        }).addOnFailureListener(e -> {
-            // Handle error
-        });
     }
 
 
