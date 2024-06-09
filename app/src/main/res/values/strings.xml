@@ -1,5 +1,5 @@
 <resources>
-    <string name="app_name">MusicApp</string>
+    <string name="app_name">Musicify</string>
     <string name="default_web_client_id">356303471546-3ht2ivru4h9hfluas9c64ckkukqsp4b9.apps.googleusercontent.com</string>
     <!-- TODO: Remove or change this placeholder text -->
     <string name="hello_blank_fragment">Hello blank fragment</string>

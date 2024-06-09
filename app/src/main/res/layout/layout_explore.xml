@@ -40,7 +40,8 @@
             android:imeOptions="actionDone"
             android:inputType="text"
             android:textColor="#000000"
-            android:textColorHint="#A7A7A7" />
+            android:textColorHint="#A7A7A7"
+            android:layout_gravity="center_vertical"/>
     </androidx.cardview.widget.CardView>
 
     <androidx.recyclerview.widget.RecyclerView
