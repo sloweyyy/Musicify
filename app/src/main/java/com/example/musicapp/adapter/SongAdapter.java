@@ -102,7 +102,7 @@ public class SongAdapter extends RecyclerView.Adapter<SongAdapter.ViewHolder> {
         holder.artistName.setText(song.getArtist());
 
         // Load image using Glide
-        Glide.with(context).load(song.getImageUrl()).placeholder(R.drawable.logo).error(R.drawable.playlist_image).into(holder.songThumbnail);
+        Glide.with(context).load(song.getImageUrl()).placeholder(R.drawable.logo).error(R.drawable.logo).into(holder.songThumbnail);
 
         checkIsLiked(song.getId(), isLiked -> {
             if (isLiked) {

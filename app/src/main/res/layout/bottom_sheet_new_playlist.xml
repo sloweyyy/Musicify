@@ -25,7 +25,8 @@
             android:layout_marginBottom="10dp"
             android:text="Create new playlist"
             android:textAlignment="center"
-            android:textSize="30dp" />
+            android:textSize="30dp"
+            android:textColor="@color/btnColor"/>
 
         <ImageView
             android:id="@+id/playlistImage"

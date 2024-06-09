@@ -89,7 +89,8 @@
         android:text="Playlist Description"
         android:textColor="#bbbbbb"
         android:textSize="18sp"
-        android:layout_marginHorizontal="@dimen/_8sdp"/>
+        android:layout_marginHorizontal="@dimen/_25sdp"
+        android:layout_gravity="center"/>
 
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/recyclerViewSongDetail"

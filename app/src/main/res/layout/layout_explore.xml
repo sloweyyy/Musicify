@@ -32,13 +32,13 @@
         <EditText
             android:id="@+id/searchExplore"
             android:layout_width="280dp"
-            android:layout_height="match_parent"
+            android:layout_height="39dp"
             android:layout_marginLeft="40dp"
             android:layout_marginRight="30dp"
             android:background="@android:color/transparent"
             android:hint="Search song, album, artist,..."
-            android:inputType="text"
             android:imeOptions="actionDone"
+            android:inputType="text"
             android:textColor="#000000"
             android:textColorHint="#A7A7A7" />
     </androidx.cardview.widget.CardView>

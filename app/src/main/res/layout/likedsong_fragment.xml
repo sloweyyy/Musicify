@@ -42,7 +42,7 @@
             android:gravity="center"
             android:text="Liked Song"
             android:textSize="24sp"
-            >
+            android:textColor="@color/white">
 
         </TextView>
         <Space  android:layout_width="@dimen/_25sdp"
@@ -86,6 +86,7 @@
             android:background="@android:color/transparent"
             android:hint="Find in liked songs"
             android:inputType="text"
+            android:imeOptions="actionDone"
             android:textColor="#A7A7A7"
             android:textColorHint="#A7A7A7" />
 

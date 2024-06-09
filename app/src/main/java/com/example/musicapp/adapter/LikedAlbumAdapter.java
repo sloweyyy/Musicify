@@ -173,12 +173,6 @@ public class LikedAlbumAdapter extends RecyclerView.Adapter<LikedAlbumAdapter.Vi
         }
     }
 
-    // Method to update the likedAlbum list
-//    public void clearLikedAlbumList() {
-//        likedAlbumsList.clear();
-//        likedAlbumsList.addAll()
-//        notifyDataSetChanged();
-//    }
 
     // Method to sort the album list by name
     public void sortAlbumByName() {

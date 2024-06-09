@@ -1,6 +1,7 @@
 package com.example.musicapp.viewmodel;
 
 import android.app.Application;
+import android.util.Log;
 
 import androidx.annotation.NonNull;
 import androidx.lifecycle.AndroidViewModel;
@@ -72,6 +73,10 @@ public class PlaylistDetailAPIViewModel extends AndroidViewModel {
         List<Song> songs = new ArrayList<>();
         for (PlaylistDetailAPI.ItemModel item : playlist.tracksContainer.tracks) {
             SimplifiedTrack track = item.track;
+            if (track.getUrl() == null)
+            {
+                Log.e("url null", track.getName());
+            }
             if (track != null && track.getUrl() != null ) {
                 songs.add(Song.fromSimplifiedTrack(track));
             }
