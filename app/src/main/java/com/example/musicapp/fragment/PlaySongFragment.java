@@ -461,20 +461,28 @@ public class PlaySongFragment extends BottomSheetDialogFragment implements Fetch
     }
 
     public void PlayPreviousSong() {
+        Log.d("current index: ", songId);
         int currentIndex = getCurrentSongIndex(songId);
+
         String previousSongId = "";
         if (currentIndex > 0) {
             previousSongId = songList.get(currentIndex - 1).getId();
         } else {
             previousSongId = songList.get(songList.size() - 1).getId();
         }
+        Log.d("previous song id : ",previousSongId);
         updateCurrentSong(previousSongId);
         MiniPlayerListener miniPlayerListener = (MiniPlayerListener) requireActivity();
         miniPlayerListener.updateMiniPlayer(songList, getCurrentSongIndex(songId));
+        Song previousSong = getSongById(previousSongId);
+        if (previousSong != null    ) {
+            updateRecentListeningSong( previousSong);
+        }
     }
 
     public void PlayNextSong() {
         if (getActivity() != null) {
+            Log.d("current index: ", songId);
             int currentIndex = getCurrentSongIndex(songId);
             String nextSongId = "";
             if (currentIndex < songList.size() - 1) {
@@ -482,9 +490,14 @@ public class PlaySongFragment extends BottomSheetDialogFragment implements Fetch
             } else {
                 nextSongId = songList.get(0).getId();
             }
+            Log.d("next song id : ",nextSongId);
             updateCurrentSong(nextSongId);
             MiniPlayerListener miniPlayerListener = (MiniPlayerListener) requireActivity();
             miniPlayerListener.updateMiniPlayer(songList, getCurrentSongIndex(songId));
+            Song nextSong = getSongById(nextSongId);
+            if (nextSong != null ) {
+                updateRecentListeningSong( nextSong);
+            }
         }
     }
 
@@ -1081,7 +1094,7 @@ public class PlaySongFragment extends BottomSheetDialogFragment implements Fetch
         void hideMiniPlayer();
     }
 
-    private void updateRecentListeningSong(Song song) {
+    private void updateRecentListeningSong( Song song) {
         FirebaseFirestore db = FirebaseFirestore.getInstance();
         FirebaseAuth mAuth = FirebaseAuth.getInstance();
         String userId = mAuth.getCurrentUser().getUid();
