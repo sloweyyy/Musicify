@@ -27,6 +27,7 @@ import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentManager;
+import androidx.fragment.app.FragmentTransaction;
 
 import com.bumptech.glide.Glide;
 import com.example.musicapp.R;
@@ -209,6 +210,8 @@ public class LyricFragment extends Fragment implements FetchAccessToken.AccessTo
         return view;
     }
 
+
+
     private void showMoreOptionsDialog(Context context) {
         // Create a new dialog
         AlertDialog.Builder builder = new AlertDialog.Builder(getContext());
@@ -221,6 +224,8 @@ public class LyricFragment extends Fragment implements FetchAccessToken.AccessTo
         LinearLayout album = dialogView.findViewById(R.id.album);
         LinearLayout share = dialogView.findViewById(R.id.share);
         LinearLayout report = dialogView.findViewById(R.id.report);
+        LinearLayout upcoming = dialogView.findViewById(R.id.upcoming);
+        upcoming.setVisibility(View.GONE);
         Button cancel = dialogView.findViewById(R.id.cancel);
         AlertDialog dialog = builder.create();
         dialog.show();
@@ -339,6 +344,21 @@ public class LyricFragment extends Fragment implements FetchAccessToken.AccessTo
                 addToPlayListFragment.show(getChildFragmentManager(), "AddToPlayListFragment");
 
                 dialog.dismiss(); // Dismiss your previous dialog if needed
+            }
+        });
+        upcoming.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                UpcomingSongFragment upcomingFragment = new UpcomingSongFragment();
+                Bundle bundle = new Bundle();
+                bundle.putSerializable("songList", (java.io.Serializable) songList);
+                upcomingFragment.setArguments(bundle);
+                upcomingFragment.show(getChildFragmentManager(), "UpcomingSongFragment");
+
+                dialog.dismiss();
+
+
+
             }
         });
     }

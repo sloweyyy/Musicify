@@ -13,6 +13,7 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.musicapp.R;
 import com.example.musicapp.adapter.SongAdapter;
+import com.example.musicapp.manager.MediaPlayerManager;
 import com.example.musicapp.model.Song;
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment;
 
@@ -25,6 +26,7 @@ public class UpcomingSongFragment extends BottomSheetDialogFragment {
     private List<Song> upcomingSongList;
     private Button backButton;
     private PlaySongFragment playSongFragment;
+    private MediaPlayerManager mediaPlayerManager;
 
 
     @Override
@@ -33,6 +35,8 @@ public class UpcomingSongFragment extends BottomSheetDialogFragment {
         if (getArguments() != null) {
             upcomingSongList = (List<Song>) getArguments().getSerializable("songList");
         }
+
+        playSongFragment = PlaySongFragment.getInstance(null, null);
 
 
     }
@@ -53,11 +57,16 @@ public class UpcomingSongFragment extends BottomSheetDialogFragment {
 
         // Retrieve the PlaySongFragment instance
         playSongFragment = PlaySongFragment.getInstance(null, null);
-
+        mediaPlayerManager = MediaPlayerManager.getInstance();
         upcomingSongAdapter = new SongAdapter(getContext(), upcomingSongList, new SongAdapter.OnSongSelectedListener() {
             @Override
             public void onSongSelected(Song song) {
                 dismiss();
+                mediaPlayerManager.setLastPlaybackPosition(0);
+                mediaPlayerManager.setCurrentPosition(0);
+
+
+
             }
         });
         upcomingSongRecyclerView.setAdapter(upcomingSongAdapter);

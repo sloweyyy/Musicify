@@ -11,7 +11,6 @@ import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.os.Build;
 import android.os.Bundle;
-import android.os.Parcelable;
 import android.util.Log;
 import android.view.View;
 import android.view.WindowManager;
@@ -50,8 +49,6 @@ import com.google.firebase.firestore.EventListener;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.FirebaseFirestoreException;
 
-import java.util.ArrayList;
-import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 
@@ -156,35 +153,8 @@ public class MainActivity extends AppCompatActivity implements BottomAppBarListe
 
 
         miniPlayerLayout.setOnClickListener(new View.OnClickListener() {
-
             @Override
             public void onClick(View v) {
-//                if (songList != null && !songList.isEmpty() && currentSongIndex >= 0) {
-//                    showPlaySongFragment(songList.get(currentSongIndex).getId(), songList);
-//                } else {
-//                    Log.e("MainActivity", "Cannot update mini player: songList not ready or invalid index");
-//                    return;
-//                }
-//                return;
-//                if (songList != null && !songList.isEmpty()) {
-//                    // Every time this executes, a new instance of PlaySongFragment is created and shown
-//                    PlaySongFragment newPlaySongFragment = new PlaySongFragment();
-//                    Bundle args = new Bundle();
-//                    args.putString("songId", songId);
-//                    // Assuming songList is a Parcelable list for simplicity. Adjust as necessary based on actual type.
-//                    args.putParcelableArrayList("songList", new ArrayList<Parcelable>((Collection<? extends Parcelable>) songList));
-//                    args.putInt("currentSongIndex", currentSongIndex);
-//
-//                    newPlaySongFragment.setArguments(args);
-//
-//                    getSupportFragmentManager().beginTransaction()
-//                            .replace(R.id.frame_layout, newPlaySongFragment, "PlaySongFragment")
-//                            .addToBackStack(null)
-//                            .commit();
-//                } else {
-//                    Log.e("MainActivity", "Cannot show PlaySongFragment: songList not ready or invalid index");
-//                }
-//            }
                 PlaySongFragment fragment = new PlaySongFragment();
                 fragment.setSongId(songId);
                 fragment.setCurrentSongList(songList, songId);
@@ -219,33 +189,6 @@ public class MainActivity extends AppCompatActivity implements BottomAppBarListe
         handleIntent(getIntent());
     }
 
-    public void showPlaySongFragment(String songId, List<Song> songList,int currentSongIndex) {
-//        PlaySongFragment playSongFragment = (PlaySongFragment) getSupportFragmentManager().findFragmentByTag("PlaySongFragment");
-//
-//        if (playSongFragment != null) {
-//            if (!playSongFragment.isVisible()) {
-//                getSupportFragmentManager().beginTransaction()
-//                        .show(playSongFragment)
-//                        .commit();
-//            }
-//        } else {
-//            playSongFragment = new PlaySongFragment();
-//            Bundle args = new Bundle();
-//            args.putString("songId", songId);
-////            args.putParcelableArrayList("songList", (ArrayList<? extends Parcelable>) songList);
-//            args.putInt("currentSongIndex", currentSongIndex);
-//            playSongFragment.setArguments(args);
-//            getSupportFragmentManager().beginTransaction()
-//                    .replace(R.id.frame_layout, playSongFragment, "PlaySongFragment")
-//                    .addToBackStack(null)
-//                    .commit();
-//        }
-        PlaySongFragment playSongFragment = new PlaySongFragment();
-        Bundle args = new Bundle();
-        args.putString("songId", songId);
-        playSongFragment.setArguments(args);
-        playSongFragment.show(getSupportFragmentManager(), "PlaySongFragment");
-    }
 
     @Override
     public void updateMiniPlayer(List<Song> songList, int currentPosition) {
@@ -271,6 +214,7 @@ public class MainActivity extends AppCompatActivity implements BottomAppBarListe
     public void hideMiniPlayer() {
         miniPlayerLayout.setVisibility(View.GONE);
     }
+
     public void handleResumeButtonClick() {
         FirebaseFirestore db = FirebaseFirestore.getInstance();
         db.collection("users").document(currentUser.getUid()).addSnapshotListener(new EventListener<DocumentSnapshot>() {
@@ -407,8 +351,7 @@ public class MainActivity extends AppCompatActivity implements BottomAppBarListe
     private void handleNotificationPermissionDenied() {
         Toast.makeText(this, "Notification permission denied. Please enable it in settings for better experience.", Toast.LENGTH_LONG).show();
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
-            Intent intent = new Intent(android.provider.Settings.ACTION_APPLICATION_DETAILS_SETTINGS,
-                    android.net.Uri.fromParts("package", getPackageName(), null));
+            Intent intent = new Intent(android.provider.Settings.ACTION_APPLICATION_DETAILS_SETTINGS, android.net.Uri.fromParts("package", getPackageName(), null));
             intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
             startActivity(intent);
         }
@@ -432,10 +375,8 @@ public class MainActivity extends AppCompatActivity implements BottomAppBarListe
 
         @Override
         public void onActivityPaused(@NonNull Activity activity) {
-            if (isPlayingMusic)
-                Log.d("inside Actitivy pause", "true");
-            else
-                Log.d("inside Actitivy pause", "false");
+            if (isPlayingMusic) Log.d("inside Actitivy pause", "true");
+            else Log.d("inside Actitivy pause", "false");
             if (isPlayingMusic) {
                 sendContinueListeningNotification(currentSongName);
             }
@@ -464,11 +405,7 @@ public class MainActivity extends AppCompatActivity implements BottomAppBarListe
 
     private void sendContinueListeningNotification(String currentSongName) {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-            NotificationChannel channel = new NotificationChannel(
-                    MUSIC_NOTIFICATION_CHANNEL_ID,
-                    "Music Channel",
-                    NotificationManager.IMPORTANCE_HIGH
-            );
+            NotificationChannel channel = new NotificationChannel(MUSIC_NOTIFICATION_CHANNEL_ID, "Music Channel", NotificationManager.IMPORTANCE_HIGH);
             NotificationManager notificationManager = getSystemService(NotificationManager.class);
             if (notificationManager != null) {
                 notificationManager.createNotificationChannel(channel);
@@ -482,17 +419,10 @@ public class MainActivity extends AppCompatActivity implements BottomAppBarListe
 
         PendingIntent pendingIntent = PendingIntent.getActivity(this, 0, intent, PendingIntent.FLAG_UPDATE_CURRENT | PendingIntent.FLAG_IMMUTABLE);
 
-        NotificationCompat.Builder builder = new NotificationCompat.Builder(this, MUSIC_NOTIFICATION_CHANNEL_ID)
-                .setSmallIcon(R.drawable.notifications_24dp_fill0_wght400_grad0_opsz24)
-                .setContentTitle("Continue Listening")
-                .setContentText("Tap to resume " + currentSongName)
-                .setPriority(NotificationCompat.PRIORITY_MAX)
-                .setContentIntent(pendingIntent)
-                .setAutoCancel(true);
+        NotificationCompat.Builder builder = new NotificationCompat.Builder(this, MUSIC_NOTIFICATION_CHANNEL_ID).setSmallIcon(R.drawable.notifications_24dp_fill0_wght400_grad0_opsz24).setContentTitle("Continue Listening").setContentText("Tap to resume " + currentSongName).setPriority(NotificationCompat.PRIORITY_MAX).setContentIntent(pendingIntent).setAutoCancel(true);
 
         NotificationManagerCompat notificationManager = NotificationManagerCompat.from(this);
-        if (ContextCompat.checkSelfPermission(this, Manifest.permission.POST_NOTIFICATIONS) == PackageManager.PERMISSION_GRANTED ||
-                Build.VERSION.SDK_INT < Build.VERSION_CODES.TIRAMISU) {
+        if (ContextCompat.checkSelfPermission(this, Manifest.permission.POST_NOTIFICATIONS) == PackageManager.PERMISSION_GRANTED || Build.VERSION.SDK_INT < Build.VERSION_CODES.TIRAMISU) {
             notificationManager.notify(NOTIFICATION_ID, builder.build());
         } else {
             // Handle permission denial case
@@ -503,9 +433,7 @@ public class MainActivity extends AppCompatActivity implements BottomAppBarListe
     @Override
     public void onPlayingStateChanged(boolean isPlaying) {
         isPlayingMusic = isPlaying;
-        if (isPlayingMusic)
-            Log.d("isPlaying", "true");
-        else
-            Log.d("isPlaying", "false");
+        if (isPlayingMusic) Log.d("isPlaying", "true");
+        else Log.d("isPlaying", "false");
     }
 }

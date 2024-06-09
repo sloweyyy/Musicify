@@ -434,7 +434,6 @@ public class PlaySongFragment extends BottomSheetDialogFragment implements Fetch
         upcoming.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                hideFragment();
                 UpcomingSongFragment upcomingFragment = new UpcomingSongFragment();
                 Bundle bundle = new Bundle();
                 bundle.putSerializable("songList", (java.io.Serializable) songList);
