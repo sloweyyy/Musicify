@@ -43,16 +43,13 @@ public class SongAdapter extends RecyclerView.Adapter<SongAdapter.ViewHolder> {
         void onSongSelected(Song song);
     }
 
-
     public interface OnLongItemClickListener {
         void onLongItemClick(Song song);
     }
 
-
     public void setOnLongItemClickListener(OnLongItemClickListener listener) {
         this.longItemClickListener = listener;
     }
-
 
     public SongAdapter(Context context, List<Song> songList, OnSongSelectedListener listener) {
         this.context = context;
@@ -116,48 +113,50 @@ public class SongAdapter extends RecyclerView.Adapter<SongAdapter.ViewHolder> {
             }
         });
 
-        holder.itemView.setOnLongClickListener(new View.OnLongClickListener() {
-            @Override
-            public boolean onLongClick(View v) {
-                int position = holder.getAdapterPosition();
-                if (position != RecyclerView.NO_POSITION && longItemClickListener != null) {
-                    longItemClickListener.onLongItemClick(songList.get(position));
-                    return true;
-                }
-                return false;
-            }
-        });
-
-        holder.itemView.setOnClickListener(v -> {
+        holder.itemView.setOnLongClickListener(v -> {
             int position1 = holder.getAdapterPosition();
-            if (position1 != RecyclerView.NO_POSITION) {
-                Song selected = songList.get(position1);
-                String preId = (position1 == 0) ? songList.get(songList.size() - 1).getId() : songList.get(position1 - 1).getId();
-                String nextId = (position1 == songList.size() - 1) ? songList.get(0).getId() : songList.get(position1 + 1).getId();
-
-                // Open PlaySongFragment as a BottomSheet
-                PlaySongFragment fragment = new PlaySongFragment();
-                fragment.setSongId(selected.getId());
-                fragment.setCurrentSongList(songList, selected.getId());
-                Bundle args = new Bundle();
-                args.putString("songId", selected.getId());
-                args.putString("previousSongId", preId);
-                args.putString("nextSongId", nextId);
-                fragment.setArguments(args);
-
-                FragmentManager fragmentManager = ((AppCompatActivity) v.getContext()).getSupportFragmentManager();
-                fragment.show(fragmentManager, "PlaySongFragment"); // Show the BottomSheet
-
-                // Update recent listening song
-                updateRecentListeningSong(selected);
-
-                if (listener != null) {
-                    listener.onSongSelected(selected);
-                }
+            if (position1 != RecyclerView.NO_POSITION && longItemClickListener != null) {
+                longItemClickListener.onLongItemClick(songList.get(position1));
+                return true;
             }
+            return false;
         });
 
+        holder.itemView.setOnClickListener(v -> handleSongClick(holder.getAdapterPosition()));
+    }
 
+    private void handleSongClick(int position) {
+        if (position != RecyclerView.NO_POSITION) {
+            Song selected = songList.get(position);
+            String preId = (position == 0) ? songList.get(songList.size() - 1).getId() : songList.get(position - 1).getId();
+            String nextId = (position == songList.size() - 1) ? songList.get(0).getId() : songList.get(position + 1).getId();
+
+            // Open PlaySongFragment as a BottomSheet
+            PlaySongFragment fragment = new PlaySongFragment();
+            fragment.setSongId(selected.getId());
+            fragment.setCurrentSongList(songList, selected.getId());
+            Bundle args = new Bundle();
+            args.putString("songId", selected.getId());
+            args.putString("previousSongId", preId);
+            args.putString("nextSongId", nextId);
+            fragment.setArguments(args);
+
+            FragmentManager fragmentManager = ((AppCompatActivity) context).getSupportFragmentManager();
+            PlaySongFragment currentFragment = (PlaySongFragment) fragmentManager.findFragmentByTag("PlaySongFragment");
+            if (currentFragment != null) {
+                currentFragment.dismiss();
+            }
+
+            // Show the new bottom sheet
+            fragment.show(fragmentManager, "PlaySongFragment");
+
+            // Update recent listening song
+            updateRecentListeningSong(selected);
+
+            if (listener != null) {
+                listener.onSongSelected(selected);
+            }
+        }
     }
 
     private void updateRecentListeningSong(Song song) {
@@ -172,7 +171,6 @@ public class SongAdapter extends RecyclerView.Adapter<SongAdapter.ViewHolder> {
                 .addOnFailureListener(e -> Log.e("SongAdapter", "Failed to update recent listening song: " + e.getMessage()));
     }
 
-    // Add missing methods
     public void clearSongs() {
         songList.clear();
         notifyDataSetChanged();
@@ -201,25 +199,16 @@ public class SongAdapter extends RecyclerView.Adapter<SongAdapter.ViewHolder> {
     }
 
     private void checkIsLiked(String id, OnIsLikedCallback callback) {
-        FirebaseAuth mAuth = FirebaseAuth.getInstance();
         String userId = mAuth.getCurrentUser().getUid();
-        FirebaseFirestore db = FirebaseFirestore.getInstance();
-
         db.collection("users").whereEqualTo("id", userId).get().addOnSuccessListener(queryDocumentSnapshots -> {
             if (!queryDocumentSnapshots.isEmpty()) {
                 DocumentSnapshot userDoc = queryDocumentSnapshots.getDocuments().get(0);
                 List<String> likedSongs = (List<String>) userDoc.get("likedsong");
-                if (likedSongs != null && likedSongs.contains(id)) {
-                    callback.onResult(true);
-                } else {
-                    callback.onResult(false);
-                }
+                callback.onResult(likedSongs != null && likedSongs.contains(id));
             } else {
                 Log.e("SongAdapter", "No user document found with userId: " + userId);
             }
-        }).addOnFailureListener(e -> {
-            Log.e("SongAdapter", "Failed to retrieve user document: " + e.getMessage());
-        });
+        }).addOnFailureListener(e -> Log.e("SongAdapter", "Failed to retrieve user document: " + e.getMessage()));
     }
 
     @Override
@@ -227,7 +216,7 @@ public class SongAdapter extends RecyclerView.Adapter<SongAdapter.ViewHolder> {
         return (songList != null) ? songList.size() : 0;
     }
 
-    public class ViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener {
+    public class ViewHolder extends RecyclerView.ViewHolder {
 
         TextView songTitle;
         TextView artistName;
@@ -238,7 +227,6 @@ public class SongAdapter extends RecyclerView.Adapter<SongAdapter.ViewHolder> {
 
         public ViewHolder(@NonNull View itemView) {
             super(itemView);
-            itemView.setOnClickListener(this);
             songTitle = itemView.findViewById(R.id.songTitle);
             artistName = itemView.findViewById(R.id.artistName);
             heartBtn = itemView.findViewById(R.id.heartBtn);
@@ -260,101 +248,37 @@ public class SongAdapter extends RecyclerView.Adapter<SongAdapter.ViewHolder> {
                 }
             });
         }
-
-        @Override
-        public void onClick(View v) {
-            int position = getAbsoluteAdapterPosition();
-            if (position != RecyclerView.NO_POSITION) {
-                Song selected = songList.get(position);
-                String preId = (position == 0) ? songList.get(songList.size() - 1).getId() : songList.get(position - 1).getId();
-                String nextId = (position == songList.size() - 1) ? songList.get(0).getId() : songList.get(position + 1).getId();
-
-                PlaySongFragment fragment = new PlaySongFragment();
-                fragment.setSongId(selected.getId());
-                fragment.setCurrentSongList(songList, selected.getId());
-                Bundle args = new Bundle();
-                args.putString("songId", selected.getId());
-                args.putString("previousSongId", preId);
-                args.putString("nextSongId", nextId);
-                fragment.setArguments(args);
-
-                FragmentManager fragmentManager = ((AppCompatActivity) v.getContext()).getSupportFragmentManager();
-
-                PlaySongFragment currentFragment = (PlaySongFragment) fragmentManager.findFragmentByTag("PlaySongFragment");
-                if (currentFragment != null) {
-                    currentFragment.dismiss();
-                }
-
-                // Show the new bottom sheet
-                fragment.show(fragmentManager, "PlaySongFragment");
-
-                if (listener != null) {
-                    listener.onSongSelected(songList.get(position));
-                }
-            }
-        }
-
     }
 
     public void PlayFirstSong() {
-        int position = 0;
-        if (position != RecyclerView.NO_POSITION) {
-            Song selected = songList.get(position);
-            String preId = songList.get(songList.size() - 1).getId();
-            String nextId = songList.get(position + 1).getId();
-            // Open PlaySongFragment as a BottomSheet
-            PlaySongFragment fragment = new PlaySongFragment();
-            fragment.setSongId(selected.getId());
-            fragment.setCurrentSongList(songList, selected.getId());
-            Bundle args = new Bundle();
-            args.putString("songId", selected.getId());
-            args.putString("previousSongId", preId);
-            args.putString("nextSongId", nextId);
-            fragment.setArguments(args);
-            // show the bottom sheet
-            fragment.show(((AppCompatActivity) context).getSupportFragmentManager(), "PlaySongFragment");
-        }
+        handleSongClick(0);
     }
 
     private void removeSongFromLikedSongs(String songId) {
-        FirebaseAuth mAuth = FirebaseAuth.getInstance();
         String userId = mAuth.getCurrentUser().getUid();
-        FirebaseFirestore db = FirebaseFirestore.getInstance();
-
         db.collection("users").whereEqualTo("id", userId).get().addOnSuccessListener(queryDocumentSnapshots -> {
             if (!queryDocumentSnapshots.isEmpty()) {
                 DocumentSnapshot userDoc = queryDocumentSnapshots.getDocuments().get(0);
                 userDoc.getReference().update("likedsong", FieldValue.arrayRemove(songId)).addOnSuccessListener(aVoid -> {
                     Toast.makeText(context, "Removed from liked songs successfully", Toast.LENGTH_SHORT).show();
-                }).addOnFailureListener(e -> {
-                    Log.e("SongAdapter", "Failed to remove song from liked songs: " + e.getMessage());
-                });
+                }).addOnFailureListener(e -> Log.e("SongAdapter", "Failed to remove song from liked songs: " + e.getMessage()));
             } else {
                 Log.e("SongAdapter", "No user document found with userId: " + userId);
             }
-        }).addOnFailureListener(e -> {
-            Log.e("SongAdapter", "Failed to retrieve user document: " + e.getMessage());
-        });
+        }).addOnFailureListener(e -> Log.e("SongAdapter", "Failed to retrieve user document: " + e.getMessage()));
     }
 
     public void addSongToLikedSongs(String songId) {
-        FirebaseAuth mAuth = FirebaseAuth.getInstance();
         String userId = mAuth.getCurrentUser().getUid();
-        FirebaseFirestore db = FirebaseFirestore.getInstance();
-
         db.collection("users").whereEqualTo("id", userId).get().addOnSuccessListener(queryDocumentSnapshots -> {
             if (!queryDocumentSnapshots.isEmpty()) {
                 DocumentSnapshot userDoc = queryDocumentSnapshots.getDocuments().get(0);
                 userDoc.getReference().update("likedsong", FieldValue.arrayUnion(songId)).addOnSuccessListener(aVoid -> {
                     Toast.makeText(context, "Added to liked songs successfully", Toast.LENGTH_SHORT).show();
-                }).addOnFailureListener(e -> {
-                    Log.e("SongAdapter", "Failed to add song to liked songs: " + e.getMessage());
-                });
+                }).addOnFailureListener(e -> Log.e("SongAdapter", "Failed to add song to liked songs: " + e.getMessage()));
             } else {
                 Log.e("SongAdapter", "No user document found with userId: " + userId);
             }
-        }).addOnFailureListener(e -> {
-            Log.e("SongAdapter", "Failed to retrieve user document: " + e.getMessage());
-        });
+        }).addOnFailureListener(e -> Log.e("SongAdapter", "Failed to retrieve user document: " + e.getMessage()));
     }
 }
