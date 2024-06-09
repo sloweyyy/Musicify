@@ -95,7 +95,7 @@ public class HomeFragment extends Fragment implements SongHomeAdapter.OnSongSele
         if (getArguments() != null) {
             previousSongId = getArguments().getString("previousSongId");
             nextSongId = getArguments().getString("nextSongId");
-            Log.d("previous song id inside home: " , previousSongId);
+            Log.d("previous song id inside home: ", previousSongId);
         }
 //    if(getArguments()!=null){
 //        songList= getArguments().getParcelableArrayList("songList");
@@ -137,9 +137,11 @@ public class HomeFragment extends Fragment implements SongHomeAdapter.OnSongSele
 //                    playSongFragment.setCurrentSongList(songId,songList );
                     Bundle args = new Bundle();
                     args.putString("songId", songId);
-                    args.putString("previousSongId",previousSongId );
+                    args.putString("previousSongId", previousSongId);
                     args.putString("nextSongId", nextSongId);
                     playSongFragment.setArguments(args);
+
+                    playSongFragment.setCurrentSongList(songList, songId);
                     playSongFragment.show(((AppCompatActivity) getContext()).getSupportFragmentManager(), "PlaySongFragment");
                 } else {
                     Toast.makeText(getContext(), "No recent song to resume", Toast.LENGTH_SHORT).show();
@@ -172,6 +174,7 @@ public class HomeFragment extends Fragment implements SongHomeAdapter.OnSongSele
                             }
                             resumeBtn.setVisibility(View.VISIBLE);
                             songId = recentSongData.get("songId").toString();
+                            songList.add(new Song(recentSongData.get("songName").toString(), recentSongData.get("artistName").toString(), recentSongData.get("imageURL").toString(), recentSongData.get("songId").toString()));
                         }
                     } else {
                         recentSongName.setText("Select song to listen");
@@ -191,16 +194,19 @@ public class HomeFragment extends Fragment implements SongHomeAdapter.OnSongSele
 
         return view;
     }
+
     public void setPreviousSongId(String previousSongId) {
         this.previousSongId = previousSongId;
-        Log.d("previous song id in home : " , this.previousSongId);
+        Log.d("previous song id in home : ", this.previousSongId);
     }
+
     public void setNextSongId(String nextSongId) {
-            this.nextSongId = nextSongId;
-        Log.d("previous song id in home : " , this.nextSongId);
+        this.nextSongId = nextSongId;
+        Log.d("previous song id in home : ", this.nextSongId);
 
 
     }
+
     @Override
     public void onAttach(@NonNull Context context) {
         super.onAttach(context);

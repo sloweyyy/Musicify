@@ -48,7 +48,6 @@ import com.google.gson.annotations.SerializedName;
 
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
@@ -150,12 +149,14 @@ public class PlaySongFragment extends BottomSheetDialogFragment implements Fetch
             nextSongId = getArguments().getString("nextSongId");
         }
 
-        // get recentlyplayed from firebase
+        // get recently played from firebase
         if (songList == null) {
             songList = new ArrayList<>();
         }
-        if (songListOrigin == null){
+        if (songListOrigin == null) {
             songListOrigin = new ArrayList<>();
+        } else {
+            songList = new ArrayList<>(songListOrigin);
         }
         FirebaseAuth mAuth = FirebaseAuth.getInstance();
         String userId = mAuth.getCurrentUser().getUid();
@@ -288,8 +289,8 @@ public class PlaySongFragment extends BottomSheetDialogFragment implements Fetch
                                     } else repeateBtn.setImageResource(R.drawable.repeate);
                                 }
                             });
-                        } else
-                        {shuffleBtn.setImageResource(R.drawable.shuffle_gray);
+                        } else {
+                            shuffleBtn.setImageResource(R.drawable.shuffle_gray);
                             songList = new ArrayList<>(songListOrigin);
                             Log.e("song list", songList.get(0).getTitle());
                         }
@@ -490,13 +491,13 @@ public class PlaySongFragment extends BottomSheetDialogFragment implements Fetch
         } else {
             previousSongId = songList.get(songList.size() - 1).getId();
         }
-        Log.d("previous song id : ",previousSongId);
+        Log.d("previous song id : ", previousSongId);
         updateCurrentSong(previousSongId);
         MiniPlayerListener miniPlayerListener = (MiniPlayerListener) requireActivity();
         miniPlayerListener.updateMiniPlayer(songList, getCurrentSongIndex(songId));
         Song previousSong = getSongById(previousSongId);
-        if (previousSong != null    ) {
-            updateRecentListeningSong( previousSong);
+        if (previousSong != null) {
+            updateRecentListeningSong(previousSong);
         }
     }
 
@@ -510,13 +511,13 @@ public class PlaySongFragment extends BottomSheetDialogFragment implements Fetch
             } else {
                 nextSongId = songList.get(0).getId();
             }
-            Log.d("next song id : ",nextSongId);
+            Log.d("next song id : ", nextSongId);
             updateCurrentSong(nextSongId);
             MiniPlayerListener miniPlayerListener = (MiniPlayerListener) requireActivity();
             miniPlayerListener.updateMiniPlayer(songList, getCurrentSongIndex(songId));
             Song nextSong = getSongById(nextSongId);
-            if (nextSong != null ) {
-                updateRecentListeningSong( nextSong);
+            if (nextSong != null) {
+                updateRecentListeningSong(nextSong);
             }
         }
     }
@@ -602,11 +603,9 @@ public class PlaySongFragment extends BottomSheetDialogFragment implements Fetch
         checkIsPlaying(new OnPlayingCallback() {
             @Override
             public void nResult(boolean isPlaying) {
-                if (isPlaying)
-                {
+                if (isPlaying) {
                     pauseBtn.setBackgroundResource(R.drawable.ic_pause);
-                }
-                else pauseBtn.setBackgroundResource(R.drawable.ic_play);
+                } else pauseBtn.setBackgroundResource(R.drawable.ic_play);
             }
         });
 
@@ -616,12 +615,22 @@ public class PlaySongFragment extends BottomSheetDialogFragment implements Fetch
                 if (isShuffle) {
                     shuffleBtn.setImageResource(R.drawable.shuffle_green);
                     mediaPlayerManager.setIsRepeat(false);
-                    songList = new ArrayList<>(songListOrigin);
-                    Collections.shuffle(songList);
+
+                    if (songListOrigin != null) {
+                        songList = new ArrayList<>(songListOrigin);
+                        Collections.shuffle(songList);
+                    } else {
+                        Log.e("PlaySongFragment", "songListOrigin is null in shuffle mode");
+                    }
 
                 } else {
                     shuffleBtn.setImageResource(R.drawable.shuffle_gray);
-                    songList = new ArrayList<>(songListOrigin);
+
+                    if (songListOrigin != null) {
+                        songList = new ArrayList<>(songListOrigin);
+                    } else {
+                        Log.e("PlaySongFragment", "songListOrigin is null in non-shuffle mode");
+                    }
                 }
             }
         });
@@ -661,6 +670,8 @@ public class PlaySongFragment extends BottomSheetDialogFragment implements Fetch
             }
         });
 
+
+
     }
 
 
@@ -690,7 +701,7 @@ public class PlaySongFragment extends BottomSheetDialogFragment implements Fetch
         else callback.onResult(false);
     }
 
-    private void checkIsPlaying(OnPlayingCallback callback){
+    private void checkIsPlaying(OnPlayingCallback callback) {
         if (mediaPlayerManager.getIsPlaying() == true) callback.nResult(true);
         else callback.nResult(false);
     }
@@ -700,6 +711,7 @@ public class PlaySongFragment extends BottomSheetDialogFragment implements Fetch
             callback.onResult(true);
         } else callback.onResult(false);
     }
+
 
     private void removeSongFromLikedSongs(String songId) {
         FirebaseAuth mAuth = FirebaseAuth.getInstance();
@@ -847,9 +859,7 @@ public class PlaySongFragment extends BottomSheetDialogFragment implements Fetch
                             if (mediaPlayerManager.getIsRepeat()) {
                                 mediaPlayerManager.getMediaPlayer().seekTo(0);
                                 mediaPlayerManager.setCurrentPosition(0);
-                            }
-                            else
-                            {
+                            } else {
                                 //mediaPlayerManager.getMediaPlayer().pause();
                                 mediaPlayerManager.getMediaPlayer().seekTo(0);
                                 PlayNextSong();
@@ -1040,9 +1050,10 @@ public class PlaySongFragment extends BottomSheetDialogFragment implements Fetch
         void onResult(boolean isRepeat);
     }
 
-    private interface OnPlayingCallback{
+    private interface OnPlayingCallback {
         void nResult(boolean isPlaying);
     }
+
     private interface OnShuffleCallback {
         void onResult(boolean isShuffle);
     }
@@ -1146,7 +1157,7 @@ public class PlaySongFragment extends BottomSheetDialogFragment implements Fetch
         void hideMiniPlayer();
     }
 
-    private void updateRecentListeningSong( Song song) {
+    private void updateRecentListeningSong(Song song) {
         FirebaseFirestore db = FirebaseFirestore.getInstance();
         FirebaseAuth mAuth = FirebaseAuth.getInstance();
         String userId = mAuth.getCurrentUser().getUid();
