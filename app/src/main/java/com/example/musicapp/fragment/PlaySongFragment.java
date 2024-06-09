@@ -49,6 +49,8 @@ import com.google.gson.annotations.SerializedName;
 import java.io.IOException;
 import java.io.Serializable;
 import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -70,6 +72,8 @@ public class PlaySongFragment extends BottomSheetDialogFragment implements Fetch
     private Runnable updateSeekBarRunnable;
     private int currentPosition;
     private List<Song> songList;
+
+    private List<Song> songListOrigin;
 
     private String albumId;
     private MediaPlayerManager mediaPlayerManager;
@@ -150,6 +154,9 @@ public class PlaySongFragment extends BottomSheetDialogFragment implements Fetch
         // get recentlyplayed from firebase
         if (songList == null) {
             songList = new ArrayList<>();
+        }
+        if (songListOrigin == null){
+            songListOrigin = new ArrayList<>();
         }
         FirebaseAuth mAuth = FirebaseAuth.getInstance();
         String userId = mAuth.getCurrentUser().getUid();
@@ -233,7 +240,12 @@ public class PlaySongFragment extends BottomSheetDialogFragment implements Fetch
                                     if (isShuffle) {
                                         shuffleBtn.setImageResource(R.drawable.shuffle_green);
                                         mediaPlayerManager.setIsRepeat(false);
-                                    } else shuffleBtn.setImageResource(R.drawable.shuffle_gray);
+                                        songList = new ArrayList<>(songListOrigin);
+                                    } else {
+                                        shuffleBtn.setImageResource(R.drawable.shuffle_gray);
+                                        songList = new ArrayList<>(songListOrigin);
+                                        Collections.shuffle(songList);
+                                    }
                                 }
                             });
                         } else {
@@ -266,6 +278,9 @@ public class PlaySongFragment extends BottomSheetDialogFragment implements Fetch
                         if (isShuffle) {
                             shuffleBtn.setImageResource(R.drawable.shuffle_green);
                             mediaPlayerManager.setIsRepeat(false);
+                            songList = new ArrayList<>(songListOrigin);
+                            Collections.shuffle(songList);
+                            Log.e("song list", songList.get(0).getTitle());
                             checkIsRepeat(new OnRepeatCallback() {
                                 @Override
                                 public void onResult(boolean isRepeat) {
@@ -274,7 +289,11 @@ public class PlaySongFragment extends BottomSheetDialogFragment implements Fetch
                                     } else repeateBtn.setImageResource(R.drawable.repeate);
                                 }
                             });
-                        } else shuffleBtn.setImageResource(R.drawable.shuffle_gray);
+                        } else
+                        {shuffleBtn.setImageResource(R.drawable.shuffle_gray);
+                            songList = new ArrayList<>(songListOrigin);
+                            Log.e("song list", songList.get(0).getTitle());
+                        }
                     }
                 });
             }
@@ -449,6 +468,7 @@ public class PlaySongFragment extends BottomSheetDialogFragment implements Fetch
 
     public void setCurrentSongList(List<Song> songList, String currentSongId) {
         this.songList = songList;
+        this.songListOrigin = songList;
         this.songId = currentSongId;
     }
 
@@ -561,13 +581,30 @@ public class PlaySongFragment extends BottomSheetDialogFragment implements Fetch
             }
         });
 
+        checkIsPlaying(new OnPlayingCallback() {
+            @Override
+            public void nResult(boolean isPlaying) {
+                if (isPlaying)
+                {
+                    pauseBtn.setBackgroundResource(R.drawable.ic_pause);
+                }
+                else pauseBtn.setBackgroundResource(R.drawable.ic_play);
+            }
+        });
+
         checkIsShuffle(new OnShuffleCallback() {
             @Override
             public void onResult(boolean isShuffle) {
                 if (isShuffle) {
                     shuffleBtn.setImageResource(R.drawable.shuffle_green);
                     mediaPlayerManager.setIsRepeat(false);
-                } else shuffleBtn.setImageResource(R.drawable.shuffle_gray);
+                    songList = new ArrayList<>(songListOrigin);
+                    Collections.shuffle(songList);
+
+                } else {
+                    shuffleBtn.setImageResource(R.drawable.shuffle_gray);
+                    songList = new ArrayList<>(songListOrigin);
+                }
             }
         });
 
@@ -633,6 +670,11 @@ public class PlaySongFragment extends BottomSheetDialogFragment implements Fetch
     private void checkIsRepeat(OnRepeatCallback callback) {
         if (mediaPlayerManager.getIsRepeat() == true) callback.onResult(true);
         else callback.onResult(false);
+    }
+
+    private void checkIsPlaying(OnPlayingCallback callback){
+        if (mediaPlayerManager.getIsPlaying() == true) callback.nResult(true);
+        else callback.nResult(false);
     }
 
     private void checkIsShuffle(OnShuffleCallback callback) {
@@ -765,7 +807,7 @@ public class PlaySongFragment extends BottomSheetDialogFragment implements Fetch
     public void setupMediaPlayer(String playUrl) {
         if (playUrl != null && !playUrl.isEmpty()) {
             mediaPlayerManager.setMediaSource(playUrl);
-            mediaPlayerManager.setIsPlaying(true);
+            //mediaPlayerManager.setIsPlaying(true);
             if (mediaPlayerManager.getIsPlaying()) {
                 mediaPlayerManager.getMediaPlayer().seekTo(mediaPlayerManager.getCurrentPosition());
 //                mediaPlayerManager.getMediaPlayer().seekTo(mediaPlayerManager.getLastPlaybackPosition());
@@ -786,16 +828,23 @@ public class PlaySongFragment extends BottomSheetDialogFragment implements Fetch
                             if (mediaPlayerManager.getIsRepeat()) {
                                 mediaPlayerManager.getMediaPlayer().seekTo(0);
                                 mediaPlayerManager.setCurrentPosition(0);
-                            } else if (mediaPlayerManager.getIsShuffle()) {
-                                mediaPlayerManager.getMediaPlayer().pause();
-                                mediaPlayerManager.setCurrentPosition(0);
-                                mediaPlayerManager.getMediaPlayer().seekTo(0);
-                                PlayRandomSong();
-                            } else if (mediaPlayerManager.getIsRepeat() == false && mediaPlayerManager.getIsShuffle() == false) {
-                                mediaPlayerManager.getMediaPlayer().pause();
+                            }
+                            else
+                            {
+                                //mediaPlayerManager.getMediaPlayer().pause();
                                 mediaPlayerManager.getMediaPlayer().seekTo(0);
                                 PlayNextSong();
                             }
+//                            if (mediaPlayerManager.getIsShuffle()) {
+//                                mediaPlayerManager.getMediaPlayer().pause();
+//                                mediaPlayerManager.setCurrentPosition(0);
+//                                mediaPlayerManager.getMediaPlayer().seekTo(0);
+//                                PlayRandomSong();
+//                            } else if (mediaPlayerManager.getIsRepeat() == false && mediaPlayerManager.getIsShuffle() == false) {
+//                                mediaPlayerManager.getMediaPlayer().pause();
+//                                mediaPlayerManager.getMediaPlayer().seekTo(0);
+//                                PlayNextSong();
+//                            }
                         }
                         handler.postDelayed(this, 500);
                     }
@@ -973,6 +1022,9 @@ public class PlaySongFragment extends BottomSheetDialogFragment implements Fetch
         void onResult(boolean isRepeat);
     }
 
+    private interface OnPlayingCallback{
+        void nResult(boolean isPlaying);
+    }
     private interface OnShuffleCallback {
         void onResult(boolean isShuffle);
     }

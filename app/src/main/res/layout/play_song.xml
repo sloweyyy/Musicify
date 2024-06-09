@@ -224,7 +224,7 @@
                 android:id="@+id/pauseBtn"
                 android:layout_width="@dimen/_24sdp"
                 android:layout_height="@dimen/_24sdp"
-                android:background="@drawable/ic_pause"
+                android:background="@drawable/ic_play"
                 android:contentDescription="pause" />
         </RelativeLayout>
 

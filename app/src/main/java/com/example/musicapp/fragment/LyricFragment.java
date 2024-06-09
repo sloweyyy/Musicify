@@ -45,6 +45,8 @@ import com.google.firebase.firestore.FieldValue;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.gson.annotations.SerializedName;
 
+import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -72,6 +74,7 @@ public class LyricFragment extends Fragment implements FetchAccessToken.AccessTo
     private String songIdhMusixmatc;
 
     private List<Song> songList;
+    private List<Song> songListOrigin;
     private String songId;
     private int currentPosition;
 
@@ -117,6 +120,9 @@ public class LyricFragment extends Fragment implements FetchAccessToken.AccessTo
 
         }
         initializeViews();
+        if (songListOrigin == null){
+            songListOrigin = new ArrayList<>();
+        }
         searchTrack();
         fetchAccessToken = new FetchAccessToken();
         fetchAccessToken.getTokenFromSpotify(this);
@@ -159,7 +165,13 @@ public class LyricFragment extends Fragment implements FetchAccessToken.AccessTo
                                     if (isShuffle) {
                                         shuffleBtn.setImageResource(R.drawable.shuffle_green);
                                         mediaPlayerManager.setIsRepeat(false);
-                                    } else shuffleBtn.setImageResource(R.drawable.shuffle_gray);
+                                        songList = new ArrayList<>(songListOrigin);
+
+                                    } else {
+                                        shuffleBtn.setImageResource(R.drawable.shuffle_gray);
+                                        songList = new ArrayList<>(songListOrigin);
+                                        Collections.shuffle(songList);
+                                    }
                                 }
                             });
                         } else {
@@ -194,6 +206,8 @@ public class LyricFragment extends Fragment implements FetchAccessToken.AccessTo
                         if (isShuffle) {
                             shuffleBtn.setImageResource(R.drawable.shuffle_green);
                             mediaPlayerManager.setIsRepeat(false);
+                            songList = new ArrayList<>(songListOrigin);
+                            Collections.shuffle(songList);
                             checkIsRepeat(new OnRepeatCallback() {
                                 @Override
                                 public void onResult(boolean isRepeat) {
@@ -202,7 +216,10 @@ public class LyricFragment extends Fragment implements FetchAccessToken.AccessTo
                                     } else repeateBtn.setImageResource(R.drawable.repeate);
                                 }
                             });
-                        } else shuffleBtn.setImageResource(R.drawable.shuffle_gray);
+                        } else {
+                            shuffleBtn.setImageResource(R.drawable.shuffle_gray);
+                            songList = new ArrayList<>(songListOrigin);
+                        }
                     }
                 });
             }
@@ -460,7 +477,12 @@ public class LyricFragment extends Fragment implements FetchAccessToken.AccessTo
                 if (isShuffle) {
                     shuffleBtn.setImageResource(R.drawable.shuffle_green);
                     mediaPlayerManager.setIsRepeat(false);
-                } else shuffleBtn.setImageResource(R.drawable.shuffle_gray);
+                    songList = new ArrayList<>(songListOrigin);
+                    Collections.shuffle(songList);
+                } else {
+                    shuffleBtn.setImageResource(R.drawable.shuffle_gray);
+                    songList = new ArrayList<>(songListOrigin);
+                }
             }
         });
         heartBtn.setOnClickListener(new View.OnClickListener() {
@@ -494,6 +516,7 @@ public class LyricFragment extends Fragment implements FetchAccessToken.AccessTo
 
     public void setCurrentSongList(List<Song> songList, String currentSongId) {
         this.songList = songList;
+        this.songListOrigin = songList;
         this.songId = currentSongId;
     }
 
@@ -576,7 +599,7 @@ public class LyricFragment extends Fragment implements FetchAccessToken.AccessTo
     public void setupMediaPlayer(String play_Url) {
         if (mediaPlayerManager.getMediaPlayer().getCurrentPosition() == 0) {
             mediaPlayerManager.setMediaSource(play_Url);
-            mediaPlayerManager.getMediaPlayer().start();
+            if (mediaPlayerManager.getIsPlaying()) mediaPlayerManager.getMediaPlayer().start();
         }
         seekBar.setMax((int) (mediaPlayerManager.getMediaPlayer().getDuration() / 1000));
         totalDuration.setText(formattedTime(mediaPlayerManager.getMediaPlayer().getDuration() / 1000));
@@ -595,16 +618,21 @@ public class LyricFragment extends Fragment implements FetchAccessToken.AccessTo
                             if (mediaPlayerManager.getIsRepeat()) {
                                 mediaPlayerManager.getMediaPlayer().seekTo(0);
                                 mediaPlayerManager.setCurrentPosition(0);
-                            } else if (mediaPlayerManager.getIsShuffle()) {
-                                mediaPlayerManager.getMediaPlayer().pause();
-                                mediaPlayerManager.setCurrentPosition(0);
+                            } else
+                            {
                                 mediaPlayerManager.getMediaPlayer().seekTo(0);
-                                PlayRandomSong();
-                            } else if (mediaPlayerManager.getIsRepeat() == false && mediaPlayerManager.getIsShuffle() == false) {
-                                mediaPlayerManager.getMediaPlayer().pause();
-                                mediaPlayerManager.getMediaPlayer().seekTo(0);
-                                PlayNextSong();
+                               PlayNextSong();
                             }
+//                                if (mediaPlayerManager.getIsShuffle()) {
+//                                mediaPlayerManager.getMediaPlayer().pause();
+//                                mediaPlayerManager.setCurrentPosition(0);
+//                                mediaPlayerManager.getMediaPlayer().seekTo(0);
+//                                PlayRandomSong();
+//                            } else if (mediaPlayerManager.getIsRepeat() == false && mediaPlayerManager.getIsShuffle() == false) {
+//                                mediaPlayerManager.getMediaPlayer().pause();
+//                                mediaPlayerManager.getMediaPlayer().seekTo(0);
+//                                PlayNextSong();
+//                            }
                         }
                     }
                 }
