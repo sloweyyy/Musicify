@@ -26,24 +26,28 @@ import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FieldValue;
 import com.google.firebase.firestore.FirebaseFirestore;
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 public class SongAdapter extends RecyclerView.Adapter<SongAdapter.ViewHolder> {
 
     private Context context;
     private List<Song> songList;
+    private OnSongSelectedListener listener;
+    private OnLongItemClickListener longItemClickListener;
+    private FirebaseFirestore db = FirebaseFirestore.getInstance();
+    private FirebaseAuth mAuth = FirebaseAuth.getInstance();
 
     public interface OnSongSelectedListener {
         void onSongSelected(Song song);
     }
 
-    private OnSongSelectedListener listener;
 
     public interface OnLongItemClickListener {
         void onLongItemClick(Song song);
     }
 
-    private OnLongItemClickListener longItemClickListener;
 
     public void setOnLongItemClickListener(OnLongItemClickListener listener) {
         this.longItemClickListener = listener;
@@ -124,7 +128,48 @@ public class SongAdapter extends RecyclerView.Adapter<SongAdapter.ViewHolder> {
             }
         });
 
+        holder.itemView.setOnClickListener(v -> {
+            int position1 = holder.getAdapterPosition();
+            if (position1 != RecyclerView.NO_POSITION) {
+                Song selected = songList.get(position1);
+                String preId = (position1 == 0) ? songList.get(songList.size() - 1).getId() : songList.get(position1 - 1).getId();
+                String nextId = (position1 == songList.size() - 1) ? songList.get(0).getId() : songList.get(position1 + 1).getId();
 
+                // Open PlaySongFragment as a BottomSheet
+                PlaySongFragment fragment = new PlaySongFragment();
+                fragment.setSongId(selected.getId());
+                fragment.setCurrentSongList(songList, selected.getId());
+                Bundle args = new Bundle();
+                args.putString("songId", selected.getId());
+                args.putString("previousSongId", preId);
+                args.putString("nextSongId", nextId);
+                fragment.setArguments(args);
+
+                FragmentManager fragmentManager = ((AppCompatActivity) v.getContext()).getSupportFragmentManager();
+                fragment.show(fragmentManager, "PlaySongFragment"); // Show the BottomSheet
+
+                // Update recent listening song
+                updateRecentListeningSong(selected);
+
+                if (listener != null) {
+                    listener.onSongSelected(selected);
+                }
+            }
+        });
+
+
+    }
+
+    private void updateRecentListeningSong(Song song) {
+        String userId = mAuth.getCurrentUser().getUid();
+        Map<String, Object> recentListeningSong = new HashMap<>();
+        recentListeningSong.put("songName", song.getTitle());
+        recentListeningSong.put("imageURL", song.getImageUrl());
+        recentListeningSong.put("artistName", song.getArtist());
+        recentListeningSong.put("songId", song.getId());
+        db.collection("users").document(userId).update("recentListeningSong", recentListeningSong)
+                .addOnSuccessListener(aVoid -> Log.d("SongAdapter", "Recent listening song updated successfully"))
+                .addOnFailureListener(e -> Log.e("SongAdapter", "Failed to update recent listening song: " + e.getMessage()));
     }
 
     // Add missing methods
