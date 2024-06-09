@@ -33,6 +33,7 @@ import com.example.musicapp.R;
 import com.example.musicapp.adapter.FetchAccessToken;
 import com.example.musicapp.manager.MediaPlayerManager;
 import com.example.musicapp.model.BottomAppBarListener;
+import com.example.musicapp.model.SimplifiedTrack;
 import com.example.musicapp.model.Song;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
@@ -53,9 +54,11 @@ import retrofit2.Response;
 import retrofit2.Retrofit;
 import retrofit2.converter.gson.GsonConverterFactory;
 import retrofit2.http.GET;
+import retrofit2.http.Header;
+import retrofit2.http.Path;
 import retrofit2.http.Query;
 
-public class LyricFragment extends Fragment implements FetchAccessToken.AccessTokenCallback {
+public class LyricFragment extends Fragment implements FetchAccessToken.AccessTokenCallback{
     private FetchAccessToken fetchAccessToken;
     private View view;
     private Handler handler = new Handler(Looper.getMainLooper());
@@ -84,10 +87,12 @@ public class LyricFragment extends Fragment implements FetchAccessToken.AccessTo
     private MusixmatchApi musixmatchApi;
     private String commondId;
 
+    private String accessToken;
+
 
     @Override
     public void onTokenReceived(String accessToken) {
-
+        this.accessToken = accessToken;
     }
 
     @Nullable
@@ -166,24 +171,14 @@ public class LyricFragment extends Fragment implements FetchAccessToken.AccessTo
         previousBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                mediaPlayerManager.getMediaPlayer().pause();
-                mediaPlayerManager.setCurrentPosition(0);
                 mediaPlayerManager.getMediaPlayer().seekTo(0);
-                ((BottomAppBarListener) requireActivity()).showBottomAppBar();
-                FragmentManager fragmentManager = getParentFragmentManager();
-                fragmentManager.popBackStack();
                 PlayPreviousSong();
             }
         });
         nextBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                mediaPlayerManager.getMediaPlayer().pause();
-                mediaPlayerManager.setCurrentPosition(0);
-                mediaPlayerManager.getMediaPlayer().seekTo(0);
-                ((BottomAppBarListener) requireActivity()).showBottomAppBar();
-                FragmentManager fragmentManager = getParentFragmentManager();
-                fragmentManager.popBackStack();
+               mediaPlayerManager.getMediaPlayer().seekTo(0);
                 PlayNextSong();
             }
         });
@@ -471,7 +466,7 @@ public class LyricFragment extends Fragment implements FetchAccessToken.AccessTo
                 MoveToArtistDetail(artistId);
             }
         });
-        setupMediaPlayer();
+        setupMediaPlayer(urlAudioValue);
         setupSeekBar();
         setupPauseButton();
 
@@ -502,7 +497,67 @@ public class LyricFragment extends Fragment implements FetchAccessToken.AccessTo
         this.total_value = duration;
     }
 
-    public void setupMediaPlayer() {
+    public void getTrack(String accessToken) {
+        Retrofit retrofit = new Retrofit.Builder().baseUrl("https://api.spotify.com/").addConverterFactory(GsonConverterFactory.create()).build();
+
+        SpotifyApi apiService = retrofit.create(SpotifyApi.class);
+        String authorization = "Bearer " + accessToken;
+        Call<SimplifiedTrack> call = apiService.getTrack(authorization, songId);
+        call.enqueue(new Callback<SimplifiedTrack>() {
+            @Override
+            public void onResponse(Call<SimplifiedTrack> call, Response<SimplifiedTrack> response) {
+                if (response.isSuccessful()) {
+                    SimplifiedTrack track = response.body();
+                    if (track != null) {
+                        setupTrack(track);
+                    }
+                } else {
+
+                }
+            }
+
+            @Override
+            public void onFailure(Call<SimplifiedTrack> call, Throwable throwable) {
+                Log.e("Error fetching track", throwable.getMessage());
+            }
+        });
+    }
+
+    public void setupTrack(SimplifiedTrack track) {
+        if (isAdded()) {
+            String song_Name = track.getName();
+            String artist_Name = track.getArtists().get(0).getName();
+            String image_Url = track.getAlbum().getImages().get(0).getUrl();
+            String play_Url = track.getUrl();
+
+            songName.setText(song_Name);
+            artistName.setText(artist_Name);
+            if (image_Url != null) {
+                Glide.with(this).load(image_Url).into(background);
+                Glide.with(this).load(image_Url).into(artistAvata);
+            }
+
+            albumId = track.getAlbum().getId();
+
+            artistId = track.getArtists().get(0).getId();
+            mediaPlayerManager.getMediaPlayer().seekTo(0);
+            setupMediaPlayer(play_Url);
+
+            setupSeekBar();
+            setupPauseButton();
+
+            PlaySongFragment.MiniPlayerListener miniPlayerListener = (PlaySongFragment.MiniPlayerListener) requireActivity();
+            Log.d("Song list", songList.toString() + " " + getCurrentSongIndex(songId));
+            miniPlayerListener.updateMiniPlayer(songList, getCurrentSongIndex(songId));
+            miniPlayerListener.showMiniPlayer();
+        }
+    }
+
+    public void setupMediaPlayer(String play_Url) {
+        if (mediaPlayerManager.getMediaPlayer().getCurrentPosition() == 0) {
+            mediaPlayerManager.setMediaSource(play_Url);
+            mediaPlayerManager.getMediaPlayer().start();
+        }
         seekBar.setMax((int) (mediaPlayerManager.getMediaPlayer().getDuration() / 1000));
         totalDuration.setText(formattedTime(mediaPlayerManager.getMediaPlayer().getDuration() / 1000));
         updateSeekBarRunnable = new Runnable() {
@@ -706,13 +761,10 @@ public class LyricFragment extends Fragment implements FetchAccessToken.AccessTo
     private void updateCurrentSong(String newSongId) {
         if (newSongId != null && !newSongId.isEmpty() && !newSongId.equals(songId)) {
             this.songId = newSongId;
-            PlaySongFragment fragment = new PlaySongFragment();
-            fragment.setSongId(songId);
-            fragment.setCurrentSongList(songList, songId);
-            Bundle args = new Bundle();
-            args.putString("songId", songId);
-            fragment.setArguments(args);
-            fragment.show(((AppCompatActivity) requireContext()).getSupportFragmentManager(), "PlaySongFragment");
+            //this.previousSongId = getPreviousSongId(newSongId); // Implement getPreviousSongId()
+            //this.nextSongId = getNextSongId(newSongId); // Implement getNextSongId()
+
+            getTrack(accessToken);
         }
     }
     private String getPreviousSongId(String currentSongId) {
@@ -824,6 +876,11 @@ public class LyricFragment extends Fragment implements FetchAccessToken.AccessTo
                 @Query("track_id") String trackId,
                 @Query("apikey") String apiKey
         );
+    }
+
+    public interface SpotifyApi {
+        @GET("v1/tracks/{songId}")
+        Call<SimplifiedTrack> getTrack(@Header("Authorization") String authorization, @Path("songId") String songId);
     }
     public static class MusixmatchSearchResponse {
         @SerializedName("message")

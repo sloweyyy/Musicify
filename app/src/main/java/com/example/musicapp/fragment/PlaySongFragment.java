@@ -525,7 +525,6 @@ public class PlaySongFragment extends BottomSheetDialogFragment implements Fetch
         args.putString("playedDuration", played_value);
         args.putString("totalDuration", total_value);
         args.putString("artistId", artistId);
-
         lyricFragment.setArguments(args);
         ((AppCompatActivity) requireContext()).getSupportFragmentManager().beginTransaction().replace(R.id.frame_layout, lyricFragment, "LyricFragment").addToBackStack("LyricFragment").commit();
     }
