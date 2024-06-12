@@ -62,11 +62,13 @@ public class AlbumDetailViewModel extends AndroidViewModel {
             public void onResponse(Call<AlbumSimplified> call, Response<AlbumSimplified> response) {
                 if (response.isSuccessful()) {
                     AlbumSimplified albumSimplified = response.body();
-                    _albumDetails.setValue(albumSimplified); // Lưu album chi tiết
+                    _albumDetails.setValue(albumSimplified);
 
                     List<Song> songs = new ArrayList<>();
                     for (SimplifiedTrack simplifiedTrack : albumSimplified.getTracksContainer().tracks) {
-                        songs.add(Song.fromSimplifiedTrack(simplifiedTrack));
+                        Song song = Song.fromSimplifiedTrack(simplifiedTrack);
+                        song.setImageUrl(albumSimplified.getImages().get(0).getUrl());
+                        songs.add(song);
                     }
                     _albumSongs.setValue(songs);
                 } else {

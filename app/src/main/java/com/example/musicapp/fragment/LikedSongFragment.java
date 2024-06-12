@@ -143,7 +143,6 @@ public class LikedSongFragment extends Fragment implements FetchAccessToken.Acce
                     currentSortState = SortState.DEFAULT;
                     sortStateText.setText("Default");
                     songAdapter.clearSongs();
-                    onTokenReceived(accessToken);
                     songAdapter.notifyDataSetChanged();
                 }
             }
