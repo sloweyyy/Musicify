@@ -780,6 +780,9 @@ public class LyricFragment extends Fragment implements FetchAccessToken.AccessTo
             previousSongId = songList.get(songList.size() - 1).getId();
         }
         updateCurrentSong(previousSongId);
+        Song previousSong = getSongById(previousSongId);
+        updateRecentListeningSong(previousSong);
+
     }
     private void PlayNextSong() {
         ((BottomAppBarListener) requireActivity()).hideBottomAppBar();
@@ -791,7 +794,12 @@ public class LyricFragment extends Fragment implements FetchAccessToken.AccessTo
             nextSongId = songList.get(0).getId();
         }
         updateCurrentSong(nextSongId);
+        Song nextSong = getSongById(nextSongId);
+        updateRecentListeningSong(nextSong);
+
     }
+
+
     private int getCurrentSongIndex(String songId) {
         for (int i = 0; i < songList.size(); i++) {
             if (songList.get(i).getId().equals(songId)) {
@@ -911,6 +919,33 @@ public class LyricFragment extends Fragment implements FetchAccessToken.AccessTo
             Log.e("SongAdapter", "Failed to retrieve user document: " + e.getMessage());
         });
     }
+
+    private void updateRecentListeningSong(Song song) {
+        FirebaseFirestore db = FirebaseFirestore.getInstance();
+        FirebaseAuth mAuth = FirebaseAuth.getInstance();
+        String userId = mAuth.getCurrentUser().getUid();
+        Map<String, Object> recentListeningSong = new HashMap<>();
+        recentListeningSong.put("songName", song.getTitle());
+        recentListeningSong.put("imageURL", song.getImageUrl());
+        recentListeningSong.put("artistName", song.getArtist());
+        recentListeningSong.put("songId", song.getId());
+        db.collection("users").document(userId).update("recentListeningSong", recentListeningSong)
+                .addOnSuccessListener(aVoid -> Log.d("SongAdapter", "Recent listening song updated successfully"))
+                .addOnFailureListener(e -> Log.e("SongAdapter", "Failed to update recent listening song: " + e.getMessage()));
+    }
+
+    private Song getSongById(String songId) {
+        if (songList != null) {
+            for (Song song : songList) {
+                if (song.getId().equals(songId)) {
+                    return song;
+                }
+            }
+        }
+        Log.e("PlaySongFragment", "Song with ID " + songId + " not found.");
+        return null;
+    }
+
     public interface MusixmatchApi {
         @GET("track.search")
         Call<MusixmatchSearchResponse> searchTrack(

@@ -49,6 +49,7 @@ import com.google.firebase.firestore.EventListener;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.FirebaseFirestoreException;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
@@ -93,12 +94,50 @@ public class MainActivity extends AppCompatActivity implements BottomAppBarListe
         miniPlayerImage = findViewById(R.id.mini_player_image);
         miniPlayerLayout = findViewById(R.id.mini_player_layout);
 
+
         ImageView miniPlayerPlayPauseButton = findViewById(R.id.mini_player_play_pause_button);
         ImageView miniPlayerNextButton = findViewById(R.id.mini_player_next_button);
         ImageView miniPlayerPreviousButton = findViewById(R.id.mini_player_previous_button);
         miniPlayerPlayPauseButton.setVisibility(View.GONE);
         miniPlayerNextButton.setVisibility(View.GONE);
         miniPlayerPreviousButton.setVisibility(View.GONE);
+        songList = new ArrayList<>();
+        // get recent song data from firestore
+        FirebaseFirestore db = FirebaseFirestore.getInstance();
+        final String[] recentSongId = {null};
+        final String[] recentSongName = {null};
+        final String[] recentSongArtist = {null};
+        final String[] recentSongImage = {null};
+
+
+        db.collection("users").document(currentUser.getUid()).addSnapshotListener(new EventListener<DocumentSnapshot>() {
+            @Override
+            public void onEvent(@Nullable DocumentSnapshot value, @Nullable FirebaseFirestoreException error) {
+                if (error != null) {
+                    Log.e("Firestore", "Listen failed.", error);
+                    return;
+                }
+                if (value != null && value.exists()) {
+                    Log.d("Firestore", "Current data: " + value.getData());
+                    if (value.contains("recentListeningSong")) {
+                        Map<String, Object> recentSongData = (Map<String, Object>) value.get("recentListeningSong");
+                        if (recentSongData != null) {
+                            miniPlayerSongTitle.setText(recentSongData.get("songName").toString());
+                            miniPlayerArtistName.setText(recentSongData.get("artistName").toString());
+                            Glide.with(MainActivity.this).load(recentSongData.get("imageURL")).into(miniPlayerImage);
+                            songId = recentSongData.get("songId").toString();
+                            recentSongId[0] = recentSongData.get("songId").toString();
+                            recentSongName[0] = recentSongData.get("songName").toString();
+                            recentSongArtist[0] = recentSongData.get("artistName").toString();
+                            recentSongImage[0] = recentSongData.get("imageURL").toString();
+
+
+                        }
+                    }
+                }
+
+            }
+        });
 
         miniPlayerImage.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -157,11 +196,13 @@ public class MainActivity extends AppCompatActivity implements BottomAppBarListe
             public void onClick(View v) {
                 PlaySongFragment fragment = new PlaySongFragment();
                 fragment.setSongId(songId);
+                if (songList == null || songList.isEmpty()) {
+                    songList.add(new Song(recentSongName[0], recentSongArtist[0], recentSongImage[0], recentSongId[0]));
+                }
                 fragment.setCurrentSongList(songList, songId);
                 Bundle args = new Bundle();
                 args.putString("songId", songId);
                 fragment.setArguments(args);
-
                 fragment.show(((AppCompatActivity) v.getContext()).getSupportFragmentManager(), "PlaySongFragment");
             }
         });
@@ -271,6 +312,7 @@ public class MainActivity extends AppCompatActivity implements BottomAppBarListe
             }
         }
     }
+
 
     private void replaceFragment(Fragment fragment) {
         FragmentManager fragmentManager = getSupportFragmentManager();
