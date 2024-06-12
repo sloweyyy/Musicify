@@ -4,6 +4,7 @@ package com.example.musicapp.service;
 import com.example.musicapp.model.AlbumSimplified;
 import com.example.musicapp.model.Artist;
 import com.example.musicapp.model.CategoryResponse;
+import com.example.musicapp.model.PlaylistSimplified;
 import com.example.musicapp.model.SearchResult;
 import com.example.musicapp.model.SimplifiedTrack;
 import com.example.musicapp.viewmodel.ArtistDetailViewModel;
@@ -44,5 +45,9 @@ public interface SpotifyApiService {
 
     @GET("v1/artists/{artistId}/top-tracks")
     Call<ArtistDetailViewModel.ArtistTopTrack> getArtistTopTrack(@Header("Authorization") String authorization, @Path("artistId") String artistId);
+
+    @GET("v1/playlists/{playlistId}")
+    Call<PlaylistSimplified> getPlaylistDetails(@Header("Authorization") String authorization, @Path("playlistId") String playlistId);
+
 
 }

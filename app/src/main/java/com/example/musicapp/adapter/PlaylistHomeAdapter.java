@@ -14,6 +14,7 @@ import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.bumptech.glide.Glide;
 import com.example.musicapp.R;
 import com.example.musicapp.fragment.PlaylistDetailAPI;
 import com.example.musicapp.model.PlaylistAPI;
@@ -90,6 +91,16 @@ public class PlaylistHomeAdapter extends RecyclerView.Adapter<PlaylistHomeAdapte
             } else if (holder.totalTracks != null) {
                 holder.totalTracks.setText("N/A");
             }
+
+            if (playlist.images != null && !playlist.images.isEmpty()) {
+                String imageUrl = playlist.images.get(0).getUrl();
+                Glide.with(context)
+                        .load(imageUrl)
+                        .circleCrop()
+                        .into(holder.playButton);
+            } else {
+                holder.playButton.setImageResource(R.drawable.play_arrow_24dp_fill0_wght400_grad0_opsz24); // Thay thế bằng ảnh mặc định của bạn
+            }
         }
         checkIsLiked(playlist.getId(), isLiked -> {
             if (isLiked) {
@@ -121,6 +132,9 @@ public class PlaylistHomeAdapter extends RecyclerView.Adapter<PlaylistHomeAdapte
             totalTracks = itemView.findViewById(R.id.totalTracks);
             heartBtn = itemView.findViewById(R.id.heartBtn);
             playButton = itemView.findViewById(R.id.playButton);
+            // set image for play button by playlist image from API
+
+
             itemView.setOnClickListener(this);
             playButton.setOnClickListener(new View.OnClickListener() {
                 @Override

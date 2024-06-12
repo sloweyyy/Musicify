@@ -82,7 +82,7 @@ public class NewsFragment extends Fragment implements FetchAccessToken.AccessTok
         Call<PlaylistSimplified> call1 = apiService.getSongs(authorization, playlistId);
         Call <PlaylistsModel> call2 = apiService.getPlaylists(authorization, categoryId);
 
-        //hỏrizontal reviewcleview
+        //horizontal recyclerview
         Log.d("HEHEHEHE", "Token: " + accessToken);
         call1.enqueue(new Callback<PlaylistSimplified>() {
             @Override
