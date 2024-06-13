@@ -134,6 +134,12 @@
             android:layout_gravity="center_vertical"
             android:src="@drawable/favourite_outline"
             app:tint="@color/btnPressed" />
+        <Spinner
+            android:layout_marginTop="@dimen/_10sdp"
+            android:id="@+id/speed_spinner"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:entries="@array/speed_options" />
     </LinearLayout>
 
     <RelativeLayout
