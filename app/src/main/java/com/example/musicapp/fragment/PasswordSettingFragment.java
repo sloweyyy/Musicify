@@ -20,6 +20,8 @@ import com.example.musicapp.activities.LoginActivity;
 import com.example.musicapp.activities.RegisterOrSignUp;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
+import com.google.firebase.auth.AuthCredential;
+import com.google.firebase.auth.EmailAuthProvider;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.firestore.DocumentReference;
@@ -83,26 +85,47 @@ public class PasswordSettingFragment extends Fragment {
                     reinputNewPassword.requestFocus();
                     return;
                 }
-                user.updatePassword(newPassword)
-                        .addOnCompleteListener(new OnCompleteListener<Void>() {
-                            @Override
-                            public void onComplete(@NonNull Task<Void> task) {
-                                if (task.isSuccessful()) {
-                                    Log.d("TAG", "User password updated.");
-                                }
-                            }
-                        });
-                FirebaseFirestore db = FirebaseFirestore.getInstance();
+//                user.updatePassword(newPassword)
+//                        .addOnCompleteListener(new OnCompleteListener<Void>() {
+//                            @Override
+//                            public void onComplete(@NonNull Task<Void> task) {
+//                                if (task.isSuccessful()) {
+//                                    Log.d("TAG", "User password updated.");
+//                                }
+//                            }
+//                        });
 
                 Map<String, Object> newPass = new HashMap<>();
                 newPass.put("password", newPassword);
                 updateDocument(newPass);
 
+                final String email = user.getEmail();
+                AuthCredential credential = EmailAuthProvider.getCredential(email,oldPassword);
+
+                user.reauthenticate(credential).addOnCompleteListener(new OnCompleteListener<Void>() {
+                    @Override
+                    public void onComplete(@NonNull Task<Void> task) {
+                        if(task.isSuccessful()){
+                            user.updatePassword(newPassword).addOnCompleteListener(new OnCompleteListener<Void>() {
+                                @Override
+                                public void onComplete(@NonNull Task<Void> task) {
+                                    if(!task.isSuccessful()){
+
+                                    }else {
+
+                                    }
+                                }
+                            });
+                        }else {
+                        }
+                    }
+                });
+
                 Intent intent = new Intent(getActivity(), LoginActivity.class);
                 startActivity(intent);
                 getActivity().finish();
-
             }
+
         });
         return view;
 

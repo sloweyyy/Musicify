@@ -7,6 +7,7 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.graphics.Color;
+import android.media.MediaPlayer;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Looper;
@@ -14,11 +15,13 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.AdapterView;
 import android.widget.Button;
 import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.SeekBar;
+import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -68,6 +71,8 @@ public class PlaySongFragment extends BottomSheetDialogFragment implements Fetch
     private Handler handler = new Handler(Looper.getMainLooper());
     private Runnable updateSeekBarRunnable;
     private int currentPosition;
+    private Spinner speedSpinner;
+
     private List<Song> songList;
 
     private List<Song> songListOrigin;
@@ -645,7 +650,39 @@ public class PlaySongFragment extends BottomSheetDialogFragment implements Fetch
                 }
             }
         });
+        speedSpinner = view.findViewById(R.id.speed_spinner);
+        speedSpinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+            @Override
+            public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
+                float speed = 1.0f;
+                switch (position) {
+                    case 0:
+                        speed = 1f;
+                        break;
+                    case 1:
+                        speed = 1.5f;
+                        break;
+                    case 2:
+                        speed = 2.0f;
+                        break;
+                    case 3:
+                        speed = 0.5f;
+                        break;
+                    case 4:
+                        speed = 0.75f;
+                        break;
+                }
+                MediaPlayer mediaPlayer = mediaPlayerManager.getMediaPlayer();
+                if (mediaPlayer != null && mediaPlayer.isPlaying()) {
+                    mediaPlayer.setPlaybackParams(mediaPlayer.getPlaybackParams().setSpeed(speed));
+                }
+            }
 
+            @Override
+            public void onNothingSelected(AdapterView<?> parent) {
+                // Do nothing
+            }
+        });
         heartBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
