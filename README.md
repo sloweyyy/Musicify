@@ -1,45 +1,85 @@
-<div align="center">
-    <a href="https://www.uit.edu.vn/" title="Trường Đại học Công nghệ Thông tin" target="_blank">
-        <img src="https://www.uit.edu.vn/sites/vi/files/banner_uit_15.png">
-    </a>
-</div>
+# Musicify
 
-## Table of Contents
-- [Tính Năng](#features)
-- [Công nghệ](#technology)
-- [Demo](#Demo)
-- [Thông tin môn học](#ThongTin)
-- [Đóng góp](#contribution)
-  
-# ỨNG DỤNG NGHE NHẠC TRỰC TUYẾN MUSICIFY
+Musicify is an Android application that allows users to explore, play, and manage their favorite music tracks and playlists. The app integrates with Firebase for authentication and Firestore for data storage, and it uses Retrofit for API calls to fetch music data.
 
-MUSICIFY là một ứng dụng nghe nhạc trực tuyến cung cấp cho người dùng một ứng dụng nghe nhạc hay ho, dễ sử dụng và miễn phí 🎶📱
+## Features
 
- ## <a name="features">Chức năng</a>
+- User Authentication: Register, login, and manage user profiles.
+- Explore Music: Browse and search for songs, albums, and artists.
+- Play Music: Stream music with a built-in media player.
+- Manage Playlists: Create, update, and delete playlists.
+- Liked Songs: Add or remove songs from the liked songs list.
+- Lyrics: View lyrics for the currently playing song.
+- Feedback: Send feedback and error reports.
 
-- 
-- 
-  
-## <a name="technology">Công Nghệ</a>
+## Project Structure
 
-- Java (Frontend) 
-- Java (Backend)
-- Firebase (database)
-  
-## <a name="Demo">Demo</a>
+```
+.
+├── app/                       # Main application module
+│   └── src/
+│       └── main/
+│           ├── java/         # Java source files
+│           │   └── com/example/musicapp/
+│           │       ├── activities/    # Activity classes
+│           │       ├── adapter/       # RecyclerView adapters
+│           │       ├── fragment/      # Fragment classes
+│           │       ├── manager/       # Manager classes
+│           │       ├── model/         # Data models
+│           │       └── viewmodel/     # ViewModels
+│           ├── res/          # Resource files
+│           └── AndroidManifest.xml
+├── gradle/                   # Gradle wrapper files
+├── .gitignore               # Git ignore rules
+├── build.gradle.kts         # Project build script
+├── gradle.properties        # Gradle configuration
+├── settings.gradle.kts      # Gradle settings
+└── local.properties         # Local SDK configuration
+```
 
-# <a name="ThongTin">Thông Tin Môn Học</a>
 
-| Môn Học        | Ngôn ngữ lập trình Java |
-| -------------- | -------------------- |
-| Lớp            | SE330.O21          |
-| GV Lý Thuyết   | Ths. Lê Thanh Trọng |
+## Getting Started
 
-# <a name="contribution">Thông Tin Thành Viên</a>
+### Prerequisites
 
-| MSSV       | Họ và Tên          | Email                   | Github                                                                                                                      |
-| ---------- | ------------------ | ----------------------- | --------------------------------------------------------------------------------------------------------------------------- |
-| `22520957` | Nguyễn Thị Bích Ngọc| 222520957@gm.uit.edu.vn | [![](https://img.shields.io/badge/bichngoc-%2324292f.svg?style=flat-square&logo=github      )](https://github.com/bichngoc55) |
-| `22521145` | Trương Lê Vĩnh Phúc| 222521145@gm.uit.edu.vn | [![](https://img.shields.io/badge/vinhphuc-%2324292f.svg?style=flat-square&logo=github      )](https://github.com/sloweyyy) |
-| `22521644` | Trần Huỳnh Nhã Uyên| 22521644@gm.uit.edu.vn | [![](https://img.shields.io/badge/tranuyn-%2324292f.svg?style=flat-square&logo=github      )](https://github.com/tranuyn) |
-| `22520925` | Hồ Kim Thiên Nga| 22520925@gm.uit.edu.vn | [![](https://img.shields.io/badge/thiennga-%2324292f.svg?style=flat-square&logo=github      )](https://github.com/cabungbu/) |
+- Android Studio
+- Java 8 or higher
+- Firebase account
+
+### Installation
+
+1. Clone the repository:
+   ```sh
+   git clone https://github.com/sloweyyy/musicify.git
+   ```
+2. Open the project in Android Studio.
+3. Add your `google-services.json` file to the `app` directory.
+4. Sync the project with Gradle files.
+
+### Running the App
+
+1. Connect an Android device or start an emulator.
+2. Click on the "Run" button in Android Studio.
+
+## Usage
+
+- Register or log in to your account.
+- Browse and search for music.
+- Play songs and view lyrics.
+- Create and manage playlists.
+- Add songs to your liked songs list and view them in the favorite songs tab.
+
+## Contributing
+
+Contributions are welcome! Please fork the repository and create a pull request with your changes.
+
+## License
+
+This project is licensed under the MIT License. See the [LICENSE](LICENSE) file for details.
+
+## Acknowledgements
+
+- [Firebase](https://firebase.google.com/)
+- [Retrofit](https://square.github.io/retrofit/)
+- [Glide](https://github.com/bumptech/glide)
+- [Spotify Web API](https://developer.spotify.com/documentation/web-api/)
