@@ -1,45 +1,35 @@
 package com.example.musicapp.fragment;
 
-import android.app.AlertDialog;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-
 import androidx.fragment.app.Fragment;
 import androidx.lifecycle.ViewModelProvider;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
-
 import com.example.musicapp.R;
 import com.example.musicapp.adapter.ArtitstHomeAdapter;
 import com.example.musicapp.adapter.FetchAccessToken;
 import com.example.musicapp.model.Artist;
 import com.example.musicapp.viewmodel.HomeArtistViewModel;
 import com.google.gson.annotations.SerializedName;
-
 import java.util.ArrayList;
 import java.util.List;
-
 import retrofit2.Call;
-import retrofit2.Callback;
-import retrofit2.Response;
-import retrofit2.Retrofit;
-import retrofit2.converter.gson.GsonConverterFactory;
 import retrofit2.http.GET;
 import retrofit2.http.Header;
 import retrofit2.http.Path;
 
 public class HomeArtistFragment extends Fragment implements FetchAccessToken.AccessTokenCallback {
     RecyclerView artist_recyclerView;
+    List<String> artistIdArray;
     private View view;
     private FetchAccessToken fetchAccessToken;
     private ArtitstHomeAdapter artitstHomeAdapter;
     private HomeArtistViewModel homeArtistViewModel;
-
     private String accesstoken;
-    List<String> artistIdArray;
 
     public HomeArtistFragment() {
         // Required empty public constructor

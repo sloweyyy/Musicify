@@ -2,12 +2,11 @@ package com.example.musicapp.fragment;
 
 import android.graphics.Rect;
 import android.view.View;
-
 import androidx.recyclerview.widget.RecyclerView;
 
 public class CenterSpaceItemDecoration extends RecyclerView.ItemDecoration {
-    private int spanCount;
-    private int spacing;
+    private final int spanCount;
+    private final int spacing;
 
     public CenterSpaceItemDecoration(int spanCount, int spacing) {
         this.spanCount = spanCount;

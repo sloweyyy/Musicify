@@ -21,14 +21,11 @@ import android.widget.LinearLayout;
 import android.widget.SeekBar;
 import android.widget.TextView;
 import android.widget.Toast;
-
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentManager;
-import androidx.fragment.app.FragmentTransaction;
-
 import com.bumptech.glide.Glide;
 import com.example.musicapp.R;
 import com.example.musicapp.adapter.FetchAccessToken;
@@ -44,13 +41,11 @@ import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FieldValue;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.gson.annotations.SerializedName;
-
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-
 import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
@@ -62,25 +57,21 @@ import retrofit2.http.Path;
 import retrofit2.http.Query;
 
 public class LyricFragment extends Fragment implements FetchAccessToken.AccessTokenCallback{
-    private FetchAccessToken fetchAccessToken;
-    private View view;
-    private Handler handler = new Handler(Looper.getMainLooper());
-    private Runnable updateSeekBarRunnable;
-
     private static final String API_KEY = "63a9e2c4de53b2981cc9b3a8df6b9f32";
     private static final String API_BASE_URL = "https://api.musixmatch.com/ws/1.1/";
-
+    PlaySongFragment playSongFragment = new PlaySongFragment();
+    private FetchAccessToken fetchAccessToken;
+    private View view;
+    private final Handler handler = new Handler(Looper.getMainLooper());
+    private Runnable updateSeekBarRunnable;
     private boolean isPlaying;
     private String songIdhMusixmatc;
-
     private List<Song> songList;
     private List<Song> songListOrigin;
     private String songId;
     private int currentPosition;
-
     private boolean isNullLyric;
     private MediaPlayerManager mediaPlayerManager;
-    PlaySongFragment playSongFragment = new PlaySongFragment();
     private ImageView background, threeDots, artistAvata, heartBtn, repeateBtn, shuffleBtn;
     private String songNameValue, artistNameValue, avataValue, played_value, total_value, urlAudioValue, albumId, artistId;
     private LinearLayout backButtonLayout;
@@ -105,7 +96,7 @@ public class LyricFragment extends Fragment implements FetchAccessToken.AccessTo
         view = inflater.inflate(R.layout.lyric, container, false);
         ((BottomAppBarListener) requireActivity()).hideBottomAppBar();
         mediaPlayerManager = MediaPlayerManager.getInstance();
-        if (mediaPlayerManager.getIsPlaying() == true) {
+        if (mediaPlayerManager.getIsPlaying()) {
             mediaPlayerManager.getMediaPlayer().start();
         }
         if (getArguments() != null) {
@@ -601,7 +592,7 @@ public class LyricFragment extends Fragment implements FetchAccessToken.AccessTo
             mediaPlayerManager.setMediaSource(play_Url);
             if (mediaPlayerManager.getIsPlaying()) mediaPlayerManager.getMediaPlayer().start();
         }
-        seekBar.setMax((int) (mediaPlayerManager.getMediaPlayer().getDuration() / 1000));
+        seekBar.setMax(mediaPlayerManager.getMediaPlayer().getDuration() / 1000);
         totalDuration.setText(formattedTime(mediaPlayerManager.getMediaPlayer().getDuration() / 1000));
         updateSeekBarRunnable = new Runnable() {
             @Override
@@ -664,7 +655,7 @@ public class LyricFragment extends Fragment implements FetchAccessToken.AccessTo
     }
     public void setupPauseButton() {
         backButtonLayout.setOnClickListener(v -> {
-            if (mediaPlayerManager.getIsPlaying() == true) {
+            if (mediaPlayerManager.getIsPlaying()) {
                 if (mediaPlayerManager.getMediaPlayer() != null) { // Check if mediaPlayer is initialized
                     mediaPlayerManager.getMediaPlayer().pause();
                 }
@@ -681,7 +672,7 @@ public class LyricFragment extends Fragment implements FetchAccessToken.AccessTo
         });
 
         pauseBtn.setOnClickListener(v -> {
-            if (mediaPlayerManager.getIsPlaying() == true) {
+            if (mediaPlayerManager.getIsPlaying()) {
                 if (mediaPlayerManager.getMediaPlayer() != null) { // Check if mediaPlayer is initialized
                     mediaPlayerManager.getMediaPlayer().pause();
                 }
@@ -721,7 +712,7 @@ public class LyricFragment extends Fragment implements FetchAccessToken.AccessTo
                             songIdhMusixmatc = searchResponse.getMessageBody().getBody().getTrackList().getTrackInfo().getId();
                             commondId = searchResponse.getMessageBody().getBody().getTrackList().getTrackInfo().getIdCommon();
                             getLyric(songIdhMusixmatc);
-                            if (isNullLyric == true)
+                            if (isNullLyric)
                                 getLyric(commondId);
                         } else {
                             lyric.setText("Don't have lyrics");
@@ -831,16 +822,7 @@ public class LyricFragment extends Fragment implements FetchAccessToken.AccessTo
             return songList.get(0).getId();
         }
     }
-    private interface OnIsLikedCallback {
-        void onResult(boolean isLiked);
-    }
-    private interface OnRepeatCallback {
-        void onResult(boolean isRepeat);
-    }
 
-    private interface OnShuffleCallback {
-        void onResult(boolean isShuffle);
-    }
     private void checkIsLiked(String id, OnIsLikedCallback callback) {
         FirebaseAuth mAuth = FirebaseAuth.getInstance();
         String userId = mAuth.getCurrentUser().getUid();
@@ -850,26 +832,22 @@ public class LyricFragment extends Fragment implements FetchAccessToken.AccessTo
             if (!queryDocumentSnapshots.isEmpty()) {
                 DocumentSnapshot userDoc = queryDocumentSnapshots.getDocuments().get(0);
                 List<String> likedSongs = (List<String>) userDoc.get("likedsong");
-                if (likedSongs != null && likedSongs.contains(id)) {
-                    callback.onResult(true);
-                } else {
-                    callback.onResult(false);
-                }
+                callback.onResult(likedSongs != null && likedSongs.contains(id));
             }
         }).addOnFailureListener(e -> {
             Log.e("SongAdapter", "Failed to retrieve user document: " + e.getMessage());
             callback.onResult(false);
         });
     }
+
     private void checkIsRepeat(OnRepeatCallback callback) {
-        if (mediaPlayerManager.getIsRepeat() == true) callback.onResult(true);
-        else callback.onResult(false);
+        callback.onResult(mediaPlayerManager.getIsRepeat());
     }
+
     private void checkIsShuffle(OnShuffleCallback callback) {
-        if (mediaPlayerManager.getIsShuffle() == true) {
-            callback.onResult(true);
-        } else callback.onResult(false);
+        callback.onResult(mediaPlayerManager.getIsShuffle());
     }
+
     private void removeSongFromLikedSongs(String songId) {
         FirebaseAuth mAuth = FirebaseAuth.getInstance();
         String userId = mAuth.getCurrentUser().getUid();
@@ -890,6 +868,7 @@ public class LyricFragment extends Fragment implements FetchAccessToken.AccessTo
             Log.e("SongAdapter", "Failed to retrieve user document: " + e.getMessage());
         });
     }
+
     public void addSongToLikedSongs(String songId) {
         FirebaseAuth mAuth = FirebaseAuth.getInstance();
         String userId = mAuth.getCurrentUser().getUid();
@@ -910,6 +889,15 @@ public class LyricFragment extends Fragment implements FetchAccessToken.AccessTo
         }).addOnFailureListener(e -> {
             Log.e("SongAdapter", "Failed to retrieve user document: " + e.getMessage());
         });
+    }
+    private interface OnIsLikedCallback {
+        void onResult(boolean isLiked);
+    }
+    private interface OnRepeatCallback {
+        void onResult(boolean isRepeat);
+    }
+    private interface OnShuffleCallback {
+        void onResult(boolean isShuffle);
     }
     public interface MusixmatchApi {
         @GET("track.search")

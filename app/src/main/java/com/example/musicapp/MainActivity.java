@@ -19,7 +19,6 @@ import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
-
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
@@ -30,7 +29,6 @@ import androidx.core.content.ContextCompat;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentManager;
 import androidx.fragment.app.FragmentTransaction;
-
 import com.bumptech.glide.Glide;
 import com.example.musicapp.activities.Launching;
 import com.example.musicapp.databinding.ActivityMainBinding;
@@ -48,28 +46,65 @@ import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.EventListener;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.FirebaseFirestoreException;
-
 import java.util.List;
 import java.util.Map;
 
 public class MainActivity extends AppCompatActivity implements BottomAppBarListener, PlaySongFragment.OnPlayingStateChangeListener, PlaySongFragment.MiniPlayerListener {
-    private boolean isPlayingMusic;
     private static final String MUSIC_NOTIFICATION_CHANNEL_ID = "Musicify";
     private static final int NOTIFICATION_ID = 1001;
-    ActivityMainBinding binding;
     private static final int PERMISSION_REQUEST_CODE = 1;
+    ActivityMainBinding binding;
     String currentSongName;
     FirebaseFirestore db;
     String songId;
     FirebaseUser currentUser;
     SharedPreferences sharedPreferences;
+    ImageButton resumeBtn;
+    private boolean isPlayingMusic;
+    private final Application.ActivityLifecycleCallbacks activityLifecycleCallbacks = new Application.ActivityLifecycleCallbacks() {
+        @Override
+        public void onActivityCreated(@NonNull Activity activity, @Nullable Bundle savedInstanceState) {
+
+        }
+
+        @Override
+        public void onActivityStarted(@NonNull Activity activity) {
+
+        }
+
+        @Override
+        public void onActivityResumed(@NonNull Activity activity) {
+
+        }
+
+        @Override
+        public void onActivityPaused(@NonNull Activity activity) {
+            if (isPlayingMusic) Log.d("inside Actitivy pause", "true");
+            else Log.d("inside Actitivy pause", "false");
+            if (isPlayingMusic) {
+                sendContinueListeningNotification(currentSongName);
+            }
+        }
+
+        @Override
+        public void onActivityStopped(@NonNull Activity activity) {
+        }
+
+        @Override
+        public void onActivitySaveInstanceState(@NonNull Activity activity, @NonNull Bundle outState) {
+
+        }
+
+        @Override
+        public void onActivityDestroyed(@NonNull Activity activity) {
+
+        }
+    };
     private TextView miniPlayerSongTitle, miniPlayerArtistName;
     private ImageView miniPlayerImage;
     private LinearLayout miniPlayerLayout;
     private int currentSongIndex = 0;
-    ImageButton resumeBtn;
     private List<Song> songList;
-
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -188,7 +223,6 @@ public class MainActivity extends AppCompatActivity implements BottomAppBarListe
         }
         handleIntent(getIntent());
     }
-
 
     @Override
     public void updateMiniPlayer(List<Song> songList, int currentPosition) {
@@ -356,46 +390,6 @@ public class MainActivity extends AppCompatActivity implements BottomAppBarListe
             startActivity(intent);
         }
     }
-
-    private final Application.ActivityLifecycleCallbacks activityLifecycleCallbacks = new Application.ActivityLifecycleCallbacks() {
-        @Override
-        public void onActivityCreated(@NonNull Activity activity, @Nullable Bundle savedInstanceState) {
-
-        }
-
-        @Override
-        public void onActivityStarted(@NonNull Activity activity) {
-
-        }
-
-        @Override
-        public void onActivityResumed(@NonNull Activity activity) {
-
-        }
-
-        @Override
-        public void onActivityPaused(@NonNull Activity activity) {
-            if (isPlayingMusic) Log.d("inside Actitivy pause", "true");
-            else Log.d("inside Actitivy pause", "false");
-            if (isPlayingMusic) {
-                sendContinueListeningNotification(currentSongName);
-            }
-        }
-
-        @Override
-        public void onActivityStopped(@NonNull Activity activity) {
-        }
-
-        @Override
-        public void onActivitySaveInstanceState(@NonNull Activity activity, @NonNull Bundle outState) {
-
-        }
-
-        @Override
-        public void onActivityDestroyed(@NonNull Activity activity) {
-
-        }
-    };
 
     @Override
     protected void onDestroy() {

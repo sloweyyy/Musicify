@@ -5,18 +5,15 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
-
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
-
 import com.example.musicapp.R;
 import com.example.musicapp.adapter.SongAdapter;
 import com.example.musicapp.manager.MediaPlayerManager;
 import com.example.musicapp.model.Song;
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment;
-
 import java.util.List;
 
 public class UpcomingSongFragment extends BottomSheetDialogFragment {

@@ -1,57 +1,54 @@
 package com.example.musicapp.model;
 
 import com.example.musicapp.R;
+
 public class Album {
-    private String id;
-    private String name;
-    private String artistName;
-    private int thumbnail;
+  private String id;
+  private String name;
+  private String artistName;
+  private int thumbnail;
 
-    public Album() {}
+  public Album() {}
 
-    public Album(String name, String artistName, int thumbnail) {
-        this.name = name;
-        this.artistName = artistName;
-        this.thumbnail = thumbnail;
-    }
+  public Album(String name, String artistName, int thumbnail) {
+    this.name = name;
+    this.artistName = artistName;
+    this.thumbnail = thumbnail;
+  }
 
-    public String getName() {
-        return name;
-    }
+  public String getName() {
+    return name;
+  }
 
+  public void setName(String name) {
+    this.name = name;
+  }
 
-    public String getArtistName() {
-        return artistName;
-    }
+  public String getArtistName() {
+    return artistName;
+  }
 
-    public int getThumbnail() {
-        return thumbnail;
-    }
+  public void setArtistName(String artistName) {
+    this.artistName = artistName;
+  }
 
-    public int getImageResource() {
-        return thumbnail;
-    }
+  public int getThumbnail() {
+    return thumbnail;
+  }
 
-    public String getId() {
-        return id;
-    }
+  public void setThumbnail(int thumbnail) {
+    this.thumbnail = thumbnail;
+  }
 
-    public void setId(String id) {
-        this.id = id;
-    }
+  public int getImageResource() {
+    return thumbnail;
+  }
 
-    public void setName(String name) {
-        this.name = name;
-    }
+  public String getId() {
+    return id;
+  }
 
-    public void setArtistName(String artistName) {
-        this.artistName = artistName;
-    }
-
-    public void setThumbnail(int thumbnail) {
-        this.thumbnail = thumbnail;
-    }
+  public void setId(String id) {
+    this.id = id;
+  }
 }
-
-
-

@@ -4,18 +4,12 @@ import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.Toast;
-
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
-
-import com.example.musicapp.fragment.ExploreFragment;
 import com.example.musicapp.model.TokenResponse;
 import com.example.musicapp.service.SpotifyAuthService;
-
 import java.io.IOException;
 import java.util.Base64;
-
 import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
@@ -26,24 +20,7 @@ public class FetchAccessToken
 {
     private String accessToken;
     private long tokenExpirationTime;
-    public interface AccessTokenCallback {
-        void onTokenReceived(String accessToken);
 
-        @Nullable
-        View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState);
-    }
-    public static class AccessTokenWrapper
-    {
-        private String accessToken;
-
-        public void setAccessToken(String accessToken) {
-            this.accessToken = accessToken;
-        }
-
-        public String getAccessToken() {
-            return accessToken;
-        }
-    }
     private void setAccessTokenExpiration(long expiresIn) {
         long currentTimeMillis = System.currentTimeMillis();
         tokenExpirationTime = currentTimeMillis + expiresIn * 1000; // Chuyển đổi từ giây sang mili giây
@@ -98,6 +75,25 @@ public class FetchAccessToken
             }
         });
 //        return accessTokenWrapper.getAccessToken();
+    }
+    public interface AccessTokenCallback {
+        void onTokenReceived(String accessToken);
+
+        @Nullable
+        View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState);
+    }
+
+    public static class AccessTokenWrapper
+    {
+        private String accessToken;
+
+        public String getAccessToken() {
+            return accessToken;
+        }
+
+        public void setAccessToken(String accessToken) {
+            this.accessToken = accessToken;
+        }
     }
 
 }

@@ -2,43 +2,34 @@ package com.example.musicapp.fragment;
 
 import android.net.Uri;
 import android.os.Bundle;
-
-import android.util.Log;
-
-import androidx.annotation.NonNull;
-import androidx.fragment.app.Fragment;
-import androidx.lifecycle.ViewModelProvider;
-import androidx.recyclerview.widget.LinearLayoutManager;
-import androidx.recyclerview.widget.RecyclerView;
-
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.TextView;
-
-
+import androidx.fragment.app.Fragment;
+import androidx.lifecycle.ViewModelProvider;
+import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
 import com.example.musicapp.R;
+import com.example.musicapp.adapter.FetchAccessToken;
 import com.example.musicapp.adapter.LikedAlbumAdapter;
 import com.example.musicapp.model.AlbumSimplified;
 import com.example.musicapp.viewmodel.LikedAlbumViewModel;
-import com.example.musicapp.adapter.FetchAccessToken;
 import com.google.firebase.storage.FirebaseStorage;
-
 import java.util.ArrayList;
 import java.util.List;
 
-
 public class LikedAlbumsFragment extends Fragment implements FetchAccessToken.AccessTokenCallback {
+    private static final int PICK_IMAGE_REQUEST = 1;
+    List<AlbumSimplified> albumList = new ArrayList<>();
     private View view;
     private RecyclerView recyclerView;
     private LikedAlbumViewModel viewModel;
     private LikedAlbumAdapter adapter;
-    List<AlbumSimplified> albumList = new ArrayList<>();
     private FetchAccessToken fetchAccessToken;
     private String accessToken;
     private FirebaseStorage storage;
-    private static final int PICK_IMAGE_REQUEST = 1;
     private Uri selectedImageUri;
 
 

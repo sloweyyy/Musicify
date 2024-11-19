@@ -8,26 +8,23 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.TextView;
-
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentManager;
 import androidx.fragment.app.FragmentTransaction;
 import androidx.recyclerview.widget.RecyclerView;
-
 import com.bumptech.glide.Glide;
 import com.example.musicapp.R;
 import com.example.musicapp.fragment.PlaylistDetailFragment;
 import com.example.musicapp.model.Playlist;
-
 import java.util.List;
 
 public class PlaylistAdapter extends RecyclerView.Adapter<PlaylistAdapter.ViewHolder> {
 
-    private Context context;
-    private List<Playlist> playlistList;
-    private String userId;
+    private final Context context;
+    private final List<Playlist> playlistList;
+    private final String userId;
 
     public PlaylistAdapter(Context context, List<Playlist> playlistList, String userId) {
         this.context = context;
@@ -69,11 +66,18 @@ public class PlaylistAdapter extends RecyclerView.Adapter<PlaylistAdapter.ViewHo
         return playlistList.size();
     }
 
+    // Method to update the playlist list
+    public void updatePlaylistList(List<Playlist> playlists) {
+        playlistList.clear();
+        playlistList.addAll(playlists);
+        notifyDataSetChanged();
+    }
+
     public class ViewHolder extends RecyclerView.ViewHolder {
 
-        private ImageView playlistImage;
-        private TextView playlistName;
-        private TextView playlistCount;
+        private final ImageView playlistImage;
+        private final TextView playlistName;
+        private final TextView playlistCount;
 
         public ViewHolder(@NonNull View itemView) {
             super(itemView);
@@ -93,14 +97,6 @@ public class PlaylistAdapter extends RecyclerView.Adapter<PlaylistAdapter.ViewHo
             int songCount = playlist.getSongs().size();
             playlistCount.setText(songCount + " songs");
         }
-    }
-
-
-    // Method to update the playlist list
-    public void updatePlaylistList(List<Playlist> playlists) {
-        playlistList.clear();
-        playlistList.addAll(playlists);
-        notifyDataSetChanged();
     }
 
 

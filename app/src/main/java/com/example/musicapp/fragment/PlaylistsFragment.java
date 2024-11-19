@@ -14,14 +14,12 @@ import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
-
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.fragment.app.Fragment;
 import androidx.lifecycle.ViewModelProvider;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
-
 import com.example.musicapp.R;
 import com.example.musicapp.adapter.PlaylistAdapter;
 import com.example.musicapp.model.Playlist;
@@ -29,26 +27,19 @@ import com.example.musicapp.viewmodel.PlaylistViewModel;
 import com.google.android.material.bottomsheet.BottomSheetDialog;
 import com.google.android.material.tabs.TabLayout;
 import com.google.firebase.auth.FirebaseAuth;
-
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
 public class PlaylistsFragment extends Fragment {
+    private static final int PICK_IMAGE_REQUEST = 1;
     private View view;
     private TabLayout tabLayout;
-
     private RecyclerView recyclerView;
     private PlaylistAdapter adapter;
-
-    private enum SortState {
-        DEFAULT, BY_NAME, BY_CREATED_AT
-    }
-
     private SortState currentSortState = SortState.DEFAULT;
 
     private PlaylistViewModel playlistViewModel;
-    private static final int PICK_IMAGE_REQUEST = 1;
     private Uri selectedImageUri;
     private BottomSheetDialog bottomSheetDialog;
 
@@ -189,5 +180,9 @@ public class PlaylistsFragment extends Fragment {
             ImageView playlistImage = bottomSheetDialog.findViewById(R.id.playlistImage);
             playlistImage.setImageURI(selectedImageUri);
         }
+    }
+
+    private enum SortState {
+        DEFAULT, BY_NAME, BY_CREATED_AT
     }
 }

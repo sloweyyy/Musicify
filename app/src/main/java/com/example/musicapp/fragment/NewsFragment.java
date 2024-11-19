@@ -1,19 +1,15 @@
 package com.example.musicapp.fragment;
 
 import android.app.AlertDialog;
-import android.content.Context;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Toast;
-
-import androidx.annotation.NonNull;
 import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
-
 import com.example.musicapp.R;
 import com.example.musicapp.adapter.FetchAccessToken;
 import com.example.musicapp.adapter.PlaylistHomeAdapter;
@@ -23,10 +19,8 @@ import com.example.musicapp.model.PlaylistSimplified;
 import com.example.musicapp.model.SimplifiedTrack;
 import com.example.musicapp.model.Song;
 import com.google.gson.annotations.SerializedName;
-
 import java.util.ArrayList;
 import java.util.List;
-
 import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
@@ -38,16 +32,15 @@ import retrofit2.http.Path;
 
 public class NewsFragment extends Fragment implements FetchAccessToken.AccessTokenCallback  {
 
+    private final String playlistId = "37i9dQZF1DX5G3iiHaIzdf";
+    private final String categoryId = "party";
+    HomeFragment homeFragment;
     private View view;
     private RecyclerView trackRecyclerView, playlistRecyclerView;
     private FetchAccessToken fetchAccessToken;
     private SongHomeAdapter songHomeAdapter;
     private PlaylistHomeAdapter playlistHomeAdapter;
     private String accesstoken;
-    HomeFragment homeFragment;
-    private final String playlistId = "37i9dQZF1DX5G3iiHaIzdf";
-    private final String categoryId = "party";
-
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
@@ -160,16 +153,14 @@ public class NewsFragment extends Fragment implements FetchAccessToken.AccessTok
     }
 
     public static class PlaylistsModel {
+        @SerializedName("playlists")
+        public Item Playlists;
         @SerializedName("message")
         private String message;
 
         public String getMessage() {
             return message;
         }
-
-        @SerializedName("playlists")
-        public Item Playlists;
-
 
         public static class Item {
             @SerializedName("items")

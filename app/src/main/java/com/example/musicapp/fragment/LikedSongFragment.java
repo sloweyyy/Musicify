@@ -14,8 +14,6 @@ import android.widget.ImageButton;
 import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
-import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentManager;
 import androidx.lifecycle.ViewModelProvider;
@@ -27,24 +25,17 @@ import com.example.musicapp.adapter.SongAdapter;
 import com.example.musicapp.model.SimplifiedTrack;
 import com.example.musicapp.model.Song;
 import com.example.musicapp.viewmodel.LikedSongViewModel;
-import com.google.firebase.auth.FirebaseAuth;
-import com.google.firebase.firestore.DocumentSnapshot;
-import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.storage.FirebaseStorage;
-
 import java.util.ArrayList;
 import java.util.List;
-
 import retrofit2.Call;
-import retrofit2.Callback;
-import retrofit2.Response;
-import retrofit2.Retrofit;
-import retrofit2.converter.gson.GsonConverterFactory;
 import retrofit2.http.GET;
 import retrofit2.http.Header;
 import retrofit2.http.Path;
 
 public class LikedSongFragment extends Fragment implements FetchAccessToken.AccessTokenCallback {
+    private static final int PICK_IMAGE_REQUEST = 1;
+    HomeFragment homeFragment;
     private View view;
     private TextView songCount, sortStateText;
     private FetchAccessToken fetchAccessToken;
@@ -59,22 +50,15 @@ public class LikedSongFragment extends Fragment implements FetchAccessToken.Acce
     private Button backBtn, sortBtn;
     private SongAdapter songAdapter;
     private LikedSongViewModel viewModel;
+    private SortState currentSortState = SortState.DEFAULT;
+    private FirebaseStorage storage;
+    private Uri selectedImageUri;
 
     @Override
     public void onTokenReceived(String accessToken) {
         this.accessToken = accessToken;
       viewModel.fetchLikedSongs(accessToken);
     }
-
-    private enum SortState {
-        DEFAULT, BY_NAME
-    }
-
-    private SortState currentSortState = SortState.DEFAULT;
-    private FirebaseStorage storage;
-    private static final int PICK_IMAGE_REQUEST = 1;
-    private Uri selectedImageUri;
-    HomeFragment homeFragment;
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
@@ -172,7 +156,6 @@ public class LikedSongFragment extends Fragment implements FetchAccessToken.Acce
             if (songAdapter != null) {
                 songAdapter.notifyDataSetChanged();
             }
-            return;
         } else {
             recyclerViewSearch.setVisibility(View.VISIBLE);
             recyclerView.setVisibility(View.GONE);
@@ -180,7 +163,7 @@ public class LikedSongFragment extends Fragment implements FetchAccessToken.Acce
             for (Song song : songAdapter.getSongs()) {
                 if (song.getTitle().toLowerCase().contains(query.toLowerCase())) {
                     filteredSongs.add(song);
-                    Log.e("FilteredSong: " + "", filteredSongs.toString());
+                    Log.e("FilteredSong: ", filteredSongs.toString());
                 }
             }
             songAdapter = new SongAdapter(getContext(), filteredSongs,homeFragment);
@@ -215,6 +198,10 @@ public class LikedSongFragment extends Fragment implements FetchAccessToken.Acce
                 // Not used
             }
         });
+    }
+
+    private enum SortState {
+        DEFAULT, BY_NAME
     }
 
 

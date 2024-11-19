@@ -15,14 +15,12 @@ import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
-
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AlertDialog;
 import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
-
 import com.bumptech.glide.Glide;
 import com.example.musicapp.R;
 import com.example.musicapp.adapter.FetchAccessToken;
@@ -36,11 +34,9 @@ import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
-
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
-
 import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
@@ -52,6 +48,12 @@ import retrofit2.http.Path;
 
 public class PlaylistDetailFragment extends Fragment implements FetchAccessToken.AccessTokenCallback {
 
+    private static final int PICK_IMAGE_REQUEST = 1;
+    private static final String ARG_PLAYLIST_ID = "playlistId";
+    private static final String ARG_PLAYLIST_NAME = "playlistName";
+    private static final String ARG_PLAYLIST_DESCRIPTION = "playlistDescription";
+    private static final String ARG_PLAYLIST_THUMBNAIL = "playlistThumbnail";
+    private static final String ARG_PLAYLIST_IMAGE_URL = "playlistImageURL";
     private RecyclerView recyclerView;
     private SongAdapter adapter;
     private List<Song> songList;
@@ -60,14 +62,7 @@ public class PlaylistDetailFragment extends Fragment implements FetchAccessToken
     private BottomSheetDialog editPlaylistDialog;
     private Playlist currentPlaylist;
     private Uri selectedImageUri;
-    private static final int PICK_IMAGE_REQUEST = 1;
     private FirebaseStorage storage;
-
-    private static final String ARG_PLAYLIST_ID = "playlistId";
-    private static final String ARG_PLAYLIST_NAME = "playlistName";
-    private static final String ARG_PLAYLIST_DESCRIPTION = "playlistDescription";
-    private static final String ARG_PLAYLIST_THUMBNAIL = "playlistThumbnail";
-    private static final String ARG_PLAYLIST_IMAGE_URL = "playlistImageURL";
     private String mPlaylistImageURL;
     private String mPlaylistName;
     private String mPlaylistDescription;
@@ -119,7 +114,7 @@ public class PlaylistDetailFragment extends Fragment implements FetchAccessToken
         nameTextView = view.findViewById(R.id.playlistName);
         descriptionTextView = view.findViewById(R.id.playlistDescription);
         fetchAccessToken = new FetchAccessToken();
-        fetchAccessToken.getTokenFromSpotify((FetchAccessToken.AccessTokenCallback) this);
+        fetchAccessToken.getTokenFromSpotify(this);
         threeDotsButton = view.findViewById(R.id.threeDots);
         backButton = getView().findViewById(R.id.iconBack);
         descriptionTextView.setVisibility(View.GONE);
@@ -433,11 +428,6 @@ public class PlaylistDetailFragment extends Fragment implements FetchAccessToken
                 });
     }
 
-    public interface SpotifyApiService {
-        @GET("v1/tracks/{trackId}")
-        Call<SimplifiedTrack> getTrack(@Header("Authorization") String authorization, @Path("trackId") String trackId);
-    }
-
     @Override
     public void onTokenReceived(String accessToken) {
         this.accessToken = accessToken;
@@ -446,5 +436,10 @@ public class PlaylistDetailFragment extends Fragment implements FetchAccessToken
         } else {
             Log.e("PlaylistDetailFragment", "Playlist ID is null");
         }
+    }
+
+    public interface SpotifyApiService {
+        @GET("v1/tracks/{trackId}")
+        Call<SimplifiedTrack> getTrack(@Header("Authorization") String authorization, @Path("trackId") String trackId);
     }
 }

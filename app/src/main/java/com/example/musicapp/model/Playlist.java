@@ -1,7 +1,6 @@
 package com.example.musicapp.model;
 
 import com.example.musicapp.R;
-
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
@@ -66,16 +65,32 @@ public class Playlist {
         return name;
     }
 
+    public void setName(String name) {
+        this.name = name;
+    }
+
     public String getUserId() {
         return userId;
+    }
+
+    public void setUserId(String userId) {
+        this.userId = userId;
     }
 
     public String getDescription() {
         return description;
     }
 
+    public void setDescription(String description) {
+        this.description = description;
+    }
+
     public int getThumbnail() {
         return thumbnail;
+    }
+
+    public void setThumbnail(int thumbnail) {
+        this.thumbnail = thumbnail;
     }
 
     public int getSongCount() {
@@ -98,10 +113,6 @@ public class Playlist {
         this.imageURL = imageURL;
     }
 
-    public void setPrivacyIcon(int privacyIcon) {
-        this.privacyIcon = privacyIcon;
-    }
-
     public int getPrivacyIcon() {
         if ("Private".equals(privacy)) {
             return R.drawable.ic_private;
@@ -110,8 +121,8 @@ public class Playlist {
         }
     }
 
-    public void setUserId(String userId) {
-        this.userId = userId;
+    public void setPrivacyIcon(int privacyIcon) {
+        this.privacyIcon = privacyIcon;
     }
 
     public String getId() {
@@ -120,19 +131,6 @@ public class Playlist {
 
     public void setId(String id) {
         this.id = id;
-    }
-
-
-    public void setName(String name) {
-        this.name = name;
-    }
-
-    public void setDescription(String description) {
-        this.description = description;
-    }
-
-    public void setThumbnail(int thumbnail) {
-        this.thumbnail = thumbnail;
     }
 
     public String getPrivacy() {

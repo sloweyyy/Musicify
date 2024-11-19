@@ -10,11 +10,9 @@ import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
-
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.recyclerview.widget.RecyclerView;
-
 import com.bumptech.glide.Glide;
 import com.example.musicapp.R;
 import com.example.musicapp.fragment.AlbumDetailFragment;
@@ -23,21 +21,11 @@ import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FieldValue;
 import com.google.firebase.firestore.FirebaseFirestore;
-
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Comparator;
 import java.util.List;
-import java.time.LocalDateTime;
-import java.util.HashMap;
-import java.util.LinkedHashMap;
-import java.util.Map;
-import java.util.stream.Collectors;
-
 
 public class AlbumAdapter extends RecyclerView.Adapter<AlbumAdapter.ViewHolder>{
-    private Context context;
-    private List<AlbumSimplified> likedAlbumsList;
+    private final Context context;
+    private final List<AlbumSimplified> likedAlbumsList;
 
     public AlbumAdapter(Context context, List<AlbumSimplified> likedAlbumsList) {
         this.context = context;
@@ -96,23 +84,88 @@ public class AlbumAdapter extends RecyclerView.Adapter<AlbumAdapter.ViewHolder>{
                 });
     }
 
-    private interface OnIsLikedCallback {
-        void onResult(boolean isLiked);
-    }
-
-    public interface OnItemClickListener {
-        void onItemClick(AlbumSimplified albumSimplified);
-    }
-
     @Override
     public int getItemCount() {
         return likedAlbumsList.size();
     }
 
+    // Method to update the likedAlbum list
+    public void updateLikedAlbumList(List<AlbumSimplified> albums) {
+        likedAlbumsList.clear();
+        likedAlbumsList.addAll(albums);
+        notifyDataSetChanged();
+    }
+
+    // Method to delete a liked album from Firestore
+    public void unlikeAlbum(String albumId) {
+        String userId = FirebaseAuth.getInstance().getCurrentUser().getUid();
+        FirebaseFirestore db = FirebaseFirestore.getInstance();
+
+        db.collection("users")
+                .whereEqualTo("id", userId)
+                .get()
+                .addOnSuccessListener(queryDocumentSnapshots -> {
+                    if (!queryDocumentSnapshots.isEmpty()) {
+                        DocumentSnapshot userDoc = queryDocumentSnapshots.getDocuments().get(0);
+                        userDoc.getReference().update("likedAlbums", FieldValue.arrayRemove(albumId))
+                                .addOnSuccessListener(aVoid -> {
+                                    Toast.makeText(context, "Removed from liked albums successfully", Toast.LENGTH_SHORT).show();
+
+                                })
+                                .addOnFailureListener(e -> {
+                                    Log.e("AlbumAdapter", "Failed to remove album from liked albums: " + e.getMessage());
+                                });
+                    } else {
+                        Log.e("AlbumAdapter", "No user document found with userId: " + userId);
+                    }
+                })
+                .addOnFailureListener(e -> {
+                    Log.e("AlbumAdapter", "Failed to retrieve user document: " + e.getMessage());
+                });
+    }
+
+    public void addAlbumToLikedAlbums(String albumId) {
+        String userId = FirebaseAuth.getInstance().getCurrentUser().getUid();
+        FirebaseFirestore db = FirebaseFirestore.getInstance();
+        db.collection("users")
+                .whereEqualTo("id", userId)
+                .get()
+                .addOnSuccessListener(queryDocumentSnapshots -> {
+                    if (!queryDocumentSnapshots.isEmpty()) {
+                        DocumentSnapshot userDoc = queryDocumentSnapshots.getDocuments().get(0);
+                        userDoc.getReference().update("likedAlbums", FieldValue.arrayUnion(albumId))
+                                .addOnSuccessListener(aVoid -> {
+                                    Toast.makeText(context, "Add to liked albums successfully", Toast.LENGTH_SHORT).show();
+                                    notifyDataSetChanged();
+                                })
+                                .addOnFailureListener(e -> {
+                                    // Handle the error
+                                    Log.e("AlbumAdapter", "Failed to add album to liked albums: " + e.getMessage());
+                                });
+                    } else {
+                        Log.e("AlbumAdapter", "No user document found with userId: " + userId);
+                    }
+                })
+                .addOnFailureListener(e -> {
+                    Log.e("AlbumAdapter", "Failed to retrieve user document: " + e.getMessage());
+                });
+    }
+
+    private interface OnIsLikedCallback {
+        void onResult(boolean isLiked);
+    }
+
+    // Method to sort the album list by name
+
+
+    public interface OnItemClickListener {
+        void onItemClick(AlbumSimplified albumSimplified);
+    }
+
     public class ViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener{
-        private ImageView albumImage;
-        private TextView albumName;
-        private ImageView heartBtn;
+        private final ImageView albumImage;
+        private final TextView albumName;
+        private final ImageView heartBtn;
         private AlbumAdapter.OnItemClickListener listener;
 
         public ViewHolder(@NonNull View itemView) {
@@ -176,69 +229,5 @@ public class AlbumAdapter extends RecyclerView.Adapter<AlbumAdapter.ViewHolder>{
         public void setOnItemClickListener(AlbumAdapter.OnItemClickListener listenerInput) {
             listener = listenerInput;
         }
-    }
-
-    // Method to update the likedAlbum list
-    public void updateLikedAlbumList(List<AlbumSimplified> albums) {
-        likedAlbumsList.clear();
-        likedAlbumsList.addAll(albums);
-        notifyDataSetChanged();
-    }
-
-    // Method to sort the album list by name
-
-
-    // Method to delete a liked album from Firestore
-    public void unlikeAlbum(String albumId) {
-        String userId = FirebaseAuth.getInstance().getCurrentUser().getUid();
-        FirebaseFirestore db = FirebaseFirestore.getInstance();
-
-        db.collection("users")
-                .whereEqualTo("id", userId)
-                .get()
-                .addOnSuccessListener(queryDocumentSnapshots -> {
-                    if (!queryDocumentSnapshots.isEmpty()) {
-                        DocumentSnapshot userDoc = queryDocumentSnapshots.getDocuments().get(0);
-                        userDoc.getReference().update("likedAlbums", FieldValue.arrayRemove(albumId))
-                                .addOnSuccessListener(aVoid -> {
-                                    Toast.makeText(context, "Removed from liked albums successfully", Toast.LENGTH_SHORT).show();
-
-                                })
-                                .addOnFailureListener(e -> {
-                                    Log.e("AlbumAdapter", "Failed to remove album from liked albums: " + e.getMessage());
-                                });
-                    } else {
-                        Log.e("AlbumAdapter", "No user document found with userId: " + userId);
-                    }
-                })
-                .addOnFailureListener(e -> {
-                    Log.e("AlbumAdapter", "Failed to retrieve user document: " + e.getMessage());
-                });
-    }
-    public void addAlbumToLikedAlbums(String albumId) {
-        String userId = FirebaseAuth.getInstance().getCurrentUser().getUid();
-        FirebaseFirestore db = FirebaseFirestore.getInstance();
-        db.collection("users")
-                .whereEqualTo("id", userId)
-                .get()
-                .addOnSuccessListener(queryDocumentSnapshots -> {
-                    if (!queryDocumentSnapshots.isEmpty()) {
-                        DocumentSnapshot userDoc = queryDocumentSnapshots.getDocuments().get(0);
-                        userDoc.getReference().update("likedAlbums", FieldValue.arrayUnion(albumId))
-                                .addOnSuccessListener(aVoid -> {
-                                    Toast.makeText(context, "Add to liked albums successfully", Toast.LENGTH_SHORT).show();
-                                    notifyDataSetChanged();
-                                })
-                                .addOnFailureListener(e -> {
-                                    // Handle the error
-                                    Log.e("AlbumAdapter", "Failed to add album to liked albums: " + e.getMessage());
-                                });
-                    } else {
-                        Log.e("AlbumAdapter", "No user document found with userId: " + userId);
-                    }
-                })
-                .addOnFailureListener(e -> {
-                    Log.e("AlbumAdapter", "Failed to retrieve user document: " + e.getMessage());
-                });
     }
 }

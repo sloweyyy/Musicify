@@ -9,12 +9,10 @@ import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
-
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.fragment.app.FragmentManager;
 import androidx.recyclerview.widget.RecyclerView;
-
 import com.bumptech.glide.Glide;
 import com.example.musicapp.R;
 import com.example.musicapp.fragment.PlaySongFragment;
@@ -25,31 +23,18 @@ import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FieldValue;
 import com.google.firebase.firestore.FirebaseFirestore;
-
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
 public class SongAdapter extends RecyclerView.Adapter<SongAdapter.ViewHolder> {
 
-    private Context context;
+    private final Context context;
     private List<Song> songList;
     private OnSongSelectedListener listener;
     private OnLongItemClickListener longItemClickListener;
-    private FirebaseFirestore db = FirebaseFirestore.getInstance();
-    private FirebaseAuth mAuth = FirebaseAuth.getInstance();
-
-    public interface OnSongSelectedListener {
-        void onSongSelected(Song song);
-    }
-
-    public interface OnLongItemClickListener {
-        void onLongItemClick(Song song);
-    }
-
-    public void setOnLongItemClickListener(OnLongItemClickListener listener) {
-        this.longItemClickListener = listener;
-    }
+    private final FirebaseFirestore db = FirebaseFirestore.getInstance();
+    private final FirebaseAuth mAuth = FirebaseAuth.getInstance();
 
     public SongAdapter(Context context, List<Song> songList, OnSongSelectedListener listener) {
         this.context = context;
@@ -62,9 +47,8 @@ public class SongAdapter extends RecyclerView.Adapter<SongAdapter.ViewHolder> {
         this.songList = songList;
     }
 
-    public void setSongs(List<Song> songs) {
-        this.songList = songs;
-        notifyDataSetChanged();
+    public void setOnLongItemClickListener(OnLongItemClickListener listener) {
+        this.longItemClickListener = listener;
     }
 
     public void sortSongByName() {
@@ -83,10 +67,6 @@ public class SongAdapter extends RecyclerView.Adapter<SongAdapter.ViewHolder> {
             }
         });
         notifyDataSetChanged();
-    }
-
-    public interface OnItemClickListener {
-        void onItemClick(PlaylistAPI playlist);
     }
 
     @NonNull
@@ -180,6 +160,11 @@ public class SongAdapter extends RecyclerView.Adapter<SongAdapter.ViewHolder> {
         return songList;
     }
 
+    public void setSongs(List<Song> songs) {
+        this.songList = songs;
+        notifyDataSetChanged();
+    }
+
     public boolean hasSong(String songId) {
         for (Song song : songList) {
             if (song.getId().equals(songId)) {
@@ -192,10 +177,6 @@ public class SongAdapter extends RecyclerView.Adapter<SongAdapter.ViewHolder> {
     public void addSong(Song song) {
         songList.add(song);
         notifyItemInserted(songList.size() - 1);
-    }
-
-    private interface OnIsLikedCallback {
-        void onResult(boolean isLiked);
     }
 
     private void checkIsLiked(String id, OnIsLikedCallback callback) {
@@ -214,6 +195,54 @@ public class SongAdapter extends RecyclerView.Adapter<SongAdapter.ViewHolder> {
     @Override
     public int getItemCount() {
         return (songList != null) ? songList.size() : 0;
+    }
+
+    public void PlayFirstSong() {
+        handleSongClick(0);
+    }
+
+    private void removeSongFromLikedSongs(String songId) {
+        String userId = mAuth.getCurrentUser().getUid();
+        db.collection("users").whereEqualTo("id", userId).get().addOnSuccessListener(queryDocumentSnapshots -> {
+            if (!queryDocumentSnapshots.isEmpty()) {
+                DocumentSnapshot userDoc = queryDocumentSnapshots.getDocuments().get(0);
+                userDoc.getReference().update("likedsong", FieldValue.arrayRemove(songId)).addOnSuccessListener(aVoid -> {
+                    Toast.makeText(context, "Removed from liked songs successfully", Toast.LENGTH_SHORT).show();
+                }).addOnFailureListener(e -> Log.e("SongAdapter", "Failed to remove song from liked songs: " + e.getMessage()));
+            } else {
+                Log.e("SongAdapter", "No user document found with userId: " + userId);
+            }
+        }).addOnFailureListener(e -> Log.e("SongAdapter", "Failed to retrieve user document: " + e.getMessage()));
+    }
+
+    public void addSongToLikedSongs(String songId) {
+        String userId = mAuth.getCurrentUser().getUid();
+        db.collection("users").whereEqualTo("id", userId).get().addOnSuccessListener(queryDocumentSnapshots -> {
+            if (!queryDocumentSnapshots.isEmpty()) {
+                DocumentSnapshot userDoc = queryDocumentSnapshots.getDocuments().get(0);
+                userDoc.getReference().update("likedsong", FieldValue.arrayUnion(songId)).addOnSuccessListener(aVoid -> {
+                    Toast.makeText(context, "Added to liked songs successfully", Toast.LENGTH_SHORT).show();
+                }).addOnFailureListener(e -> Log.e("SongAdapter", "Failed to add song to liked songs: " + e.getMessage()));
+            } else {
+                Log.e("SongAdapter", "No user document found with userId: " + userId);
+            }
+        }).addOnFailureListener(e -> Log.e("SongAdapter", "Failed to retrieve user document: " + e.getMessage()));
+    }
+
+    public interface OnSongSelectedListener {
+        void onSongSelected(Song song);
+    }
+
+    public interface OnLongItemClickListener {
+        void onLongItemClick(Song song);
+    }
+
+    public interface OnItemClickListener {
+        void onItemClick(PlaylistAPI playlist);
+    }
+
+    private interface OnIsLikedCallback {
+        void onResult(boolean isLiked);
     }
 
     public class ViewHolder extends RecyclerView.ViewHolder {
@@ -248,37 +277,5 @@ public class SongAdapter extends RecyclerView.Adapter<SongAdapter.ViewHolder> {
                 }
             });
         }
-    }
-
-    public void PlayFirstSong() {
-        handleSongClick(0);
-    }
-
-    private void removeSongFromLikedSongs(String songId) {
-        String userId = mAuth.getCurrentUser().getUid();
-        db.collection("users").whereEqualTo("id", userId).get().addOnSuccessListener(queryDocumentSnapshots -> {
-            if (!queryDocumentSnapshots.isEmpty()) {
-                DocumentSnapshot userDoc = queryDocumentSnapshots.getDocuments().get(0);
-                userDoc.getReference().update("likedsong", FieldValue.arrayRemove(songId)).addOnSuccessListener(aVoid -> {
-                    Toast.makeText(context, "Removed from liked songs successfully", Toast.LENGTH_SHORT).show();
-                }).addOnFailureListener(e -> Log.e("SongAdapter", "Failed to remove song from liked songs: " + e.getMessage()));
-            } else {
-                Log.e("SongAdapter", "No user document found with userId: " + userId);
-            }
-        }).addOnFailureListener(e -> Log.e("SongAdapter", "Failed to retrieve user document: " + e.getMessage()));
-    }
-
-    public void addSongToLikedSongs(String songId) {
-        String userId = mAuth.getCurrentUser().getUid();
-        db.collection("users").whereEqualTo("id", userId).get().addOnSuccessListener(queryDocumentSnapshots -> {
-            if (!queryDocumentSnapshots.isEmpty()) {
-                DocumentSnapshot userDoc = queryDocumentSnapshots.getDocuments().get(0);
-                userDoc.getReference().update("likedsong", FieldValue.arrayUnion(songId)).addOnSuccessListener(aVoid -> {
-                    Toast.makeText(context, "Added to liked songs successfully", Toast.LENGTH_SHORT).show();
-                }).addOnFailureListener(e -> Log.e("SongAdapter", "Failed to add song to liked songs: " + e.getMessage()));
-            } else {
-                Log.e("SongAdapter", "No user document found with userId: " + userId);
-            }
-        }).addOnFailureListener(e -> Log.e("SongAdapter", "Failed to retrieve user document: " + e.getMessage()));
     }
 }

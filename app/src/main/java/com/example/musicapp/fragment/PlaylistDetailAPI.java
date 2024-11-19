@@ -1,6 +1,5 @@
 package com.example.musicapp.fragment;
 
-import android.app.AlertDialog;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -9,7 +8,6 @@ import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
-
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
@@ -17,25 +15,15 @@ import androidx.fragment.app.FragmentManager;
 import androidx.lifecycle.ViewModelProvider;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
-
 import com.bumptech.glide.Glide;
 import com.example.musicapp.R;
 import com.example.musicapp.adapter.FetchAccessToken;
 import com.example.musicapp.adapter.SongAdapter;
 import com.example.musicapp.model.SimplifiedTrack;
-import com.example.musicapp.model.Song;
 import com.example.musicapp.viewmodel.PlaylistDetailAPIViewModel;
-import com.example.musicapp.viewmodel.PlaylistDetailViewModel;
 import com.google.gson.annotations.SerializedName;
-
-import java.util.ArrayList;
 import java.util.List;
-
 import retrofit2.Call;
-import retrofit2.Callback;
-import retrofit2.Response;
-import retrofit2.Retrofit;
-import retrofit2.converter.gson.GsonConverterFactory;
 import retrofit2.http.GET;
 import retrofit2.http.Header;
 import retrofit2.http.Path;
@@ -43,6 +31,7 @@ import retrofit2.http.Path;
 public class PlaylistDetailAPI extends Fragment implements FetchAccessToken.AccessTokenCallback {
     View view;
     RecyclerView recyclerView;
+    HomeFragment homeFragment;
     private PlaylistDetailAPIViewModel viewModel;
     private FetchAccessToken fetchAccessToken;
     private PlaylistSimplified playlistSimplified;
@@ -54,10 +43,7 @@ public class PlaylistDetailAPI extends Fragment implements FetchAccessToken.Acce
     private TextView playlistName;
     private TextView playlistDescription;
     private ImageView imageView;
-
     private SongAdapter songAdapter;
-    HomeFragment homeFragment;
-
 
     @Override
     public void onTokenReceived(String accessToken) {
@@ -172,29 +158,28 @@ public class PlaylistDetailAPI extends Fragment implements FetchAccessToken.Acce
     }
 
     public class PlaylistSimplified {
+        @SerializedName("images")
+        public List<imageModel> images;
+        @SerializedName("tracks")
+        public TracksModel tracksContainer;
         @SerializedName("description")
         private String description;
+        @SerializedName("id")
+        private String id;
+        @SerializedName("name")
+        private String name;
 
         public String getDescription() {
             return description;
         }
 
-        @SerializedName("id")
-        private String id;
-
         public String getId() {
             return id;
         }
 
-        @SerializedName("name")
-        private String name;
-
         public String getName() {
             return name;
         }
-
-        @SerializedName("images")
-        public List<imageModel> images;
 
         public class imageModel {
             @SerializedName("url")
@@ -204,9 +189,6 @@ public class PlaylistDetailAPI extends Fragment implements FetchAccessToken.Acce
                 return url;
             }
         }
-
-        @SerializedName("tracks")
-        public TracksModel tracksContainer;
 
     }
 

@@ -9,11 +9,9 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.TextView;
-
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.recyclerview.widget.RecyclerView;
-
 import com.bumptech.glide.Glide;
 import com.example.musicapp.R;
 import com.example.musicapp.fragment.ArtistDetailFragment;
@@ -23,15 +21,15 @@ import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.firestore.FieldValue;
 import com.google.firebase.firestore.FirebaseFirestore;
-
 import java.util.List;
+
 public class ArtitstHomeAdapter extends RecyclerView.Adapter<ArtitstHomeAdapter.ViewHolder> {
 
-    private Context context;
-    private List<Artist> artistList;
     String userId;
     FirebaseUser user;
     FirebaseAuth mAuth;
+    private final Context context;
+    private final List<Artist> artistList;
 
     public ArtitstHomeAdapter(Context context, List<Artist> artistList) {
         this.context = context;
@@ -48,11 +46,7 @@ public class ArtitstHomeAdapter extends RecyclerView.Adapter<ArtitstHomeAdapter.
                 .addOnSuccessListener(documentSnapshot -> {
                     if (documentSnapshot.exists()) {
                         List<String> likedArtists = (List<String>) documentSnapshot.get("likedArtist");
-                        if (likedArtists != null && likedArtists.contains(artistId)) {
-                            callback.onResult(true);
-                        } else {
-                            callback.onResult(false);
-                        }
+                        callback.onResult(likedArtists != null && likedArtists.contains(artistId));
                     } else {
                         Log.e("ArtitstHomeAdapter", "User document does not exist");
                         callback.onResult(false);

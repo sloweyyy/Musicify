@@ -2,13 +2,12 @@ package com.example.musicapp.fragment;
 
 import android.app.AlertDialog;
 import android.app.Dialog;
+import android.content.Context;
 import android.content.DialogInterface;
 import android.graphics.Color;
+import android.os.Bundle;
 import android.os.Handler;
 import android.os.Looper;
-import android.content.Context;
-import android.graphics.Color;
-import android.os.Bundle;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -18,79 +17,54 @@ import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
-import android.widget.Toast;
-
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 import androidx.lifecycle.ViewModelProvider;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
-
 import com.bumptech.glide.Glide;
 import com.example.musicapp.R;
 import com.example.musicapp.adapter.AlbumAdapter;
 import com.example.musicapp.adapter.FetchAccessToken;
 import com.example.musicapp.adapter.SongAdapter;
-import com.example.musicapp.model.AlbumSimplified;
 import com.example.musicapp.model.Artist;
 import com.example.musicapp.model.BottomAppBarListener;
-import com.example.musicapp.model.SimplifiedTrack;
 import com.example.musicapp.model.Song;
 import com.example.musicapp.viewmodel.ArtistDetailViewModel;
-import com.google.firebase.auth.FirebaseAuth;
-import com.google.firebase.firestore.DocumentSnapshot;
-import com.google.firebase.firestore.FieldValue;
+import com.google.android.gms.tasks.OnFailureListener;
+import com.google.android.gms.tasks.OnSuccessListener;
+import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.FirebaseFirestore;
-import com.google.gson.annotations.SerializedName;
-
 import java.util.ArrayList;
-
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-
-import retrofit2.Call;
-import retrofit2.Callback;
-import retrofit2.Response;
-import retrofit2.Retrofit;
-import retrofit2.converter.gson.GsonConverterFactory;
-import retrofit2.http.GET;
-import retrofit2.http.Header;
-import retrofit2.http.Path;
-import com.example.musicapp.adapter.FetchAccessToken;
-import com.google.android.gms.tasks.OnFailureListener;
-import com.google.android.gms.tasks.OnSuccessListener;
-import com.google.firebase.auth.FirebaseAuth;
-import com.google.firebase.firestore.DocumentReference;
-import com.google.firebase.firestore.DocumentSnapshot;
-import com.google.firebase.firestore.FieldValue;
-import com.google.firebase.firestore.FirebaseFirestore;
-import com.google.gson.annotations.SerializedName;
-import android.content.Context;
 import jp.wasabeef.blurry.Blurry;
 
 public class ArtistDetailFragment extends Fragment implements FetchAccessToken.AccessTokenCallback {
+    HomeFragment homeFragment;
     private RecyclerView recyclerViewAlbums;
     private ArtistDetailViewModel viewModel;
     private AlbumAdapter albumAdapter;
     private SongAdapter songAdapter;
     private RecyclerView recyclerViewSongs;
     private Artist artist;
-    private List<Artist> followedArtists = new ArrayList<>();
+    private final List<Artist> followedArtists = new ArrayList<>();
     private Button backButton;
     private Button moreButton;
     private View view;
     private String artistId;
     private String accessToken;
     private FetchAccessToken fetchAccessToken;
-    HomeFragment homeFragment;
     private TextView artistName;
     private ImageView imageView;
-    private Handler handler = new Handler(Looper.getMainLooper());
+    private final Handler handler = new Handler(Looper.getMainLooper());
 
     private boolean isFragmentAttached = false;
+
+    public ArtistDetailFragment() {
+    }
 
     @Override
     public void onAttach(@NonNull Context context) {
@@ -102,9 +76,6 @@ public class ArtistDetailFragment extends Fragment implements FetchAccessToken.A
     public void onDetach() {
         super.onDetach();
         isFragmentAttached = false;
-    }
-
-    public ArtistDetailFragment() {
     }
 
     @Override

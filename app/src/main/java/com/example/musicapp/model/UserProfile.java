@@ -1,40 +1,40 @@
 package com.example.musicapp.model;
 
 public class UserProfile {
-    private String name;
-    private String email;
-    private String backgroundImageUrl;
-    private String avatarUrl;
+  private String name;
+  private String email;
+  private String backgroundImageUrl;
+  private String avatarUrl;
 
-    public String getName() {
-        return name;
-    }
+  public String getName() {
+    return name;
+  }
 
-    public String getEmail() {
-        return email;
-    }
+  public void setName(String name) {
+    this.name = name;
+  }
 
-    public String getBackgroundImageUrl() {
-        return backgroundImageUrl;
-    }
+  public String getEmail() {
+    return email;
+  }
 
-    public String getAvatarUrl() {
-        return avatarUrl;
-    }
+  public void setEmail(String email) {
+    this.email = email;
+  }
 
-    public void setName(String name) {
-        this.name = name;
-    }
+  public String getBackgroundImageUrl() {
+    return backgroundImageUrl;
+  }
 
-    public void setEmail(String email) {
-        this.email = email;
-    }
+  public void setBackgroundImageUrl(String backgroundImageUrl) {
+    this.backgroundImageUrl = backgroundImageUrl;
+  }
 
-    public void setBackgroundImageUrl(String backgroundImageUrl) {
-        this.backgroundImageUrl = backgroundImageUrl;
-    }
+  public String getAvatarUrl() {
+    return avatarUrl;
+  }
 
-    public void setAvatarUrl(String avatarUrl) {
-        this.avatarUrl = avatarUrl;
-    }
+  public void setAvatarUrl(String avatarUrl) {
+    this.avatarUrl = avatarUrl;
+  }
 }

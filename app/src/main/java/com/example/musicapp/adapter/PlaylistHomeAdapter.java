@@ -9,11 +9,9 @@ import android.view.ViewGroup;
 import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.TextView;
-
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.recyclerview.widget.RecyclerView;
-
 import com.example.musicapp.R;
 import com.example.musicapp.fragment.PlaylistDetailAPI;
 import com.example.musicapp.model.PlaylistAPI;
@@ -21,15 +19,14 @@ import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.firestore.FieldValue;
 import com.google.firebase.firestore.FirebaseFirestore;
-
 import java.util.List;
 
 public class PlaylistHomeAdapter extends RecyclerView.Adapter<PlaylistHomeAdapter.ViewHolder> {
-    private Context context;
     List<PlaylistAPI> playlistList;
     String userId;
     FirebaseUser user;
     FirebaseAuth mAuth;
+    private final Context context;
 
     public PlaylistHomeAdapter(Context context, List<PlaylistAPI> playlistList) {
         this.context = context;
@@ -62,11 +59,7 @@ public class PlaylistHomeAdapter extends RecyclerView.Adapter<PlaylistHomeAdapte
                 .addOnSuccessListener(documentSnapshot -> {
                     if (documentSnapshot.exists()) {
                         List<String> likedPlaylist = (List<String>) documentSnapshot.get("likedPlaylist");
-                        if (likedPlaylist != null && likedPlaylist.contains(playlistId)) {
-                            callback.onResult(true);
-                        } else {
-                            callback.onResult(false);
-                        }
+                        callback.onResult(likedPlaylist != null && likedPlaylist.contains(playlistId));
                     } else {
                         Log.e("PlaylistHomeAdapter", "User document does not exist");
                         callback.onResult(false);
@@ -100,13 +93,13 @@ public class PlaylistHomeAdapter extends RecyclerView.Adapter<PlaylistHomeAdapte
         });
     }
 
-    private interface OnIsLikedCallback {
-        void onResult(boolean isLiked);
-    }
-
     @Override
     public int getItemCount() {
         return playlistList.size();
+    }
+
+    private interface OnIsLikedCallback {
+        void onResult(boolean isLiked);
     }
 
     public class ViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener {

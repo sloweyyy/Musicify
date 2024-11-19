@@ -5,12 +5,10 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
-
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 import androidx.viewpager2.widget.ViewPager2;
-
 import com.example.musicapp.R;
 import com.example.musicapp.adapter.TabFavoriteAdapter;
 import com.google.android.material.tabs.TabLayout;

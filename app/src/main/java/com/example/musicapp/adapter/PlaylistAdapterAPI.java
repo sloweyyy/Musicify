@@ -6,22 +6,17 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.TextView;
-
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.recyclerview.widget.RecyclerView;
-
 import com.bumptech.glide.Glide;
 import com.example.musicapp.R;
-
 import com.example.musicapp.fragment.PlaylistDetailAPI;
-
 import com.example.musicapp.model.PlaylistAPI;
-
 import java.util.List;
 
 public class PlaylistAdapterAPI extends RecyclerView.Adapter<PlaylistAdapterAPI.myViewHolder>{
-    private List<PlaylistAPI> Playlists;
+    private final List<PlaylistAPI> Playlists;
 
     public PlaylistAdapterAPI(List<PlaylistAPI> Playlists) {
         this.Playlists = Playlists;
@@ -62,12 +57,11 @@ public class PlaylistAdapterAPI extends RecyclerView.Adapter<PlaylistAdapterAPI.
 
     class myViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener
     {
-        private PlaylistAdapterAPI.OnItemClickListener listener;
         TextView textViewName;
         ImageView imageView;
-
         ImageView anhOKhoa;
         TextView textViewTotal;
+        private PlaylistAdapterAPI.OnItemClickListener listener;
         public myViewHolder(@NonNull View itemView, PlaylistAdapterAPI.OnItemClickListener listener) {
             super(itemView);
             itemView.setOnClickListener(this);

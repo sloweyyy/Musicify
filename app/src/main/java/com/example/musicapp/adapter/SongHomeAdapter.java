@@ -9,33 +9,25 @@ import android.view.ViewGroup;
 import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.TextView;
-
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.fragment.app.FragmentManager;
 import androidx.recyclerview.widget.RecyclerView;
-
 import com.bumptech.glide.Glide;
 import com.example.musicapp.R;
 import com.example.musicapp.fragment.PlaySongFragment;
 import com.example.musicapp.model.Song;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.firestore.FirebaseFirestore;
-
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
 public class SongHomeAdapter extends RecyclerView.Adapter<SongHomeAdapter.ViewHolder> {
-    private Context context;
-    private List<Song> songList;
     int position;
-
-    public interface OnSongSelectedListener {
-        void onSongSelected(Song song);
-    }
-
-    private OnSongSelectedListener listener;
+    private final Context context;
+    private final List<Song> songList;
+    private final OnSongSelectedListener listener;
 
     public SongHomeAdapter(Context context, List<Song> songList, OnSongSelectedListener listener) {
         this.context = context;
@@ -66,6 +58,10 @@ public class SongHomeAdapter extends RecyclerView.Adapter<SongHomeAdapter.ViewHo
     @Override
     public int getItemCount() {
         return songList.size();
+    }
+
+    public interface OnSongSelectedListener {
+        void onSongSelected(Song song);
     }
 
     public class ViewHolder extends RecyclerView.ViewHolder {

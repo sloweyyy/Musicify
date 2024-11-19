@@ -2,7 +2,6 @@ package com.example.musicapp.activities;
 
 import android.annotation.SuppressLint;
 import android.content.Intent;
-import android.media.Image;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Looper;
@@ -10,22 +9,20 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.TextView;
-
 import androidx.activity.EdgeToEdge;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.graphics.Insets;
 import androidx.core.view.ViewCompat;
 import androidx.core.view.WindowInsetsCompat;
-
 import com.bumptech.glide.Glide;
 import com.example.musicapp.R;
 
 public class GettingStartedActivity extends AppCompatActivity {
     TextView typingt;
-    private String fullText = "Your ultimate music experience";
-    private int index = 0;
     Button btnStart;
     Handler handler;
+    private final String fullText = "Your ultimate music experience";
+    private int index = 0;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {

@@ -2,7 +2,6 @@ package com.example.musicapp.fragment;
 
 import android.app.AlertDialog;
 import android.os.Bundle;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -10,25 +9,19 @@ import android.widget.Button;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
-
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentManager;
-import androidx.recyclerview.widget.GridLayoutManager;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
-
 import com.example.musicapp.R;
 import com.example.musicapp.adapter.FetchAccessToken;
 import com.example.musicapp.adapter.PlaylistAdapter;
 import com.example.musicapp.adapter.PlaylistAdapterAPI;
-import com.example.musicapp.adapter.exploreAdapter;
 import com.example.musicapp.model.PlaylistAPI;
 import com.google.gson.annotations.SerializedName;
-
 import java.util.List;
-
 import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
@@ -41,13 +34,11 @@ import retrofit2.http.Path;
 public class List_Playlist extends Fragment implements FetchAccessToken.AccessTokenCallback {
     View view;
     RecyclerView recyclerView;
-
+    TextView header;
     private String categoryId;
-
     private PlaylistAdapter adapter;
     private LinearLayout backButtonLayout;
     private Button iconBack;
-    TextView header;
     private FetchAccessToken fetchAccessToken;
     @Nullable
     @Override
@@ -130,27 +121,28 @@ public class List_Playlist extends Fragment implements FetchAccessToken.AccessTo
         }
 
     }
+
+    public void getPlaylist(String accessToken){
+    }
     public interface SpotifyApiService {
         @GET("v1/browse/categories/{categoryId}/playlists")
         Call<List_Playlist.PlaylistsModel> getPlaylists(@Header("Authorization") String authorization, @Path("categoryId") String categoryId);
     }
+
     public static class PlaylistsModel {
+        @SerializedName("playlists")
+        public Item Playlists;
         @SerializedName("message")
         private String message;
+
         public String getMessage() {
             return message;
         }
-
-        @SerializedName("playlists")
-        public Item Playlists;
-
 
         public static class Item {
             @SerializedName("items")
             public List<PlaylistAPI> PlaylistsArray;
 
         }
-    }
-    public void getPlaylist(String accessToken){
     }
 }

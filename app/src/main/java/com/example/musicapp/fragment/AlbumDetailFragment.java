@@ -7,14 +7,12 @@ import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.TextView;
-
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 import androidx.lifecycle.ViewModelProvider;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
-
 import com.bumptech.glide.Glide;
 import com.example.musicapp.R;
 import com.example.musicapp.adapter.FetchAccessToken;
@@ -23,11 +21,11 @@ import com.example.musicapp.model.AlbumSimplified;
 import com.example.musicapp.model.Artist;
 import com.example.musicapp.model.Song;
 import com.example.musicapp.viewmodel.AlbumDetailViewModel;
-
 import java.util.ArrayList;
 import java.util.List;
 
 public class AlbumDetailFragment extends Fragment implements FetchAccessToken.AccessTokenCallback {
+    HomeFragment homeFragment;
     private RecyclerView recyclerView;
     private AlbumDetailViewModel viewModel;
     private SongAdapter songAdapter;
@@ -39,10 +37,8 @@ public class AlbumDetailFragment extends Fragment implements FetchAccessToken.Ac
     private String accessToken;
     private FetchAccessToken fetchAccessToken;
     private TextView albumName;
-
     private TextView albumArtist;
     private ImageView imageView;
-    HomeFragment homeFragment;
 
     public AlbumDetailFragment() {
     }

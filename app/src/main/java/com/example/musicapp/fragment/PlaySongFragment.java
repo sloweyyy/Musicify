@@ -24,13 +24,11 @@ import android.widget.SeekBar;
 import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
-
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.fragment.app.FragmentManager;
 import androidx.fragment.app.FragmentTransaction;
-
 import com.bumptech.glide.Glide;
 import com.example.musicapp.R;
 import com.example.musicapp.adapter.FetchAccessToken;
@@ -48,14 +46,12 @@ import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FieldValue;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.gson.annotations.SerializedName;
-
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-
 import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
@@ -67,40 +63,32 @@ import retrofit2.http.Path;
 
 public class PlaySongFragment extends BottomSheetDialogFragment implements FetchAccessToken.AccessTokenCallback, OnSongSelectedListener {
 
+    private static PlaySongFragment instance;
+    public String accessToken;
     private View view;
-    private Handler handler = new Handler(Looper.getMainLooper());
+    private final Handler handler = new Handler(Looper.getMainLooper());
     private Runnable updateSeekBarRunnable;
     private int currentPosition;
     private Spinner speedSpinner;
-
     private List<Song> songList;
-
     private List<Song> songListOrigin;
-
     private String albumId;
     private MediaPlayerManager mediaPlayerManager;
     private String songnameValue, artistnameValue, avataValue, played_value, total_value, urlAudioValue, artistId;
     private TextView songname, artistname, duration_played, duration_total, lyric;
     private ImageView cover_art, threeDots, repeateBtn, shuffleBtn;
     private ImageButton previousBtn, pauseBtn, nextBtn, show_lyricBtn;
-
     private LinearLayout backButtonLayout, lyricLayout, threeDotsLayout, iconBackPlayingLayout;
-
     private Button iconBackPlaying;
-
     private SeekBar seekBar;
     private boolean isPlaying = false;
-    private int position = -1;
+    private final int position = -1;
     private FetchAccessToken fetchAccessToken;
-    public String accessToken;
-
     private ImageView heartBtn;
     private String songId, previousSongId, nextSongId;
-
     private ImageView miniPlayerPlayPauseButton;
-
     private SongAdapter songAdapter; // Add SongAdapter here
-    private static PlaySongFragment instance;
+    private OnPlayingStateChangeListener playingStateChangeListener;
 
     public static PlaySongFragment getInstance(List<Song> songList, String songId) {
         if (instance == null) {
@@ -113,15 +101,9 @@ public class PlaySongFragment extends BottomSheetDialogFragment implements Fetch
         return instance;
     }
 
-    public interface OnPlayingStateChangeListener {
-        void onPlayingStateChanged(boolean isPlaying);
-    }
-
     public void setPlayingStateChangedListener(OnPlayingStateChangeListener listener) {
         this.playingStateChangeListener = listener;
     }
-
-    private OnPlayingStateChangeListener playingStateChangeListener;
 
     @Override
     public void onTokenReceived(String accessToken) {
@@ -711,7 +693,6 @@ public class PlaySongFragment extends BottomSheetDialogFragment implements Fetch
 
     }
 
-
     private void checkIsLiked(String id, OnIsLikedCallback callback) {
         FirebaseAuth mAuth = FirebaseAuth.getInstance();
         String userId = mAuth.getCurrentUser().getUid();
@@ -721,11 +702,7 @@ public class PlaySongFragment extends BottomSheetDialogFragment implements Fetch
             if (!queryDocumentSnapshots.isEmpty()) {
                 DocumentSnapshot userDoc = queryDocumentSnapshots.getDocuments().get(0);
                 List<String> likedSongs = (List<String>) userDoc.get("likedsong");
-                if (likedSongs != null && likedSongs.contains(id)) {
-                    callback.onResult(true);
-                } else {
-                    callback.onResult(false);
-                }
+                callback.onResult(likedSongs != null && likedSongs.contains(id));
             }
         }).addOnFailureListener(e -> {
             Log.e("SongAdapter", "Failed to retrieve user document: " + e.getMessage());
@@ -734,21 +711,16 @@ public class PlaySongFragment extends BottomSheetDialogFragment implements Fetch
     }
 
     private void checkIsRepeat(OnRepeatCallback callback) {
-        if (mediaPlayerManager.getIsRepeat() == true) callback.onResult(true);
-        else callback.onResult(false);
+        callback.onResult(mediaPlayerManager.getIsRepeat());
     }
 
     private void checkIsPlaying(OnPlayingCallback callback) {
-        if (mediaPlayerManager.getIsPlaying() == true) callback.nResult(true);
-        else callback.nResult(false);
+        callback.nResult(mediaPlayerManager.getIsPlaying());
     }
 
     private void checkIsShuffle(OnShuffleCallback callback) {
-        if (mediaPlayerManager.getIsShuffle() == true) {
-            callback.onResult(true);
-        } else callback.onResult(false);
+        callback.onResult(mediaPlayerManager.getIsShuffle());
     }
-
 
     private void removeSongFromLikedSongs(String songId) {
         FirebaseAuth mAuth = FirebaseAuth.getInstance();
@@ -881,7 +853,7 @@ public class PlaySongFragment extends BottomSheetDialogFragment implements Fetch
 //                mediaPlayerManager.getMediaPlayer().seekTo(mediaPlayerManager.getLastPlaybackPosition());
                 mediaPlayerManager.getMediaPlayer().start();
             }
-            seekBar.setMax((int) (mediaPlayerManager.getMediaPlayer().getDuration() / 1000));
+            seekBar.setMax(mediaPlayerManager.getMediaPlayer().getDuration() / 1000);
             duration_total.setText(formattedTime(mediaPlayerManager.getMediaPlayer().getDuration() / 1000));
             updateSeekBarRunnable = new Runnable() {
                 @Override
@@ -920,7 +892,6 @@ public class PlaySongFragment extends BottomSheetDialogFragment implements Fetch
         }
     }
 
-
     public void setupSeekBar() {
         seekBar.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
             @Override
@@ -951,7 +922,7 @@ public class PlaySongFragment extends BottomSheetDialogFragment implements Fetch
             playingStateChangeListener.onPlayingStateChanged(isPlaying);
         }
         pauseBtn.setOnClickListener(v -> {
-            if (mediaPlayerManager.getIsPlaying() == true) {
+            if (mediaPlayerManager.getIsPlaying()) {
                 if (mediaPlayerManager.getMediaPlayer() != null) { // Check if mediaPlayer is initialized
                     //currentPosition = mediaPlayerManager.getMediaPlayer().getCurrentPosition();
                     mediaPlayerManager.getMediaPlayer().pause();
@@ -1044,7 +1015,6 @@ public class PlaySongFragment extends BottomSheetDialogFragment implements Fetch
         transaction.commit();
     }
 
-
     private void updateCurrentSong(String newSongId) {
         if (newSongId != null && !newSongId.isEmpty() && !newSongId.equals(songId)) {
             this.songId = newSongId;
@@ -1079,6 +1049,42 @@ public class PlaySongFragment extends BottomSheetDialogFragment implements Fetch
         }
     }
 
+    public void updatePlayPauseButton() {
+        if (mediaPlayerManager.getIsPlaying()) {
+            miniPlayerPlayPauseButton.setImageResource(R.drawable.ic_pause);
+        } else {
+            miniPlayerPlayPauseButton.setImageResource(R.drawable.ic_play);
+        }
+    }
+
+    public void playPause() {
+        if (mediaPlayerManager.getIsPlaying()) {
+            mediaPlayerManager.getMediaPlayer().pause();
+        } else {
+            mediaPlayerManager.getMediaPlayer().start();
+        }
+        mediaPlayerManager.setIsPlaying(!mediaPlayerManager.getIsPlaying());
+        updatePlayPauseButton();
+    }
+
+    private void updateRecentListeningSong(Song song) {
+        FirebaseFirestore db = FirebaseFirestore.getInstance();
+        FirebaseAuth mAuth = FirebaseAuth.getInstance();
+        String userId = mAuth.getCurrentUser().getUid();
+        Map<String, Object> recentListeningSong = new HashMap<>();
+        recentListeningSong.put("songName", song.getTitle());
+        recentListeningSong.put("imageURL", song.getImageUrl());
+        recentListeningSong.put("artistName", song.getArtist());
+        recentListeningSong.put("songId", song.getId());
+        db.collection("users").document(userId).update("recentListeningSong", recentListeningSong)
+                .addOnSuccessListener(aVoid -> Log.d("SongAdapter", "Recent listening song updated successfully"))
+                .addOnFailureListener(e -> Log.e("SongAdapter", "Failed to update recent listening song: " + e.getMessage()));
+    }
+
+    public interface OnPlayingStateChangeListener {
+        void onPlayingStateChanged(boolean isPlaying);
+    }
+
     private interface OnIsLikedCallback {
         void onResult(boolean isLiked);
     }
@@ -1098,6 +1104,18 @@ public class PlaySongFragment extends BottomSheetDialogFragment implements Fetch
     public interface SpotifyApi {
         @GET("v1/tracks/{songId}")
         Call<TrackModel> getTrack(@Header("Authorization") String authorization, @Path("songId") String songId);
+    }
+
+    public interface OnPreviousSongClickListener {
+        void onPreviousSongClick(String previousSongId);
+    }
+
+    public interface MiniPlayerListener {
+        void updateMiniPlayer(List<Song> songList, int currentPosition);
+
+        void showMiniPlayer();
+
+        void hideMiniPlayer();
     }
 
     public static class TrackModel {
@@ -1162,50 +1180,6 @@ public class PlaySongFragment extends BottomSheetDialogFragment implements Fetch
                 }
             }
         }
-    }
-
-    public void updatePlayPauseButton() {
-        if (mediaPlayerManager.getIsPlaying()) {
-            miniPlayerPlayPauseButton.setImageResource(R.drawable.ic_pause);
-        } else {
-            miniPlayerPlayPauseButton.setImageResource(R.drawable.ic_play);
-        }
-    }
-
-    public void playPause() {
-        if (mediaPlayerManager.getIsPlaying()) {
-            mediaPlayerManager.getMediaPlayer().pause();
-        } else {
-            mediaPlayerManager.getMediaPlayer().start();
-        }
-        mediaPlayerManager.setIsPlaying(!mediaPlayerManager.getIsPlaying());
-        updatePlayPauseButton();
-    }
-
-    public interface OnPreviousSongClickListener {
-        void onPreviousSongClick(String previousSongId);
-    }
-
-    public interface MiniPlayerListener {
-        void updateMiniPlayer(List<Song> songList, int currentPosition);
-
-        void showMiniPlayer();
-
-        void hideMiniPlayer();
-    }
-
-    private void updateRecentListeningSong(Song song) {
-        FirebaseFirestore db = FirebaseFirestore.getInstance();
-        FirebaseAuth mAuth = FirebaseAuth.getInstance();
-        String userId = mAuth.getCurrentUser().getUid();
-        Map<String, Object> recentListeningSong = new HashMap<>();
-        recentListeningSong.put("songName", song.getTitle());
-        recentListeningSong.put("imageURL", song.getImageUrl());
-        recentListeningSong.put("artistName", song.getArtist());
-        recentListeningSong.put("songId", song.getId());
-        db.collection("users").document(userId).update("recentListeningSong", recentListeningSong)
-                .addOnSuccessListener(aVoid -> Log.d("SongAdapter", "Recent listening song updated successfully"))
-                .addOnFailureListener(e -> Log.e("SongAdapter", "Failed to update recent listening song: " + e.getMessage()));
     }
 
 }

@@ -7,14 +7,12 @@ import android.app.Dialog;
 import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.Toast;
-
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.widget.AppCompatButton;
@@ -22,25 +20,22 @@ import androidx.fragment.app.DialogFragment;
 import androidx.lifecycle.ViewModelProvider;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
-
 import com.example.musicapp.R;
 import com.example.musicapp.adapter.AddToPlaylistAdapter;
 import com.example.musicapp.model.Playlist;
 import com.example.musicapp.viewmodel.PlaylistViewModel;
 import com.google.android.material.bottomsheet.BottomSheetDialog;
 import com.google.firebase.auth.FirebaseAuth;
-
 import java.util.ArrayList;
 import java.util.List;
 
 public class AddToPlayListFragment extends DialogFragment {
+    private static final int PICK_IMAGE_REQUEST = 1;
     private RecyclerView playlistsRecyclerView;
     private AddToPlaylistAdapter addToPlaylistAdapter;
     private List<Playlist> playlistList;
     private String userId;
     private String songId;
-
-    private static final int PICK_IMAGE_REQUEST = 1;
     private Uri selectedImageUri;
     private BottomSheetDialog bottomSheetDialog;
     private PlaylistViewModel playlistViewModel;

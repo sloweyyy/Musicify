@@ -2,30 +2,25 @@ package com.example.musicapp.adapter;
 
 import android.content.Context;
 import android.os.Bundle;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.TextView;
-import android.widget.Toast;
-
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.recyclerview.widget.RecyclerView;
-
 import com.bumptech.glide.Glide;
 import com.example.musicapp.R;
 import com.example.musicapp.fragment.ArtistDetailFragment;
 import com.example.musicapp.model.Artist;
-
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
 
 public class FollowedArtistAdapter extends RecyclerView.Adapter<FollowedArtistAdapter.ViewHolder> {
-    private Context context;
+    private final Context context;
     private List<Artist> followedArtists = new ArrayList<>();
     private boolean isAscending = false;
 
@@ -62,9 +57,24 @@ public class FollowedArtistAdapter extends RecyclerView.Adapter<FollowedArtistAd
         else return 0;
     }
 
+    public void sortArtistByName() {
+        Collections.sort(followedArtists, new Comparator<Artist>() {
+            @Override
+            public int compare(Artist artist1, Artist artist2) {
+                if (isAscending) {
+                    return artist2.getName().compareToIgnoreCase(artist1.getName());
+                } else {
+                    return artist1.getName().compareToIgnoreCase(artist2.getName());
+                }
+            }
+        });
+        isAscending = !isAscending;
+        notifyDataSetChanged();
+    }
+
     public class ViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener {
-        private ImageView artistImage;
-        private TextView artistName;
+        private final ImageView artistImage;
+        private final TextView artistName;
 
         public ViewHolder(@NonNull View itemView) {
             super(itemView);
@@ -90,20 +100,5 @@ public class FollowedArtistAdapter extends RecyclerView.Adapter<FollowedArtistAd
                         .commit();
             }
         }
-    }
-
-    public void sortArtistByName() {
-        Collections.sort(followedArtists, new Comparator<Artist>() {
-            @Override
-            public int compare(Artist artist1, Artist artist2) {
-                if (isAscending) {
-                    return artist2.getName().compareToIgnoreCase(artist1.getName());
-                } else {
-                    return artist1.getName().compareToIgnoreCase(artist2.getName());
-                }
-            }
-        });
-        isAscending = !isAscending;
-        notifyDataSetChanged();
     }
 }

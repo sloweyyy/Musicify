@@ -1,13 +1,11 @@
 package com.example.musicapp.adapter;
 
 import androidx.annotation.NonNull;
-
-import androidx.viewpager2.adapter.FragmentStateAdapter;
-
-import com.example.musicapp.fragment.HomeArtistFragment;
-import com.example.musicapp.fragment.NewsFragment;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentActivity;
+import androidx.viewpager2.adapter.FragmentStateAdapter;
+import com.example.musicapp.fragment.HomeArtistFragment;
+import com.example.musicapp.fragment.NewsFragment;
 
 public class HomeFragmentAdapter extends FragmentStateAdapter {
      public HomeFragmentAdapter(@NonNull FragmentActivity fragmentActivity) {

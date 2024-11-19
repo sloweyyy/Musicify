@@ -11,13 +11,11 @@ import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
-
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.fragment.app.Fragment;
 import androidx.viewpager2.widget.ViewPager2;
-
 import com.bumptech.glide.Glide;
 import com.bumptech.glide.request.RequestOptions;
 import com.example.musicapp.MainActivity;
@@ -36,7 +34,6 @@ import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.EventListener;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.FirebaseFirestoreException;
-
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -44,9 +41,6 @@ import java.util.Map;
 
 public class HomeFragment extends Fragment implements SongHomeAdapter.OnSongSelectedListener, SongAdapter.OnSongSelectedListener {
 
-    private View view;
-    private TabLayout tabLayout;
-    private ViewPager2 viewPager2;
     ImageView artistImage;
     String songId;
     TextView recentSongArtist, recentSongName;
@@ -55,10 +49,13 @@ public class HomeFragment extends Fragment implements SongHomeAdapter.OnSongSele
     FirebaseAuth mAuth;
     ImageButton resumeBtn;
     HomeFragment homeFragment;
-    private HomeFragmentAdapter homeFragmentAdapter;
-    private MainActivity mainActivity;
     String previousSongId, nextSongId = null;
     List<Song> songList = new ArrayList<>();
+    private View view;
+    private TabLayout tabLayout;
+    private ViewPager2 viewPager2;
+    private HomeFragmentAdapter homeFragmentAdapter;
+    private MainActivity mainActivity;
 
     public void setMainActivityReference(MainActivity activity) {
         mainActivity = activity;

@@ -7,26 +7,23 @@ import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
-
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
-
 import com.bumptech.glide.Glide;
 import com.example.musicapp.R;
 import com.example.musicapp.fragment.AddToPlayListFragment;
 import com.example.musicapp.model.Playlist;
 import com.google.firebase.firestore.FieldValue;
 import com.google.firebase.firestore.FirebaseFirestore;
-
 import java.util.List;
 
 public class AddToPlaylistAdapter extends RecyclerView.Adapter<AddToPlaylistAdapter.ViewHolder> {
 
-    private Context context;
-    private List<Playlist> playlistList;
-    private String userId;
-    private String songId;
-    private AddToPlayListFragment fragment;
+    private final Context context;
+    private final List<Playlist> playlistList;
+    private final String userId;
+    private final String songId;
+    private final AddToPlayListFragment fragment;
 
     public AddToPlaylistAdapter(Context context, List<Playlist> playlistList, String userId, String songId, AddToPlayListFragment fragment) {
         this.context = context;
@@ -63,30 +60,6 @@ public class AddToPlaylistAdapter extends RecyclerView.Adapter<AddToPlaylistAdap
         return playlistList.size();
     }
 
-    public class ViewHolder extends RecyclerView.ViewHolder {
-        private ImageView playlistImage;
-        private TextView playlistName;
-        private TextView playlistCount;
-
-        public ViewHolder(@NonNull View itemView) {
-            super(itemView);
-            playlistImage = itemView.findViewById(R.id.playlistImage);
-            playlistName = itemView.findViewById(R.id.playlistName);
-            playlistCount = itemView.findViewById(R.id.playlistCount);
-        }
-
-        public void bind(Playlist playlist) {
-            Glide.with(context).load(playlist.getImageURL())
-                    .placeholder(R.drawable.image_up).error(R.drawable.image_up)
-                    .into(playlistImage);
-
-            playlistName.setText(playlist.getName());
-
-            int songCount = playlist.getSongs().size();
-            playlistCount.setText(songCount + " songs");
-        }
-    }
-
     private void addSongToPlaylist(String songId, String playlistId, int position) {
         FirebaseFirestore db = FirebaseFirestore.getInstance();
 
@@ -105,5 +78,29 @@ public class AddToPlaylistAdapter extends RecyclerView.Adapter<AddToPlaylistAdap
                 .addOnFailureListener(e -> {
                     Toast.makeText(context, "Error adding to playlist", Toast.LENGTH_SHORT).show();
                 });
+    }
+
+    public class ViewHolder extends RecyclerView.ViewHolder {
+        private final ImageView playlistImage;
+        private final TextView playlistName;
+        private final TextView playlistCount;
+
+        public ViewHolder(@NonNull View itemView) {
+            super(itemView);
+            playlistImage = itemView.findViewById(R.id.playlistImage);
+            playlistName = itemView.findViewById(R.id.playlistName);
+            playlistCount = itemView.findViewById(R.id.playlistCount);
+        }
+
+        public void bind(Playlist playlist) {
+            Glide.with(context).load(playlist.getImageURL())
+                    .placeholder(R.drawable.image_up).error(R.drawable.image_up)
+                    .into(playlistImage);
+
+            playlistName.setText(playlist.getName());
+
+            int songCount = playlist.getSongs().size();
+            playlistCount.setText(songCount + " songs");
+        }
     }
 }

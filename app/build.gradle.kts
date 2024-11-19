@@ -97,6 +97,8 @@ dependencies {
     implementation (libs.android.mail)
     implementation (libs.android.activation)
     //blur
-    implementation ("jp.wasabeef:blurry:3.0.0")
+    implementation ("jp.wasabeef:blurry:4.0.1")
+
+
 
 }

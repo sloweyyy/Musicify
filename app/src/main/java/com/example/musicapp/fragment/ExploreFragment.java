@@ -8,7 +8,6 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.EditText;
 import android.widget.Toast;
-
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
@@ -16,24 +15,13 @@ import androidx.lifecycle.ViewModelProvider;
 import androidx.recyclerview.widget.GridLayoutManager;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
-
 import com.example.musicapp.R;
 import com.example.musicapp.adapter.FetchAccessToken;
 import com.example.musicapp.adapter.SongAdapter;
 import com.example.musicapp.adapter.exploreAdapter;
-import com.example.musicapp.model.Categories;
-import com.example.musicapp.model.SearchResult;
 import com.example.musicapp.model.Song;
 import com.example.musicapp.viewmodel.ExploreViewModel;
-
 import java.util.List;
-
-import retrofit2.Call;
-import retrofit2.http.GET;
-import retrofit2.http.Header;
-import retrofit2.http.Path;
-import retrofit2.http.Query;
-
 
 public class ExploreFragment extends Fragment implements FetchAccessToken.AccessTokenCallback {
     View view;

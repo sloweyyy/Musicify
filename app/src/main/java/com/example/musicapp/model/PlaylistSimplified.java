@@ -5,51 +5,45 @@ import com.google.gson.annotations.SerializedName;
 import java.util.List;
 
 public class PlaylistSimplified {
-    @SerializedName("description")
-    private String description;
+  @SerializedName("images")
+  public List<imageModel> images;
+  @SerializedName("tracks")
+  public TracksModel tracksContainer;
+  @SerializedName("description")
+  private String description;
+  @SerializedName("id")
+  private String id;
+  @SerializedName("name")
+  private String name;
 
-    public String getDescription() {
-        return description;
+  public String getDescription() {
+    return description;
+  }
+
+  public String getId() {
+    return id;
+  }
+
+  public String getName() {
+    return name;
+  }
+
+  public static class imageModel {
+    @SerializedName("url")
+    public String url;
+
+    public String getUrl() {
+      return url;
     }
+  }
 
-    @SerializedName("id")
-    private String id;
+  public static class TracksModel {
+    @SerializedName("items")
+    public List<ItemModel> tracks;
 
-    public String getId() {
-        return id;
+    public static class ItemModel {
+      @SerializedName("track")
+      public SimplifiedTrack track;
     }
-
-    @SerializedName("name")
-    private String name;
-
-    public String getName() {
-        return name;
-    }
-
-    @SerializedName("images")
-    public List<imageModel> images;
-
-    public static class imageModel{
-        @SerializedName("url")
-        public String url;
-
-        public String getUrl() {
-            return url;
-        }
-    }
-
-    @SerializedName("tracks")
-    public TracksModel tracksContainer;
-
-
-    public static class TracksModel {
-        @SerializedName("items")
-        public List<ItemModel> tracks;
-
-
-        public static class ItemModel{
-            @SerializedName("track")
-            public SimplifiedTrack track;
-        }
-    }
+  }
 }

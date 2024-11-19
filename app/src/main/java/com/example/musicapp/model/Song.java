@@ -1,7 +1,6 @@
 package com.example.musicapp.model;
 
 import android.util.Log;
-
 import java.util.List;
 
 public class Song {
@@ -9,7 +8,7 @@ public class Song {
 
     private boolean isLiked;
 
-    private String id;
+    private final String id;
     private String artist;
     private String imageUrl;
 
@@ -27,43 +26,6 @@ public class Song {
         this.id = id;
         this.isLiked = false;
     }
-
-    public String getTitle() {
-        return title;
-    }
-
-    public String getArtist() {
-        return artist;
-    }
-
-    public String getImageUrl() {
-        return imageUrl;
-    }
-
-    public String getId() {
-        return id;
-    }
-
-    public boolean isLiked() {
-        return isLiked;
-    }
-
-    public void setImageUrl(String imageUrl) {
-        this.imageUrl = imageUrl;
-    }
-
-    public void setTitle(String title) {
-        this.title = title;
-    }
-
-    public void setLiked(boolean liked) {
-        isLiked = liked;
-    }
-
-    public void setArtist(String artist) {
-        this.artist = artist;
-    }
-
 
     public static Song fromSimplifiedTrack(SimplifiedTrack track) {
         String artistName = "";
@@ -97,5 +59,41 @@ public class Song {
         }
 
         return new Song(track.getName(), artistName, imageUrl, id);
+    }
+
+    public String getTitle() {
+        return title;
+    }
+
+    public void setTitle(String title) {
+        this.title = title;
+    }
+
+    public String getArtist() {
+        return artist;
+    }
+
+    public void setArtist(String artist) {
+        this.artist = artist;
+    }
+
+    public String getImageUrl() {
+        return imageUrl;
+    }
+
+    public void setImageUrl(String imageUrl) {
+        this.imageUrl = imageUrl;
+    }
+
+    public String getId() {
+        return id;
+    }
+
+    public boolean isLiked() {
+        return isLiked;
+    }
+
+    public void setLiked(boolean liked) {
+        isLiked = liked;
     }
 }

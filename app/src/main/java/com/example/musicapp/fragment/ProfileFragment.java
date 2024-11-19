@@ -1,7 +1,8 @@
 package com.example.musicapp.fragment;
  
-import android.app.Dialog;
 import static android.app.Activity.RESULT_OK;
+
+import android.app.Dialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
@@ -18,11 +19,7 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageButton;
 import android.widget.ImageView;
-import android.widget.LinearLayout;
-import android.widget.ScrollView;
 import android.widget.TextView;
-import android.widget.Toast;
-
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AlertDialog;
@@ -30,34 +27,26 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.content.ContextCompat;
 import androidx.fragment.app.Fragment;
 import androidx.lifecycle.ViewModelProvider;
-
 import com.bumptech.glide.Glide;
 import com.example.musicapp.R;
 import com.example.musicapp.activities.LoginActivity;
-import com.example.musicapp.activities.PrivacyPolicyActivity;
-import com.example.musicapp.activities.TermsConditionActivity;
 import com.example.musicapp.viewmodel.ProfileViewModel;
 import com.google.android.material.textfield.TextInputEditText;
-import com.google.firebase.auth.AuthCredential;
-import com.google.firebase.auth.AuthResult;
 import com.google.firebase.auth.FirebaseAuth;
-
 import de.hdodenhof.circleimageview.CircleImageView;
 import jp.wasabeef.blurry.Blurry;
 
 public class ProfileFragment extends Fragment {
+    private static final int PICK_IMAGE_REQUEST = 1;
+    private static final int PICK_AVATAR_IMAGE_REQUEST = 2;
     View view;
     ImageButton  modifyName;
     ImageView backgroundAvatar;
     CircleImageView avatar;
     Button logout;
     EditText Name;
-    private static final int PICK_IMAGE_REQUEST = 1;
-    private static final int PICK_AVATAR_IMAGE_REQUEST = 2;
     Uri selectedAvatarUri = null;
     Uri selectedImageUri = null;
-    private ProfileViewModel profileViewModel;
-
     TextView privacyPolicy;
     TextView modifyPassword;
     TextView termsAndConditions,update,feedbackError;
@@ -68,6 +57,8 @@ public class ProfileFragment extends Fragment {
     TextView reportSucess;
     String email;
     String name;
+    private ProfileViewModel profileViewModel;
+
     @Nullable
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {

@@ -8,7 +8,6 @@ import com.example.musicapp.model.SearchResult;
 import com.example.musicapp.model.SimplifiedTrack;
 import com.example.musicapp.viewmodel.ArtistDetailViewModel;
 import com.example.musicapp.viewmodel.PlaylistDetailAPIViewModel;
-
 import retrofit2.Call;
 import retrofit2.http.GET;
 import retrofit2.http.Header;

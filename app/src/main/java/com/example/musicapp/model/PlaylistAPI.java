@@ -6,48 +6,44 @@ import com.google.gson.annotations.SerializedName;
 import java.util.List;
 
 public class PlaylistAPI {
-    @SerializedName("description")
-    private String description;
+  @SerializedName("images")
+  public List<imageModel> images;
+  @SerializedName("tracks")
+  public tracksModel tracks;
+  @SerializedName("description")
+  private String description;
+  @SerializedName("id")
+  private String id;
+  @SerializedName("name")
+  private String name;
 
-    public String getDescription() {
-        return description;
+  public String getDescription() {
+    return description;
+  }
+
+  public String getId() {
+    return id;
+  }
+
+  public String getName() {
+    return name;
+  }
+
+  public static class imageModel {
+    @SerializedName("url")
+    private String url;
+
+    public String getUrl() {
+      return url;
     }
+  }
 
-    @SerializedName("id")
-    private String id;
+  public static class tracksModel {
+    @SerializedName("total")
+    private String total;
 
-    public String getId() {
-        return id;
+    public String getTotal() {
+      return total;
     }
-
-    @SerializedName("name")
-    private String name;
-
-    public String getName() {
-        return name;
-    }
-
-    @SerializedName("images")
-    public List<imageModel> images;
-
-    public static class imageModel{
-        @SerializedName("url")
-        private String url;
-
-        public String getUrl() {
-            return url;
-        }
-    }
-
-    @SerializedName("tracks")
-    public tracksModel tracks;
-
-    public static class tracksModel {
-        @SerializedName("total")
-        private String total;
-
-        public String getTotal() {
-            return total;
-        }
-    }
+  }
 }

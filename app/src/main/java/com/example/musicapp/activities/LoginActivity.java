@@ -2,7 +2,6 @@ package com.example.musicapp.activities;
 
 import android.annotation.SuppressLint;
 import android.content.Intent;
-import android.content.IntentSender;
 import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.os.Handler;
@@ -13,10 +12,8 @@ import android.view.View;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.Button;
 import android.widget.EditText;
-import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
-
 import androidx.activity.EdgeToEdge;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -24,18 +21,13 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.graphics.Insets;
 import androidx.core.view.ViewCompat;
 import androidx.core.view.WindowInsetsCompat;
-
 import com.example.musicapp.MainActivity;
 import com.example.musicapp.R;
-import com.google.android.gms.auth.api.identity.BeginSignInRequest;
-import com.google.android.gms.auth.api.identity.BeginSignInResult;
 import com.google.android.gms.auth.api.identity.Identity;
 import com.google.android.gms.auth.api.identity.SignInClient;
 import com.google.android.gms.auth.api.identity.SignInCredential;
 import com.google.android.gms.common.api.ApiException;
 import com.google.android.gms.tasks.OnCompleteListener;
-import com.google.android.gms.tasks.OnFailureListener;
-import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.AuthCredential;
 import com.google.firebase.auth.AuthResult;
@@ -47,6 +39,8 @@ import com.google.firebase.auth.GoogleAuthProvider;
 
 public class LoginActivity extends AppCompatActivity {
 
+    private static final String TAG = "Hehe";
+    private static final int REQ_ONE_TAP = 2;
     FirebaseAuth mAuth = FirebaseAuth.getInstance();
     Button btnSignIn, iconBack;
     TextView btnRegisterNow;
@@ -55,9 +49,7 @@ public class LoginActivity extends AppCompatActivity {
     TextView textForgetPassword;
     SharedPreferences sharedPreferences;
     boolean passwordVisible;
-    private static final String TAG = "Hehe";
-    private static final int REQ_ONE_TAP = 2;
-    private boolean showOneTapUI = true;
+    private final boolean showOneTapUI = true;
     private SignInClient oneTapClient;
 
     public void hideKeyboard(View view) {
